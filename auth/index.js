@@ -73,14 +73,23 @@ router.post('/register', (req, res, next) => {
 			if (error)
 				throw error;
 			else if (!results.rows[0]){
-				pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
-				if (error)
-					throw error;
-				else
-					res.status(200).json({message: 'New User: ' + login});
+				pool.query('SELECT * FROM users WHERE login = $1', [req.body.login], (error, results) => {
+					if (error)
+						throw error;
+					else if (!results.rows[0]){
+						pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
+							if (error){
+								throw error;
+							} else {
+								res.status(200).json({message: 'New User: ' + email});
+							}
+						});
+					} else {
+						res.status(401).json({error: login + ' is already taken'});
+					}
 				});
 			} else {
-				res.status(401).json({error: login + ' is already taken'});
+				res.status(401).json({error: email + ' is already taken'});
 			}
 		});
 	} else {
