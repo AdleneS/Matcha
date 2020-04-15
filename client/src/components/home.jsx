@@ -29,7 +29,7 @@ class Pretender extends Component {
 						<Card.Body>
 							<Card.Title>{ pretender.login }</Card.Title>
 								<Card.Text>
-									{ Moment(pretender.date).format('L') }
+									{ Moment(pretender.date).format('DD/MM/YYYY') }
 								</Card.Text>
 							<Button variant="primary">Go somewhere</Button>
 						</Card.Body>

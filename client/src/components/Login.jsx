@@ -7,23 +7,17 @@ import {useHistory} from "react-router-dom";
 export default function Login () {
 
 	const [sValue, setValue] = useState({email:'', password:''});
+
 	const { setIsLogged } = useContext(MyContext);
 	const setIsLoggedTrue = () => {
 		setIsLogged(true);
 	}
 	
-	//constructor(props) {
-	//  super(props)
-	//  this.state = {
-	//	email : '',
-	//	password: ''
-	//  };
-	//}
-
 	const handleInputChange = (event) => {
 		const { value, name } = event.target;
 		setValue({...sValue, [name]: value})
 	}
+
 	let history = useHistory();
 	const onSubmit = (event) => {
 		event.preventDefault();
@@ -37,6 +31,7 @@ export default function Login () {
 		})
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
+			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
 				setIsLoggedTrue();
@@ -67,7 +62,7 @@ export default function Login () {
 			<Form onSubmit={(event) => {onSubmit(event)}}>
 				<Form.Group controlId="formBasicEmail">
 					<Form.Label>Email address</Form.Label>
-					<Form.Control type="email" name="email" placeholder="Enter email"onChange={(event) => {handleInputChange(event)}} value={sValue.email}  required/>
+					<Form.Control type="email" name="email" placeholder="Enter email" onChange={(event) => {handleInputChange(event)}} value={sValue.email}  required/>
 					<Form.Text className="text-muted">
 						We'll never share your email with anyone else.
 					</Form.Text>

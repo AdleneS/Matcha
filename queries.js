@@ -36,13 +36,13 @@ const getUsers = (request, response) => {
 	}
 
 	const createUser = (request, response) => {
-		const { login, email, password } = request.body
-	
-		pool.query('INSERT INTO users (login, email, password, date) VALUES ($1, $2, $3, $4)', [login, email, bcrypt.hashSync(password, 10), moment().format('MM/DD/YYYY')], (error, results) => {
+		const { login, email, password, birthday, gender, sexual_orientation } = request.body
+		console.log(request.body);
+		pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
 			if (error) {
 				throw error
 			}
-			response.status(201).send(`User added with ID: ${login}`)
+			response.status(200).send(`User added with ID: ${login}`)
 		})
 	}
 

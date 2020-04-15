@@ -5,6 +5,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const secret = 'keyboard cat';
+var moment = require('moment');
 
 router.get('/', (req, res) => {
 	res.json({
@@ -54,4 +55,36 @@ router.post('/signup', (req, res, next) => {
 	}
 });
 
+function validateRegistration(user){
+	const validEmail = typeof user.email == 'string' && 
+						user.email.trim() != '';
+	const validPassword = typeof user.password == 'string' && 
+						user.password.trim() != '' &&
+						user.password.trim().length >= 3;
+	const verifyPassword = typeof user.password == typeof user.verify_password;
+
+	return validEmail && validPassword && verifyPassword;
+}
+
+router.post('/register', (req, res, next) => {
+	const { login, email, password, birthday, gender, sexual_orientation } = req.body;
+	if(validateRegistration(req.body)){
+		pool.query('SELECT * FROM users WHERE email = $1', [req.body.email], (error, results) => {
+			if (error)
+				throw error;
+			else if (!results.rows[0]){
+				pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
+				if (error)
+					throw error;
+				else
+					res.status(200).json({message: 'New User: ' + login});
+				});
+			} else {
+				res.status(401).json({error: login + ' is already taken'});
+			}
+		});
+	} else {
+		next(new Error('Invalid Information '));
+	}
+});
 module.exports = router;

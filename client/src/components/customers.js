@@ -25,7 +25,7 @@ class Customers extends Component {
 				<ul>
 					{this.state.customers.map(customer =>
 						<li key={customer.id}>
-							{ customer.login } { customer.email }  { Moment(customer.date).format('L') }
+							{ customer.login } { customer.email }  { Moment(customer.date).format('DD/MM/YYYY') }
 						</li>)
 					}
 				</ul>
