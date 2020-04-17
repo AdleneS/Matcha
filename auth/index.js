@@ -61,7 +61,7 @@ function validateRegistration(user){
 	const validPassword = typeof user.password == 'string' && 
 						user.password.trim() != '' &&
 						user.password.trim().length >= 3;
-	const verifyPassword = typeof user.password == typeof user.verify_password;
+	const verifyPassword = user.password == user.verify_password;
 
 	return validEmail && validPassword && verifyPassword;
 }
@@ -85,15 +85,15 @@ router.post('/register', (req, res, next) => {
 							}
 						});
 					} else {
-						res.status(401).json({error: login + ' is already taken'});
+						res.status(401).json({error: login + ' is already taken', errortype:"login"});
 					}
 				});
 			} else {
-				res.status(401).json({error: email + ' is already taken'});
+				res.status(401).json({error: email + ' is already taken', errortype:"email"});
 			}
 		});
 	} else {
-		next(new Error('Invalid Information '));
+		res.status(401).json({error: 'wrong information', errortype:"info"});
 	}
 });
 module.exports = router;

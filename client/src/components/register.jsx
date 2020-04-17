@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import {useHistory} from "react-router-dom";
+import "./animation.css";
 
 export default function Register () {
 
@@ -15,28 +16,33 @@ export default function Register () {
 
 	let history = useHistory();
 	const onSubmit = (event) => {
-		if (sValue.password === sValue.verify_password){
-			event.preventDefault();
-			fetch('/auth/register', {
-				method: 'POST',
-				body: JSON.stringify(sValue),
-				headers:{'Content-type': 'application/json'}
-			})
-			.then(res =>  res.json().then(data => ({status: res.status, body: data})))
-			.then(res => {
-				if (res.status === 200) {
-					history.push('/login');
-				} else {
-					const error = new Error(res.body.error);
-					throw error;
+		event.preventDefault();
+		fetch('/auth/register', {
+			method: 'POST',
+			body: JSON.stringify(sValue),
+			headers:{'Content-type': 'application/json'}
+		})
+		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
+		.then(res => {
+			if (res.status === 200) {
+				history.push('/login');
+			} else {
+				console.log(res.body.error)
+				if (res.body.errortype === "login")
+					document.getElementById("login").classList.add("shake");
+				if (res.body.errortype === "email")
+					document.getElementById("email").classList.add("shake");
+				if (res.body.errortype === "info"){
+					document.getElementById("verify_password").classList.add("shake");
+					document.getElementById("password").classList.add("shake");
 				}
-			})
-				.catch(err => {
-				alert(err);
-			});
-		} else {
-			alert("Bad Password")
-		}
+					
+				const error = new Error(res.body.error);
+				throw error;
+			}
+		})
+			.catch(err => {
+		});
 	}
 
 	const divReg = {
@@ -51,12 +57,12 @@ export default function Register () {
 	};
 
 	return (
-		<div style={divReg}>
+		<div style={divReg} className="fade">
 			<Form onSubmit={(event) => {onSubmit(event)}}>
 			<Form.Row>
 				<Form.Group as={Col} controlId="login">
-					<Form.Label>Login</Form.Label>
-					<Form.Control type="text" placeholder="Enter login" name="login" onChange={(event) => {handleInputChange(event)}} value={sValue.login} />
+					<Form.Label >Login</Form.Label>
+					<Form.Control type="text"placeholder="Enter login" name="login" onChange={(event) => {handleInputChange(event)}} value={sValue.login} />
 				</Form.Group>
 				<Form.Group as={Col} controlId="email">
 					<Form.Label>Email</Form.Label>
