@@ -4,13 +4,13 @@ const bodyParser = require('body-parser');
 const hostname = '127.0.0.1';
 const port = 5000;
 const app = express();
-const pool = require('./db');
 const db = require('./queries');
-const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const withAuth = require('./middleware');
-
+const fs = require('fs');
 var auth = require('./auth');
+const multer = require('multer');
+const path = require('path');
 
 app.use(bodyParser.json())
 app.use(
@@ -41,6 +41,41 @@ app.get('/logout', function(req, res){
 	res.clearCookie('ssid');
 	res.sendStatus(200);
  });
+
+ const handleError = (err, res) => {
+	res
+	  .status(500)
+	  .json({ info: 'Oops! Something went wrong!' })
+  };
+  
+  const upload = multer({
+	dest: "./img_container/tmp"
+  });
+
+app.post("/imgupload", upload.single("file"),(req, res) => {
+	console.log(req.file);
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, "./img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname));
+
+    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+      fs.rename(tempPath, targetPath, err => {
+        if (err) return handleError(err, res);
+
+        res
+          .status(200)
+          .json({ info: 'File uploaded!' })
+      });
+    } else {
+      fs.unlink(tempPath, err => {
+        if (err) return handleError(err, res);
+
+        res
+          .status(403)
+		  .json({ info: "Only .png files are allowed!" })
+      });
+    }
+  }
+);
 
 app.use('/auth', auth)
 app.get('/users', db.getUsers)

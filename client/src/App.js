@@ -9,6 +9,7 @@ import ErrorPage from './components/404';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import withAuth from './withAuth';
 import MyContext from './components/appcontext';
+import testupload from './components/test_upload'
 
 export default function App() {
 	const [islogged, setIsLogged] = useState(false);
@@ -35,6 +36,7 @@ export default function App() {
 					<NavBar />
 					<Switch>
 						<Route path="/home" component={withAuth(Home)} />
+						<Route path="/testupload" component={withAuth(testupload)} />
 						<Route path="/customers" component={withAuth(Customers)} />
 						<Route path="/login" component={Login} />
 						<Route path="/register" component={Register} />

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import Moment from 'moment';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
+import {Link} from 'react-router-dom';
 import './home.css';
+import "./animation.css";
 
 class Pretender extends Component {
 	constructor(props){
@@ -21,17 +22,17 @@ class Pretender extends Component {
 	render() {
 		Moment.locale('fr');
 		return (
-			<div className="">
-				<div className="cardContainer">
+			<div>
+				<div className="cardContainer fade">
 					{this.state.pretender.map(pretender =>
-						<Card key={ pretender.id } style={{ width: '15rem', margin: '10px'}}>
+						<Card className="item" key={ pretender.id } style={{ width: '15rem', margin: '10px'}}>
 						<Card.Img variant="top" src="holder.js/200px180" />
 						<Card.Body>
 							<Card.Title>{ pretender.login }</Card.Title>
 								<Card.Text>
 									{ Moment(pretender.date).format('DD/MM/YYYY') }
 								</Card.Text>
-							<Button variant="primary">Go somewhere</Button>
+								<Link className="btn btn-primary" to={"#/user/page/" + pretender.id}> See { pretender.login } profile </Link>
 						</Card.Body>
 						</Card>)
 					}

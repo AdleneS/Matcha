@@ -24,6 +24,7 @@ function validateUser(user){
 }
 
 router.post('/signup', (req, res, next) => {
+	
 	if(validateUser(req.body)){
 		pool.query('SELECT * FROM users WHERE email = $1', [req.body.email], (error, results) => {
 			if (error)
@@ -56,44 +57,43 @@ router.post('/signup', (req, res, next) => {
 });
 
 function validateRegistration(user){
+	const validLogin = typeof user.login == 'string' && 
+							user.login.trim() != '' &&
+							user.login.trim().length >= 3;
 	const validEmail = typeof user.email == 'string' && 
 						user.email.trim() != '';
+	const validBirthday = typeof user.birthday == 'string';
 	const validPassword = typeof user.password == 'string' && 
 						user.password.trim() != '' &&
 						user.password.trim().length >= 3;
 	const verifyPassword = user.password == user.verify_password;
 
-	return validEmail && validPassword && verifyPassword;
+	return {login: validLogin, email: validEmail, pass: validPassword, v_pass: verifyPassword, birthday: validBirthday};
 }
 
 router.post('/register', (req, res, next) => {
+	
 	const { login, email, password, birthday, gender, sexual_orientation } = req.body;
-	if(validateRegistration(req.body)){
-		pool.query('SELECT * FROM users WHERE email = $1', [req.body.email], (error, results) => {
-			if (error)
-				throw error;
-			else if (!results.rows[0]){
-				pool.query('SELECT * FROM users WHERE login = $1', [req.body.login], (error, results) => {
-					if (error)
-						throw error;
-					else if (!results.rows[0]){
-						pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
-							if (error){
-								throw error;
-							} else {
-								res.status(200).json({message: 'New User: ' + email});
-							}
-						});
-					} else {
-						res.status(401).json({error: login + ' is already taken', errortype:"login"});
-					}
-				});
+	var err = validateRegistration(req.body)
+	if(err.email && err.pass && err.v_pass && err.login){
+		pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
+			if (error){
+				res.status(401).json({error: error});
 			} else {
-				res.status(401).json({error: email + ' is already taken', errortype:"email"});
+				res.status(200).json({message: 'New User: ' + email});
 			}
 		});
 	} else {
-		res.status(401).json({error: 'wrong information', errortype:"info"});
+		if (!err.email)
+			res.status(401).json({error: 'email'});
+		if (!err.pass)
+			res.status(401).json({error: 'pass'});
+		if (!err.v_pass)
+			res.status(401).json({error: 'v_pass'});
+		if (!err.login)
+			res.status(401).json({error: 'login'});
+		if (!err.birthday)
+			res.status(401).json({error: 'birthday'});
 	}
 });
 module.exports = router;

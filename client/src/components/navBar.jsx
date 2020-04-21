@@ -4,7 +4,6 @@ import Nav from 'react-bootstrap/Nav';
 import logo from '../imgs/logoMatcha.png';
 import MyContext from './appcontext';
 import {Link} from 'react-router-dom';
-
 import './home.css';
 
 export default function Mynav () {
@@ -44,6 +43,8 @@ export default function Mynav () {
 				<Link className="nav-link" to={"/customers"}> Customers </Link>
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
 				{islogged && (<Link className="nav-link" onClick={handleClick}> Log Out </Link>)}
+				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
+
 			</Nav>
 		</Navbar>
 	);

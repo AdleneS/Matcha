@@ -3,8 +3,7 @@
 	transform: translate3d(0, 0, 0);
 	backface-visibility: hidden;
 	perspective: 1000px;
-	box-shadow: red;
-	background-color: rgb(255, 187, 187);
+	background-color: rgb(255, 220, 220);
   }
 
   .fade {
