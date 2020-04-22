@@ -11,6 +11,7 @@ const fs = require('fs');
 var auth = require('./auth');
 const multer = require('multer');
 const path = require('path');
+const pool = require('./db');
 
 app.use(bodyParser.json())
 app.use(
@@ -38,7 +39,8 @@ app.get('/checkCookie', withAuth, function (req, res) {
 });
 
 app.get('/logout', function(req, res){
-	res.clearCookie('ssid');
+  res.clearCookie('ssid');
+  res.clearCookie('uid');
 	res.sendStatus(200);
  });
 
@@ -53,14 +55,14 @@ app.get('/logout', function(req, res){
   });
 
 app.post("/imgupload", upload.single("file"),(req, res) => {
-	console.log(req.file);
+    console.log(req.file);
     const tempPath = req.file.path;
     const targetPath = path.join(__dirname, "./img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname));
-
     if (path.extname(req.file.originalname).toLowerCase() === ".png") {
       fs.rename(tempPath, targetPath, err => {
         if (err) return handleError(err, res);
-
+        pool.query('INSERT INTO img (path, uid) VALUES ($1, $2)', [targetPath, req.cookies.uid], (error, results) => {
+          if (error) throw error;});
         res
           .status(200)
           .json({ info: 'File uploaded!' })
