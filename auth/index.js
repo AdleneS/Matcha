@@ -31,13 +31,14 @@ router.post('/signup', (req, res, next) => {
 				throw error;
 			else if (results.rows[0]){
 					if (bcrypt.compareSync(req.body.password, results.rows[0].password)){
-						const email = results.rows[0].email;
-						const payload = { email };
+						const rows = results.rows[0];
+						const payload = { email: rows.email };
+						const info = { email: rows.email, login: rows.login, uid: rows.uid };
 						const token = jwt.sign(payload, secret, {
 							expiresIn: '2h'
 						});
 						res.cookie('ssid', token, { httpOnly: true })
-							.cookie('uid', results.rows[0].uid)
+							.cookie('info', info)
 							.json({ message:'Logged !'})
 							.status(200);
 					} else {

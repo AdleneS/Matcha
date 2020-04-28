@@ -11,6 +11,17 @@ const getUsers = (request, response) => {
 		})
 	}
 
+	const getUsersImg = (request, response) => {
+		pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1', [request.cookies.info.uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
+
+
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
 	
@@ -76,6 +87,7 @@ const getUsers = (request, response) => {
 	module.exports = {
 		pool,
 		getUsers,
+		getUsersImg,
 		getUserById,
 		createUser,
 		updateUser,

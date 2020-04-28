@@ -4,7 +4,6 @@ import Nav from 'react-bootstrap/Nav';
 import logo from '../imgs/logoMatcha.png';
 import MyContext from './appcontext';
 import {Link} from 'react-router-dom';
-import './home.css';
 
 export default function Mynav () {
 	const {islogged, setIsLogged} = useContext(MyContext);
@@ -26,15 +25,15 @@ export default function Mynav () {
 	return (
 		<Navbar className="nav-flat" variant="dark">
 			<Link to={"/home"}>
-			<Navbar.Brand>
-				<img
-					src={logo}
-					width="150"
-					height="50"
-					className="d-inline-block align-top"
-					alt="React Bootstrap logo"
-				/>
-			</Navbar.Brand>
+				<Navbar.Brand>
+					<img
+						src={logo}
+						width="150"
+						height="50"
+						className="d-inline-block align-top"
+						alt="React Bootstrap logo"
+					/>
+				</Navbar.Brand>
 			</Link>
 
 			<Nav className="mr-auto">

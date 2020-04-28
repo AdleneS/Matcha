@@ -33,15 +33,16 @@ export default function App() {
 		<MyContext.Provider value={{islogged: islogged, setIsLogged:setIsLogged}}>
 			<div className="app">
 					<BrowserRouter>
-					<NavBar />
-					<Switch>
-						<Route path="/home" component={withAuth(Home)} />
-						<Route path="/testupload" component={withAuth(testupload)} />
-						<Route path="/customers" component={withAuth(Customers)} />
-						<Route path="/login" component={Login} />
-						<Route path="/register" component={Register} />
-						<Route path='*' component={ErrorPage}/>
-					</Switch>	</BrowserRouter>
+						<NavBar />
+						<Switch>
+							<Route path="/home" component={withAuth(Home)} />
+							<Route path="/testupload" component={withAuth(testupload)} />
+							<Route path="/customers" component={withAuth(Customers)} />
+							<Route path="/login" component={Login} />
+							<Route path="/register" component={Register} />
+							<Route path='*' component={ErrorPage}/>
+						</Switch>
+					</BrowserRouter>
 			</div>
 	
 		</MyContext.Provider>

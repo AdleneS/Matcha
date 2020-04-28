@@ -57,23 +57,23 @@ app.get('/logout', function(req, res){
 app.post("/imgupload", upload.single("file"),(req, res) => {
     console.log(req.file);
     const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, "./img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname));
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+    const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+    if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
       fs.rename(tempPath, targetPath, err => {
         if (err) return handleError(err, res);
-        pool.query('INSERT INTO img (path, uid) VALUES ($1, $2)', [targetPath, req.cookies.uid], (error, results) => {
+        pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, 1], (error, results) => {
           if (error) throw error;});
         res
           .status(200)
           .json({ info: 'File uploaded!' })
       });
     } else {
-      fs.unlink(tempPath, err => {
+        fs.unlink(tempPath, err => {
         if (err) return handleError(err, res);
 
         res
           .status(403)
-		  .json({ info: "Only .png files are allowed!" })
+		  .json({ info: "Only .png and .jpg files are allowed!" })
       });
     }
   }
@@ -81,6 +81,7 @@ app.post("/imgupload", upload.single("file"),(req, res) => {
 
 app.use('/auth', auth)
 app.get('/users', db.getUsers)
+app.get('/pretender', db.getUsersImg)
 app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
