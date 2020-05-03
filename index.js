@@ -39,45 +39,73 @@ app.get('/checkCookie', withAuth, function (req, res) {
 });
 
 app.get('/logout', function(req, res){
-  res.clearCookie('ssid');
-  res.clearCookie('uid');
+	res.clearCookie('ssid');
+	res.clearCookie('uid');
 	res.sendStatus(200);
  });
 
  const handleError = (err, res) => {
 	res
-	  .status(500)
-	  .json({ info: 'Oops! Something went wrong!' })
-  };
-  
-  const upload = multer({
-	dest: "./img_container/tmp"
-  });
+		.status(500)
+		.json({ info: 'Oops! Something went wrong!' })
+	};
+	
+	const upload = multer({
+	dest: "./client/public/img_container/tmp"
+	});
 
 app.post("/imgupload", upload.single("file"),(req, res) => {
-    console.log(req.file);
-    const tempPath = req.file.path;
-    const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
-    if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
-      fs.rename(tempPath, targetPath, err => {
-        if (err) return handleError(err, res);
-        pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, 1], (error, results) => {
-          if (error) throw error;});
-        res
-          .status(200)
-          .json({ info: 'File uploaded!' })
-      });
-    } else {
-        fs.unlink(tempPath, err => {
-        if (err) return handleError(err, res);
+		const tempPath = req.file.path;
+		const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+		if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
+			fs.rename(tempPath, targetPath, err => {
+				if (err) return handleError(err, res);
+				pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, 1], (error, results) => {
+					if (error) throw error;});
+				res
+					.status(200)
+					.json({ info: 'File uploaded!' })
+			});
+		} else {
+				fs.unlink(tempPath, err => {
+				if (err) return handleError(err, res);
 
-        res
-          .status(403)
-		  .json({ info: "Only .png and .jpg files are allowed!" })
-      });
-    }
-  }
+				res
+					.status(403)
+			.json({ info: "Only .png and .jpg files are allowed!" })
+			});
+		}
+	}
 );
+
+
+app.post('/like', function(req, res){
+	const liker = req.cookies.info.uid;
+	const liked = req.body.likedUid;
+	pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
+		if (error){
+			throw error
+		} else if (results.rows[0]){
+		 pool.query('DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
+			 if (error){
+				res.status(400)
+			 }
+			 res
+				.json({info: 'Unliked !'})
+				.status(200)
+		 });
+		} else {
+			pool.query('INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)', [liker, liked], (error, results) => {
+				if (error){
+					res.status(400)
+				}
+			res
+			.json({ info: 'Liked !'})
+			.status(200)
+			});
+		}
+	});
+});
 
 app.use('/auth', auth)
 app.get('/users', db.getUsers)

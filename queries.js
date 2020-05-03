@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt');
 var moment = require('moment');
 
 const getUsers = (request, response) => {
+
 		pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
 			if (error) {
 				throw error
@@ -24,7 +25,7 @@ const getUsers = (request, response) => {
 
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
-	
+		console.log(request.params);
 		pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
 			if (error) {
 				getUserByEmail(request, response)
@@ -37,6 +38,8 @@ const getUsers = (request, response) => {
 	const getUserByEmail = (request, response) => {
 		//const email = request.params.id
 		//if (email == undefined)
+		console.log(request.params);
+
 		const	email = request.params.id
 		pool.query('SELECT * FROM users WHERE email = $1', [email], (error, results) => {
 			if (error) {

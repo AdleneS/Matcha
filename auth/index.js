@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const secret = 'keyboard cat';
 var moment = require('moment');
+const { v4: uuidv4 } = require('uuid');
 
 router.get('/', (req, res) => {
 	res.json({
@@ -78,7 +79,7 @@ router.post('/register', (req, res, next) => {
 	const { login, email, password, birthday, gender, sexual_orientation } = req.body;
 	var err = validateRegistration(req.body)
 	if(err.email && err.pass && err.v_pass && err.login){
-		pool.query('INSERT INTO users (login, uid, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [login, bcrypt.hashSync(password + Date.now() + Math.random() * 1000, 10), email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
+		pool.query('INSERT INTO users (login, uid, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [login, uuidv4(), email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
 			if (error){
 				res.status(401).json({error: error});
 			} else {

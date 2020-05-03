@@ -41,7 +41,7 @@ export default function Mynav () {
 				<Link className="nav-link" to={"/login"}> Login </Link>
 				<Link className="nav-link" to={"/customers"}> Customers </Link>
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
-				{islogged && (<Link className="nav-link" onClick={handleClick}> Log Out </Link>)}
+				{islogged && (<Navbar.Text className="nav-link" onClick={handleClick}> Log Out </Navbar.Text>)}
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
 
 			</Nav>
