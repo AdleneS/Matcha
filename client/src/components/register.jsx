@@ -1,16 +1,17 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
-
+import MyContext from './appcontext';
 import Col from 'react-bootstrap/Col';
-import {useHistory} from "react-router-dom";
+import {useHistory, Redirect} from "react-router-dom";
 import "./animation.css";
 
 export default function Register () {
 
 	const [sValue, setValue] = useState({login:'', email:'', password:'', verify_password:'', birthday:'', gender:'man', sexual_orientation:'heterosexual'});
 	const [sError, setError] = useState({err_same_login: false, err_same_email: false, err_login: false, err_email: false, err_pass: false, err_vpass: false, err_birth: false});
+	const { islogged } = useContext(MyContext);
 
 	const handleInputChange = (event) => {
 		const { value, name } = event.target;
@@ -70,6 +71,9 @@ export default function Register () {
 		marginTop:"30px",
 	};
 
+	if(islogged){
+		return <Redirect to="/Home"/>
+	}
 	return (
 		<div style={divReg} className="fade">
 			<Form onSubmit={(event) => {onSubmit(event)}}>

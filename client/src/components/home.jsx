@@ -6,11 +6,12 @@ import './home.css';
 import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
-class Pretender extends Component {
+class Home extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			pretender: []
+			pretender: [],
+			likes: []
 		}
 		this.onClick = this.onClick.bind(this);
 	}
@@ -18,8 +19,10 @@ class Pretender extends Component {
 	componentDidMount(){
 		fetch('/pretender/')
 			.then(res => res.json())
-			.then (pretender => this.setState({pretender}, () => console.log('pretender fetched..',
-			pretender)));
+			.then (pretender => this.setState({pretender}, () => console.log("pretender fetched...", pretender)))
+		fetch('/users/likes')
+			.then(res => res.json())
+			.then (likes => this.setState({likes}, () => console.log(likes)))
 	}
 
 	onClick = (event, pretenderUid) => {
@@ -36,7 +39,9 @@ class Pretender extends Component {
 			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
-
+				fetch('/users/likes')
+				.then(res => res.json())
+				.then (likes => this.setState({likes}))
 			} else {
 				const error = new Error(res.body.error);
 				throw error;
@@ -63,8 +68,13 @@ class Pretender extends Component {
 									<br></br>
 									{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
 								</Card.Text>
-									<BsHeart onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333", width: "30px", height: "30px", position: "absolute"}}/>
-									<BsHeartFill onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333",  width: "30px", height: "30px"}}/>
+								{this.state.likes.map(likes => 
+									<Card.Text> {likes.uid_liked === pretender.uid ?
+										(<BsHeartFill onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333",  width: "30px", height: "30px", position: "absolute"}}/>) : null}
+									
+									</Card.Text>
+								)}
+								<BsHeart onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333", width: "30px", height: "30px", position: "absolute"}}/>
 						</div>
 						</Card>
 						</Link>
@@ -75,4 +85,4 @@ class Pretender extends Component {
 	}
 }
 
-export default Pretender;
+export default Home;

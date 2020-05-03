@@ -109,6 +109,7 @@ app.post('/like', function(req, res){
 
 app.use('/auth', auth)
 app.get('/users', db.getUsers)
+app.get('/users/likes', db.getLikes)
 app.get('/pretender', db.getUsersImg)
 app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)

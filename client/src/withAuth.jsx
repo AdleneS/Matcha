@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import Spinner from 'react-bootstrap/Spinner';
 
 export default function withAuth(ComponentToProtect){
 
@@ -15,7 +16,7 @@ export default function withAuth(ComponentToProtect){
 
 		componentDidMount(){
 			this._isMounted = true;
-			fetch('/checkCookie')
+				fetch('/checkCookie')
 				.then(res => {
 					if (res.status === 200){
 						this.setState({ loading: false });
@@ -33,14 +34,26 @@ export default function withAuth(ComponentToProtect){
 			this._isMounted = false;
 		}
 		render(){
+			const spin = {
+				margin: "0 auto",
+				width: "100px",
+				height: "100px"
+			};
+
 			const { loading, redirect } = this.state;
 			if (loading){
-				return null;
+				return (
+					<div style={{display : "flex", marginTop: "100px"}}>
+						<Spinner style={spin} animation="border" variant="dark"/>
+					</div>
+					
+				)
 			}
 			if (redirect){
 				return <Redirect to="/login"/>;
 			}
-			return <ComponentToProtect {...this.props}/>
+			if (this._isMounted && !loading)
+				return <ComponentToProtect {...this.props}/>
 		}
 	}
 }

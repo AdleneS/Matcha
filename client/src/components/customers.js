@@ -16,7 +16,6 @@ class Customers extends Component {
 			.then (customers => this.setState({customers}, () => console.log('Customers fetched..',
 			customers)));
 	}
-
 	render() {
 		Moment.locale('fr');
 		return (

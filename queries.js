@@ -22,6 +22,16 @@ const getUsers = (request, response) => {
 		})
 	}
 
+	const getLikes = (request, response) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1', [request.cookies.info.uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
+
 
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
@@ -91,6 +101,7 @@ const getUsers = (request, response) => {
 		pool,
 		getUsers,
 		getUsersImg,
+		getLikes,
 		getUserById,
 		createUser,
 		updateUser,

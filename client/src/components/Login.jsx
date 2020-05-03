@@ -2,13 +2,13 @@ import React, {useState, useContext} from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import MyContext from './appcontext';
-import {useHistory} from "react-router-dom";
+import {useHistory, Redirect} from "react-router-dom";
 
 export default function Login () {
 
 	const [sValue, setValue] = useState({email:'', password:''});
 
-	const { setIsLogged } = useContext(MyContext);
+	const { islogged, setIsLogged } = useContext(MyContext);
 	const setIsLoggedTrue = () => {
 		setIsLogged(true);
 	}
@@ -57,6 +57,9 @@ export default function Login () {
 		marginTop:"30px",
 	};
 
+	if(islogged){
+		return <Redirect to="/Home"/>
+	}
 	return (
 		<div style={divLog}>
 			<Form onSubmit={(event) => {onSubmit(event)}}>
@@ -79,5 +82,6 @@ export default function Login () {
 				</Button>
 			</Form>
 		</div>
+
 	);
 }
