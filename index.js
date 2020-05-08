@@ -1,4 +1,4 @@
-const https = require('http');
+const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const hostname = '127.0.0.1';
@@ -12,6 +12,9 @@ var auth = require('./auth');
 const multer = require('multer');
 const path = require('path');
 const pool = require('./db');
+const socketIo = require('socket.io');
+const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(bodyParser.json())
 app.use(
@@ -29,6 +32,31 @@ app.use(cookieParser());
 //  cookie: { secure: false, maxAge: 7200000 }
 //}))
 
+let interval;
+
+io.on("connection", (socket) => {
+	console.log(socket.id);
+	if (interval) {
+	  clearInterval(interval);
+	}
+	interval = setInterval(() => getApiAndEmit(socket), 1000);
+	socket.on("disconnect", () => {
+	  console.log("Client disconnected");
+	  clearInterval(interval);
+	});
+  });
+
+const getApiAndEmit = socket => {
+	//pool.query('SELECT * FROM likes WHERE uid_liked = $1 ORDER BY id DESC LIMIT 1', [req.cookies.info.uid], (error, results) => {
+	//	if (error)
+	//		throw error;
+	//	res
+	//	.json({ info: 'Liked !'})
+	//	.status(200)
+	//})
+	const response = new Date();
+	socket.emit("FromAPI", response);
+}
 
 app.get('/', (req, res) => {
 		res.json({ info: 'Node.js, Express, and Postgres API' })
@@ -124,6 +152,7 @@ app.use(function(err, req, res, next){
 		});
 		
 })
-app.listen(port, hostname, () => {
+
+server.listen(port, hostname, () => {
 	console.log(`Server running at http://${hostname}:${port}/`);
 });
