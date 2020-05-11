@@ -25,8 +25,13 @@ class Home extends Component {
 			.then (likes => this.setState({likes}, () => console.log(likes)))
 	}
 
+	notif = this.props.socket.on('getNotif', (data) => {
+		console.log(data);
+	});
+	
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
+
 		fetch('/like/', {
 			method: 'POST',
 			body: JSON.stringify({likedUid: pretenderUid}),
@@ -39,6 +44,7 @@ class Home extends Component {
 			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
+				this.props.socket.emit('sendNotif', pretenderUid)
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))

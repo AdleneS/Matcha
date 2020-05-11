@@ -1,7 +1,7 @@
+const http = require('http');
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const secret = 'keyboard cat';
@@ -38,9 +38,11 @@ router.post('/signup', (req, res, next) => {
 						const token = jwt.sign(payload, secret, {
 							expiresIn: '2h'
 						});
-						res.cookie('ssid', token, { httpOnly: true })
+
+						res
+							.cookie('ssid', token, { httpOnly: true })
 							.cookie('info', info)
-							.json({ message:'Logged !'})
+							.json({ message:'Logged !', uid: rows.uid})
 							.status(200);
 					} else {
 						res.status(401)

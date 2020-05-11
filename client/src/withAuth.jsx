@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 
-export default function withAuth(ComponentToProtect){
+export default function withAuth(ComponentToProtect, socket){
 
 	return class extends Component{
 		_isMounted = false;
@@ -16,6 +16,7 @@ export default function withAuth(ComponentToProtect){
 
 		componentDidMount(){
 			this._isMounted = true;
+			console.log(this.props);
 				fetch('/checkCookie')
 				.then(res => {
 					if (res.status === 200){
@@ -53,7 +54,7 @@ export default function withAuth(ComponentToProtect){
 				return <Redirect to="/login"/>;
 			}
 			if (this._isMounted && !loading)
-				return <ComponentToProtect {...this.props}/>
+				return <ComponentToProtect {...this.props} socket={socket}/>
 		}
 	}
 }

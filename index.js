@@ -12,9 +12,10 @@ var auth = require('./auth');
 const multer = require('multer');
 const path = require('path');
 const pool = require('./db');
-const socketIo = require('socket.io');
+
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = require('socket.io')(server);
+var socketArray = {};
 
 app.use(bodyParser.json())
 app.use(
@@ -32,43 +33,35 @@ app.use(cookieParser());
 //  cookie: { secure: false, maxAge: 7200000 }
 //}))
 
-let interval;
-
 io.on("connection", (socket) => {
-	console.log(socket.id);
-	if (interval) {
-	  clearInterval(interval);
-	}
-	interval = setInterval(() => getApiAndEmit(socket), 1000);
-	socket.on("disconnect", () => {
-	  console.log("Client disconnected");
-	  clearInterval(interval);
+	socket.on('FromAPI', (uid) => {
+		socketArray[socket.id] = uid;
+		console.log(socketArray[socket.id])
+		//console.log('uid : '+ uid + ' from ' +  socket.id)
 	});
+	socket.on("sendNotif", (uid) => {
+		found = Object.keys(socketArray).find(key => socketArray[key] === uid);
+		console.log(found)
+		io.to(found).emit('getNotif', 'coucou')
+	});
+	socket.on('disconnect', () => {
+		delete socketArray[socket.id]
+		console.log('user disconnected');
+	  });
   });
-
-const getApiAndEmit = socket => {
-	//pool.query('SELECT * FROM likes WHERE uid_liked = $1 ORDER BY id DESC LIMIT 1', [req.cookies.info.uid], (error, results) => {
-	//	if (error)
-	//		throw error;
-	//	res
-	//	.json({ info: 'Liked !'})
-	//	.status(200)
-	//})
-	const response = new Date();
-	socket.emit("FromAPI", response);
-}
 
 app.get('/', (req, res) => {
 		res.json({ info: 'Node.js, Express, and Postgres API' })
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
-	res.sendStatus(200);
+	res .json({uid: req.cookies.info.uid})
+		.status(200);
 });
 
 app.get('/logout', function(req, res){
 	res.clearCookie('ssid');
-	res.clearCookie('uid');
+	res.clearCookie('info');
 	res.sendStatus(200);
  });
 

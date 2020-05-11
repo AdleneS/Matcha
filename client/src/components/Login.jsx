@@ -4,7 +4,8 @@ import Button from 'react-bootstrap/Button';
 import MyContext from './appcontext';
 import {useHistory, Redirect} from "react-router-dom";
 
-export default function Login () {
+
+export default function Login (props) {
 
 	const [sValue, setValue] = useState({email:'', password:''});
 
@@ -34,6 +35,8 @@ export default function Login () {
 			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
+				//props.socket.emit('FromAPI', res.body.uid)
+				console.log("RESULTAT", res)
 				setIsLoggedTrue();
 				history.push('/home');
 			} else {
