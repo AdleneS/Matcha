@@ -6,9 +6,10 @@ import Login from './components/Login';
 import Home from './components/home';
 import Register from './components/register';
 import ErrorPage from './components/404';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import withAuth from './withAuth';
 import MyContext from './components/appcontext';
+
 import testupload from './components/test_upload'
 import io from 'socket.io-client'
 const ENDPOINT = "127.0.0.1:5000"
@@ -34,12 +35,15 @@ export default function App() {
 		});
 	});
 
-		return (
+	return (
 		<MyContext.Provider value={{islogged: islogged, setIsLogged:setIsLogged}}>
 			<div className="app">
 					<BrowserRouter>
-						<NavBar />
+						<NavBar socket={socket}/>
 						<Switch>
+							<Route exact path="/">
+								<Redirect to="/home"/>
+							</Route>
 							<Route path="/home" component={withAuth(Home, socket)}/>
 							<Route path="/testupload" component={withAuth(testupload)} />
 							<Route path="/customers" component={withAuth(Customers)} />
@@ -51,7 +55,6 @@ export default function App() {
 						</Switch>
 					</BrowserRouter>
 			</div>
-	
 		</MyContext.Provider>
 	 );
 }

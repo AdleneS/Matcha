@@ -39,10 +39,10 @@ io.on("connection", (socket) => {
 		console.log(socketArray[socket.id])
 		//console.log('uid : '+ uid + ' from ' +  socket.id)
 	});
-	socket.on("sendNotif", (uid) => {
-		found = Object.keys(socketArray).find(key => socketArray[key] === uid);
-		console.log(found)
-		io.to(found).emit('getNotif', 'coucou')
+	socket.on("sendNotif", (data) => {
+		console.log(socketArray)
+		found = Object.keys(socketArray).find(key => socketArray[key] === data.uid);
+		io.to(found).emit('getNotif', data)
 	});
 	socket.on('disconnect', () => {
 		delete socketArray[socket.id]
@@ -99,7 +99,6 @@ app.post("/imgupload", upload.single("file"),(req, res) => {
 	}
 );
 
-
 app.post('/like', function(req, res){
 	const liker = req.cookies.info.uid;
 	const liked = req.body.likedUid;
@@ -112,7 +111,7 @@ app.post('/like', function(req, res){
 				res.status(400)
 			 }
 			 res
-				.json({info: 'Unliked !'})
+				.json({info: 'unlike'})
 				.status(200)
 		 });
 		} else {
@@ -121,7 +120,7 @@ app.post('/like', function(req, res){
 					res.status(400)
 				}
 			res
-			.json({ info: 'Liked !'})
+			.json({ info: 'like'})
 			.status(200)
 			});
 		}

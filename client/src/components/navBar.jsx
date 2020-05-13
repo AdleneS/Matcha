@@ -1,15 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from '../imgs/logoMatcha.png';
 import MyContext from './appcontext';
+
 import {Link} from 'react-router-dom';
 import { FaBell } from "react-icons/fa";
 
 
-export default function Mynav () {
+export default function Mynav (props) {
 	const {islogged, setIsLogged} = useContext(MyContext);
-	
+	const [nb_notif, setNotif] = useState(0);
+	const socket = props.socket;
+
 	function handleClick(e) {
 		e.preventDefault();
 		fetch('/logout')
@@ -21,9 +24,15 @@ export default function Mynav () {
 				throw error;
 			}
 		})
-		//document.cookie = 'ssid =; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 	}
-	
+
+	useEffect(() => {
+		socket.on('getNotif', (data) => {
+			setNotif(nb_notif => nb_notif + 1)
+			console.log(data)
+		});
+	},[socket])
+
 	return (
 		<Navbar className="nav-flat" variant="dark">
 			<Link to={"/home"}>
@@ -44,10 +53,10 @@ export default function Mynav () {
 				<Link className="nav-link" to={"/customers"}> Customers </Link>
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
-				{islogged && (<Navbar.Text className="nav-link" onClick={handleClick}> Log Out </Navbar.Text>)}
+				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
-			<FaBell style={{color: "#FFFFFF", width: "30px", height: "30px",}}/>
-			<FaBell style={{color: "#AA11ff", width: "30px", height: "30px",}}/>
+				{nb_notif > 0 && <FaBell  onClick={() => setNotif(0)} style={{color: "red", width: "30px", height: "30px", cursor: "pointer"}}/>}
+				{nb_notif < 1 && <FaBell style={{color: "#FFFFFF", width: "30px", height: "30px"}}/>}
 		</Navbar>
 	);
 }

@@ -11,7 +11,7 @@ class Home extends Component {
 		super(props);
 		this.state = {
 			pretender: [],
-			likes: []
+			likes: [],
 		}
 		this.onClick = this.onClick.bind(this);
 	}
@@ -23,12 +23,10 @@ class Home extends Component {
 		fetch('/users/likes')
 			.then(res => res.json())
 			.then (likes => this.setState({likes}, () => console.log(likes)))
+		this.setState({notification:this.context.nb_notif});
 	}
 
-	notif = this.props.socket.on('getNotif', (data) => {
-		console.log(data);
-	});
-	
+
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
 
@@ -44,7 +42,10 @@ class Home extends Component {
 			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
-				this.props.socket.emit('sendNotif', pretenderUid)
+				if (res.body.info === 'like')
+					this.props.socket.emit('sendNotif', {uid: pretenderUid, notif_type: 'like'})
+				else
+					this.props.socket.emit('sendNotif', {uid: pretenderUid, notif_type: 'unlike'})
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))
@@ -60,9 +61,13 @@ class Home extends Component {
 
 	render() {
 		Moment.locale('fr');
+
 		return (
 			<div>
+				<div style={{color:"red"}}>
+				</div>
 				<div className="cardContainer fade">
+					
 					{this.state.pretender.map(pretender =>
 					<Link key={pretender.id} to={"#/user/page/" + pretender.id}>
 						<Card className="item" key={ pretender.id } style={{ width: '15rem', margin: '10px'}}>
@@ -75,7 +80,7 @@ class Home extends Component {
 									{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
 								</Card.Text>
 								{this.state.likes.map(likes => 
-									<Card.Text> {likes.uid_liked === pretender.uid ?
+									<Card.Text key={likes.id}> {likes.uid_liked === pretender.uid ?
 										(<BsHeartFill onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333",  width: "30px", height: "30px", position: "absolute"}}/>) : null}
 									
 									</Card.Text>
@@ -85,6 +90,7 @@ class Home extends Component {
 						</Card>
 						</Link>
 					)}
+					
 				</div>
 			</div>
 		);

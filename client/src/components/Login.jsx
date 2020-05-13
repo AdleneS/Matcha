@@ -35,8 +35,6 @@ export default function Login (props) {
 			console.log(res);
 			console.log("Responses:", res);
 			if (res.status === 200) {
-				//props.socket.emit('FromAPI', res.body.uid)
-				console.log("RESULTAT", res)
 				setIsLoggedTrue();
 				history.push('/home');
 			} else {
