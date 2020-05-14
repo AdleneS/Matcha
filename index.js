@@ -40,8 +40,7 @@ io.on("connection", (socket) => {
 		//console.log('uid : '+ uid + ' from ' +  socket.id)
 	});
 	socket.on("sendNotif", (data) => {
-		console.log(socketArray)
-		found = Object.keys(socketArray).find(key => socketArray[key] === data.uid);
+		found = Object.keys(socketArray).find(key => socketArray[key] === data.notified_uid);
 		io.to(found).emit('getNotif', data)
 	});
 	socket.on('disconnect', () => {
@@ -52,6 +51,10 @@ io.on("connection", (socket) => {
 
 app.get('/', (req, res) => {
 		res.json({ info: 'Node.js, Express, and Postgres API' })
+});
+
+app.get('/cookie', (req, res) => {
+	res.json({info: req.cookies.info});
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
@@ -90,10 +93,9 @@ app.post("/imgupload", upload.single("file"),(req, res) => {
 		} else {
 				fs.unlink(tempPath, err => {
 				if (err) return handleError(err, res);
-
-				res
-					.status(403)
-			.json({ info: "Only .png and .jpg files are allowed!" })
+					res
+						.status(403)
+						.json({ info: "Only .png and .jpg files are allowed!" })
 			});
 		}
 	}
@@ -134,6 +136,7 @@ app.get('/pretender', db.getUsersImg)
 app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
+app.post('/notif/create', db.createNotif)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 app.use(function(err, req, res, next){

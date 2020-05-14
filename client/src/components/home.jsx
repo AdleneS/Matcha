@@ -12,11 +12,15 @@ class Home extends Component {
 		this.state = {
 			pretender: [],
 			likes: [],
+			cookie: {}
 		}
 		this.onClick = this.onClick.bind(this);
 	}
 
 	componentDidMount(){
+		fetch('/cookie/')
+			.then(res => res.json())
+			.then (cookie => this.setState({cookie}, () => console.log(cookie)))
 		fetch('/pretender/')
 			.then(res => res.json())
 			.then (pretender => this.setState({pretender}, () => console.log("pretender fetched...", pretender)))
@@ -25,7 +29,6 @@ class Home extends Component {
 			.then (likes => this.setState({likes}, () => console.log(likes)))
 		this.setState({notification:this.context.nb_notif});
 	}
-
 
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
@@ -39,13 +42,12 @@ class Home extends Component {
 		})
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
-			console.log(res);
-			console.log("Responses:", res);
 			if (res.status === 200) {
-				if (res.body.info === 'like')
-					this.props.socket.emit('sendNotif', {uid: pretenderUid, notif_type: 'like'})
-				else
-					this.props.socket.emit('sendNotif', {uid: pretenderUid, notif_type: 'unlike'})
+				if (res.body.info === 'like'){
+					this.props.socket.emit('sendNotif', {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: 'like'})
+				} else {
+					this.props.socket.emit('sendNotif', {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: 'unlike'})
+				}
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))
@@ -54,7 +56,7 @@ class Home extends Component {
 				throw error;
 			}
 		})
-			.catch(err => {
+		.catch(err => {
 			alert(err);
 		});
 	}

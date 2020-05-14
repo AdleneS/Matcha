@@ -46,10 +46,6 @@ const getUsers = (request, response) => {
 	}
 
 	const getUserByEmail = (request, response) => {
-		//const email = request.params.id
-		//if (email == undefined)
-		console.log(request.params);
-
 		const	email = request.params.id
 		pool.query('SELECT * FROM users WHERE email = $1', [email], (error, results) => {
 			if (error) {
@@ -61,13 +57,25 @@ const getUsers = (request, response) => {
 
 	const createUser = (request, response) => {
 		const { login, email, password, birthday, gender, sexual_orientation } = request.body
-		console.log(request.body);
 		pool.query('INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)', [login, email, bcrypt.hashSync(password, 10), moment().format('YYYY/MM/DD'), moment(birthday,'YYYY/MM/DD'), gender.toLowerCase(), sexual_orientation.toLowerCase()], (error, results) => {
 			if (error) {
 				throw error
 			}
 			response.status(200).send(`User added with ID: ${login}`)
 		})
+	}
+
+	
+	const createNotif = (request, response) => {
+		const { notified_uid, notifier_uid, notifier_login, notif_type } = request.body
+		console.log(request.body)
+		pool.query('INSERT INTO notifications (notified_uid, notifier_uid, notifier_login, notif_type, date) VALUES ($1, $2, $3, $4, $5)', [notified_uid, notifier_uid, notifier_login, notif_type, moment().format('YYYY/MM/DD')], (error, results) => {
+			if (error){
+				response.status(401).json({error: error});
+			} else {
+				response.status(200).json({message: 'New Notif'});
+			}
+		});
 	}
 
 	const updateUser = (request, response) => {
@@ -107,4 +115,5 @@ const getUsers = (request, response) => {
 		updateUser,
 		deleteUser,
 		getUserByEmail,
+		createNotif,
 	}

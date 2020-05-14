@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const secret = 'keyboard cat';
 var moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
+const cookieParser = require('cookie-parser');
 
 router.get('/', (req, res) => {
 	res.json({
