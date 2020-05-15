@@ -41,8 +41,8 @@ router.post('/signup', (req, res, next) => {
 						});
 
 						res
-							.cookie('ssid', token, { httpOnly: true })
-							.cookie('info', info)
+							.cookie('ssid', token, { httpOnly: true, secure: false, sameSite: 'strict'})
+							.cookie('info', info, { httpOnly: true, secure: false, sameSite: 'strict'})
 							.json({ message:'Logged !', uid: rows.uid})
 							.status(200);
 					} else {

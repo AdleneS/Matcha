@@ -10,8 +10,31 @@ import { FaBell } from "react-icons/fa";
 
 export default function Mynav (props) {
 	const {islogged, setIsLogged} = useContext(MyContext);
-	const [nb_notif, setNotif] = useState(2);
+	const [nb_notif, set_nbNotif] = useState(0);
+	const [notifs, setNotif] = useState([])
 	const socket = props.socket;
+
+	useEffect(() => {
+		socket.on('getNotif', () => {
+			set_nbNotif(nb_notif => nb_notif + 1)
+		});
+	},[socket])
+	
+	useEffect(() => {
+		fetch('/notif/get')
+		.then(response => response.json())
+		.then(response => setNotif(response));
+	}, [])
+
+	useEffect(() => {
+		fetch('/notif/get')
+			.then(response => response.json())
+			.then(response => setNotif(response));
+	}, [nb_notif])
+
+	useEffect(() => {
+		console.log(notifs)
+	}, [notifs])
 
 	function handleClick(e) {
 		e.preventDefault();
@@ -22,28 +45,6 @@ export default function Mynav (props) {
 			} else {
 				const error = new Error(res.error);
 				throw error;
-			}
-		})
-	}
-
-	useEffect(() => {
-		socket.on('getNotif', (data) => {
-			setNotif(nb_notif => nb_notif + 1)
-			addNotif(data)
-		});
-	},[socket])
-
-	function trygetcookie(){
-		console.log(document.cookie.info)
-	}
-
-	function addNotif(data){
-			console.log(data)
-			fetch('/notif/create', {
-			method: 'POST',
-			body: JSON.stringify({ notified_uid: data.notified_uid , notifier_uid: data.notifier_uid ,notifier_login: data.notifier_login, notif_type: data.notif_type}),
-			headers:{
-				'Content-type': 'application/json'
 			}
 		})
 	}
@@ -70,7 +71,7 @@ export default function Mynav (props) {
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
-				{nb_notif > 0 && <FaBell  onClick={trygetcookie} style={{color: "red", width: "30px", height: "30px", cursor: "pointer"}}/>}
+				{nb_notif > 0 && <FaBell  onClick={nb_notif => set_nbNotif(0)} style={{color: "red", width: "30px", height: "30px", cursor: "pointer"}}/>}
 				{nb_notif < 1 && <FaBell style={{color: "#FFFFFF", width: "30px", height: "30px"}}/>}
 		</Navbar>
 	);

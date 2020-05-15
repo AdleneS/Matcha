@@ -39,9 +39,9 @@ io.on("connection", (socket) => {
 		console.log(socketArray[socket.id])
 		//console.log('uid : '+ uid + ' from ' +  socket.id)
 	});
-	socket.on("sendNotif", (data) => {
-		found = Object.keys(socketArray).find(key => socketArray[key] === data.notified_uid);
-		io.to(found).emit('getNotif', data)
+	socket.on("sendNotif", (notified_uid) => {
+		found = Object.keys(socketArray).find(key => socketArray[key] === notified_uid);
+		io.to(found).emit('getNotif')
 	});
 	socket.on('disconnect', () => {
 		delete socketArray[socket.id]
@@ -137,6 +137,7 @@ app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
 app.post('/notif/create', db.createNotif)
+app.get('/notif/get', db.getNotif)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 app.use(function(err, req, res, next){

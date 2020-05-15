@@ -20,14 +20,24 @@ class Home extends Component {
 	componentDidMount(){
 		fetch('/cookie/')
 			.then(res => res.json())
-			.then (cookie => this.setState({cookie}, () => console.log(cookie)))
+			.then (cookie => this.setState({cookie}))
 		fetch('/pretender/')
 			.then(res => res.json())
-			.then (pretender => this.setState({pretender}, () => console.log("pretender fetched...", pretender)))
+			.then (pretender => this.setState({pretender}))
 		fetch('/users/likes')
 			.then(res => res.json())
-			.then (likes => this.setState({likes}, () => console.log(likes)))
+			.then (likes => this.setState({likes}))
 		this.setState({notification:this.context.nb_notif});
+	}
+
+	 addNotif = (data) => {
+			fetch('/notif/create', {
+			method: 'POST',
+			body: JSON.stringify({ notified_uid: data.notified_uid , notifier_uid: data.notifier_uid ,notifier_login: data.notifier_login, notif_type: data.notif_type}),
+			headers:{
+				'Content-type': 'application/json'
+			}
+		})
 	}
 
 	onClick = (event, pretenderUid) => {
@@ -43,11 +53,13 @@ class Home extends Component {
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
 			if (res.status === 200) {
+				const data = {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: res.body.info}
 				if (res.body.info === 'like'){
-					this.props.socket.emit('sendNotif', {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: 'like'})
+					this.props.socket.emit('sendNotif', pretenderUid)
 				} else {
-					this.props.socket.emit('sendNotif', {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: 'unlike'})
+					this.props.socket.emit('sendNotif', pretenderUid)
 				}
+				this.addNotif(data);
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))

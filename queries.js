@@ -32,6 +32,16 @@ const getUsers = (request, response) => {
 		})
 	}
 
+	const getNotif = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		pool.query('SELECT * FROM notifications WHERE notified_uid = $1', [user_uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
 
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
@@ -116,4 +126,5 @@ const getUsers = (request, response) => {
 		deleteUser,
 		getUserByEmail,
 		createNotif,
+		getNotif,
 	}
