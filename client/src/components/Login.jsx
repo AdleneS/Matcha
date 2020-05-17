@@ -13,7 +13,6 @@ export default function Login (props) {
 	const setIsLoggedTrue = () => {
 		setIsLogged(true);
 	}
-	
 	const handleInputChange = (event) => {
 		const { value, name } = event.target;
 		setValue({...sValue, [name]: value})

@@ -138,6 +138,8 @@ app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
 app.post('/notif/create', db.createNotif)
 app.get('/notif/get', db.getNotif)
+app.get('/notif/getnb', db.getNotifNb)
+app.put('/notif/setseen', db.setNotifSeen)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 app.use(function(err, req, res, next){

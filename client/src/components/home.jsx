@@ -42,7 +42,6 @@ class Home extends Component {
 
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
-
 		fetch('/like/', {
 			method: 'POST',
 			body: JSON.stringify({likedUid: pretenderUid}),

@@ -34,7 +34,7 @@ const getUsers = (request, response) => {
 
 	const getNotif = (request, response) => {
 		const user_uid = request.cookies.info.uid;
-		pool.query('SELECT * FROM notifications WHERE notified_uid = $1', [user_uid], (error, results) => {
+		pool.query('SELECT * FROM notifications  WHERE notified_uid = $1 ORDER BY id DESC LIMIT 10' , [user_uid], (error, results) => {
 			if (error) {
 				throw error
 			}else{
@@ -42,10 +42,29 @@ const getUsers = (request, response) => {
 			}
 		})
 	}
-
+	const getNotifNb = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		pool.query('SELECT * FROM notifications WHERE notified_uid = $1 AND seen = false', [user_uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rowCount)
+			}
+		})
+	}
+	const setNotifSeen = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		const notif_id = request.body.notif_id;
+		pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false and id = $2', [user_uid, notif_id], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200)
+			}
+		})
+	}
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
-		console.log(request.params);
 		pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
 			if (error) {
 				getUserByEmail(request, response)
@@ -127,4 +146,6 @@ const getUsers = (request, response) => {
 		getUserByEmail,
 		createNotif,
 		getNotif,
+		getNotifNb,
+		setNotifSeen,
 	}

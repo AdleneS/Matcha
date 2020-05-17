@@ -3,10 +3,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from '../imgs/logoMatcha.png';
 import MyContext from './appcontext';
-
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import {Link} from 'react-router-dom';
-import { FaBell } from "react-icons/fa";
-
 
 export default function Mynav (props) {
 	const {islogged, setIsLogged} = useContext(MyContext);
@@ -19,12 +18,17 @@ export default function Mynav (props) {
 			set_nbNotif(nb_notif => nb_notif + 1)
 		});
 	},[socket])
-	
+
 	useEffect(() => {
+	if (islogged){
+		fetch('/notif/getnb')
+			.then(response => response.json())
+			.then(response => set_nbNotif(response));
 		fetch('/notif/get')
-		.then(response => response.json())
-		.then(response => setNotif(response));
-	}, [])
+			.then(response => response.json())
+			.then(response => setNotif(response));
+		}
+	},[islogged])
 
 	useEffect(() => {
 		fetch('/notif/get')
@@ -43,6 +47,23 @@ export default function Mynav (props) {
 			if (res.status === 200){
 				setIsLogged(false);
 			} else {
+				const error = new Error(res.error);
+				throw error;
+			}
+		})
+	}
+
+	function onHover(e, notif_id) {
+		e.preventDefault()
+		fetch('/notif/setseen', {
+			method: 'PUT',
+			body: JSON.stringify({notif_id: notif_id}),
+			headers:{
+				'Content-type': 'application/json'
+			}
+		})
+		.then(res => {
+			if (res.status !== 200){
 				const error = new Error(res.error);
 				throw error;
 			}
@@ -71,8 +92,12 @@ export default function Mynav (props) {
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
-				{nb_notif > 0 && <FaBell  onClick={nb_notif => set_nbNotif(0)} style={{color: "red", width: "30px", height: "30px", cursor: "pointer"}}/>}
-				{nb_notif < 1 && <FaBell style={{color: "#FFFFFF", width: "30px", height: "30px"}}/>}
+			{islogged && 
+			<DropdownButton onClick={nb_notif => set_nbNotif(0)} variant={nb_notif ? "danger" : "secondary"} id="dropdown-button-drop-left" drop='left' title={ nb_notif ? nb_notif + " Notifications" : 'Notification' }>
+				{notifs.map((notifs) => (
+					<Dropdown.Item onMouseEnter={(event) => {onHover(event, notifs.id)}} key={notifs.id} href="#/action-1">{notifs.notifier_login} vous a {notifs.notif_type}</Dropdown.Item>
+				))}
+			</DropdownButton>}
 		</Navbar>
 	);
 }

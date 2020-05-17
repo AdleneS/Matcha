@@ -16,7 +16,6 @@ export default function withAuth(ComponentToProtect, socket){
 
 		componentDidMount(){
 			this._isMounted = true;
-			console.log(this.props);
 				fetch('/checkCookie')
 				.then(res => {
 					if (res.status === 200){
