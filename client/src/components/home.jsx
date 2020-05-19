@@ -18,6 +18,10 @@ class Home extends Component {
 	}
 
 	componentDidMount(){
+		navigator.geolocation.getCurrentPosition(function(position) {
+		  console.log("Latitude is :", position.coords.latitude);
+		  console.log("Longitude is :", position.coords.longitude);
+		});
 		fetch('/cookie/')
 			.then(res => res.json())
 			.then (cookie => this.setState({cookie}))
