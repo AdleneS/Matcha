@@ -17,12 +17,18 @@ const socket = io(ENDPOINT);
 
 export default function App() {
 	const [islogged, setIsLogged] = useState(false);
+	const [geo, setGeo] = useState();
 
 	useEffect(() => {
 		fetch('/checkCookie')
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
 			if (res.status === 200){
+				navigator.geolocation.getCurrentPosition(function(position) {
+					fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng='+position.coords.latitude+','+ position.coords.longitude+'&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI')
+					.then(res => res.json())
+					.then (geo => setGeo(geo.results[5].address_components[1].long_name))
+				  }, function(position) {console.log("Enable Geolocation")});
 				setIsLogged(true);
 				socket.emit('FromAPI', res.body.uid)
 			} else {
@@ -33,7 +39,19 @@ export default function App() {
 		.catch(err => {
 			setIsLogged(false);
 		});
-	});
+	}, []);
+
+	useEffect(() => {
+		if ("geolocation" in navigator && geo) {
+			fetch('/users/location', {
+				method: 'PUT',
+				body: JSON.stringify({location: geo}),
+				headers:{
+					'Content-type': 'application/json'
+				}
+			})
+		}
+	},[geo])
 
 	return (
 		<MyContext.Provider value={{islogged: islogged, setIsLogged:setIsLogged}}>

@@ -92,11 +92,11 @@ export default function Mynav (props) {
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
-			{islogged && 
+			{islogged &&
 			<DropdownButton onClick={nb_notif => set_nbNotif(0)} variant={nb_notif ? "danger" : "secondary"} id="dropdown-button-drop-left" drop='left' title={ nb_notif ? nb_notif + " Notifications" : 'Notification' }>
-				{notifs.map((notifs) => (
+				{notifs.length ? notifs.map((notifs) => (
 					<Dropdown.Item onMouseEnter={(event) => {onHover(event, notifs.id)}} key={notifs.id} href="#/action-1">{notifs.notifier_login} vous a {notifs.notif_type}</Dropdown.Item>
-				))}
+				)): 	<Dropdown.Item> Vous n'avez pas de notification <span role="img" aria-label="bad">☹️</span> </Dropdown.Item>}
 			</DropdownButton>}
 		</Navbar>
 	);

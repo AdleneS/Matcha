@@ -12,7 +12,6 @@ var auth = require('./auth');
 const multer = require('multer');
 const path = require('path');
 const pool = require('./db');
-
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 var socketArray = {};
@@ -36,8 +35,6 @@ app.use(cookieParser());
 io.on("connection", (socket) => {
 	socket.on('FromAPI', (uid) => {
 		socketArray[socket.id] = uid;
-		console.log(socketArray[socket.id])
-		//console.log('uid : '+ uid + ' from ' +  socket.id)
 	});
 	socket.on("sendNotif", (notified_uid) => {
 		found = Object.keys(socketArray).find(key => socketArray[key] === notified_uid);
@@ -140,7 +137,7 @@ app.post('/notif/create', db.createNotif)
 app.get('/notif/get', db.getNotif)
 app.get('/notif/getnb', db.getNotifNb)
 app.put('/notif/setseen', db.setNotifSeen)
-app.put('/users/:id', db.updateUser)
+app.put('/users/location', db.updateLocation)
 app.delete('/users/:id', db.deleteUser)
 app.use(function(err, req, res, next){
 		res.status(err.status || 500);

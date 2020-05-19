@@ -63,6 +63,18 @@ const getUsers = (request, response) => {
 			}
 		})
 	}
+	const updateLocation = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		console.log(request.body.location)
+		pool.query('UPDATE users SET country = $2 WHERE uid = $1', [user_uid, request.body.location], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200)
+			}
+		})
+	}
+
 	const getUserById = (request, response) => {
 		const id = parseInt(request.params.id)
 		pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
@@ -107,22 +119,6 @@ const getUsers = (request, response) => {
 		});
 	}
 
-	const updateUser = (request, response) => {
-		const id = parseInt(request.params.id)
-		const { name, email } = request.body
-	
-		pool.query(
-			'UPDATE users SET name = $1, email = $2 WHERE id = $3',
-			[name, email, id],
-			(error, results) => {
-				if (error) {
-					throw error
-				}
-				response.status(200).send(`User modified with ID: ${id}`)
-			}
-		)
-	}
-
 	const deleteUser = (request, response) => {
 		const id = parseInt(request.params.id)
 	
@@ -141,11 +137,11 @@ const getUsers = (request, response) => {
 		getLikes,
 		getUserById,
 		createUser,
-		updateUser,
 		deleteUser,
 		getUserByEmail,
 		createNotif,
 		getNotif,
 		getNotifNb,
 		setNotifSeen,
+		updateLocation,
 	}
