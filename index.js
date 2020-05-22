@@ -104,7 +104,7 @@ app.post('/like', function(req, res){
 	pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
 		if (error){
 			throw error
-		} else if (results.rows[0]){
+		} else if (results.rows.length){
 		 pool.query('DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
 			 if (error){
 				res.status(400)
@@ -133,6 +133,7 @@ app.get('/pretender', db.getUsersImg)
 app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
+app.post('/match/create', db.createMatch)
 app.post('/notif/create', db.createNotif)
 app.get('/notif/get', db.getNotif)
 app.get('/notif/getnb', db.getNotifNb)

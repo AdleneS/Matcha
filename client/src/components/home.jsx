@@ -40,6 +40,18 @@ class Home extends Component {
 		})
 	}
 
+	addMatch = (pretenderUid) => {
+		console.log("Front")
+		fetch('/match/create', {
+			method: 'POST',
+			body: JSON.stringify({pretenderUid: pretenderUid}),
+			headers:{
+				'Content-type': 'application/json'
+			}
+		})
+	}
+
+
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
 		fetch('/like/', {
@@ -53,12 +65,9 @@ class Home extends Component {
 		.then(res => {
 			if (res.status === 200) {
 				const data = {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: res.body.info}
-				if (res.body.info === 'like'){
-					this.props.socket.emit('sendNotif', pretenderUid)
-				} else {
-					this.props.socket.emit('sendNotif', pretenderUid)
-				}
+				this.props.socket.emit('sendNotif', pretenderUid)
 				this.addNotif(data);
+				this.addMatch(pretenderUid);
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))
@@ -103,7 +112,6 @@ class Home extends Component {
 						</Card>
 						</Link>
 					)}
-					
 				</div>
 			</div>
 		);

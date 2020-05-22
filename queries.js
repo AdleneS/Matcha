@@ -130,6 +130,33 @@ const getUsers = (request, response) => {
 		})
 	}
 
+	const createMatch = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		const pretender_uid = request.body.pretenderUid;
+		console.log("Back")
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [pretender_uid, user_uid], (error, results) => {
+			if (error){
+				response
+				.json({error: 'Bad Request'})
+				.status(400)
+			} else if (results.rows.length){
+				pool.query('INSERT INTO match (uid_1, uid_2, date) VALUES ($1, $2, $3)', [user_uid, pretender_uid, moment().format('LLL')], (error, results) => {
+					if (error){
+						response.status(400)
+					}
+					response
+					.json({info: 'Match'})
+					.status(200)
+				})
+			} else {
+				response
+				.json({ info: 'NoMatch'})
+				.status(200)
+			}
+		});
+	};
+	
+
 	module.exports = {
 		pool,
 		getUsers,
@@ -144,4 +171,5 @@ const getUsers = (request, response) => {
 		getNotifNb,
 		setNotifSeen,
 		updateLocation,
+		createMatch,
 	}
