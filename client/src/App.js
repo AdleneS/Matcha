@@ -28,11 +28,11 @@ export default function App() {
 					fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng='+position.coords.latitude+','+ position.coords.longitude+'&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI')
 					.then(res => res.json())
 					.then (geo => setGeo(geo.results[5].address_components[1].long_name))
-				  }, function(position) {console.log("Enable Geolocation")});
+				  }, function() {console.log("Enable Geolocation")});
 				setIsLogged(true);
 				socket.emit('FromAPI', res.body.uid)
 			} else {
-				const error = new Error(res.error);
+				const error = new Error(res.body.error);
 				throw error;
 			}
 		})
@@ -55,24 +55,26 @@ export default function App() {
 
 	return (
 		<MyContext.Provider value={{islogged: islogged, setIsLogged:setIsLogged}}>
-			<div className="app">
-					<BrowserRouter>
-						<NavBar socket={socket}/>
-						<Switch>
-							<Route exact path="/">
-								<Redirect to="/home"/>
-							</Route>
-							<Route path="/home" component={withAuth(Home, socket)}/>
-							<Route path="/testupload" component={withAuth(testupload)} />
-							<Route path="/customers" component={withAuth(Customers)} />
-							<Route path="/login">
-								<Login socket={socket}/>
-							</Route>
-							<Route path="/register" component={Register} />
-							<Route path='*' component={ErrorPage}/>
-						</Switch>
-					</BrowserRouter>
-			</div>
+			
+				<div className="app">
+						<BrowserRouter>
+							<NavBar socket={socket}/>
+							<Switch>
+								<Route exact path="/">
+									<Redirect to="/home"/>
+								</Route>
+								<Route path="/home" component={withAuth(Home, socket)}/>
+								<Route path="/testupload" component={withAuth(testupload)} />
+								<Route path="/customers" component={withAuth(Customers)} />
+								<Route path="/login">
+									<Login socket={socket}/>
+								</Route>
+								<Route path="/register" component={Register} />
+								<Route path='*' component={ErrorPage}/>
+							</Switch>
+						</BrowserRouter>
+				</div>
+			
 		</MyContext.Provider>
 	 );
 }

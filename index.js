@@ -98,34 +98,6 @@ app.post("/imgupload", upload.single("file"),(req, res) => {
 	}
 );
 
-app.post('/like', function(req, res){
-	const liker = req.cookies.info.uid;
-	const liked = req.body.likedUid;
-	pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
-		if (error){
-			throw error
-		} else if (results.rows.length){
-		 pool.query('DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
-			 if (error){
-				res.status(400)
-			 }
-			 res
-				.json({info: 'unlike'})
-				.status(200)
-		 });
-		} else {
-			pool.query('INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)', [liker, liked], (error, results) => {
-				if (error){
-					res.status(400)
-				}
-			res
-			.json({ info: 'like'})
-			.status(200)
-			});
-		}
-	});
-});
-
 app.use('/auth', auth)
 app.get('/users', db.getUsers)
 app.get('/users/likes', db.getLikes)
@@ -133,7 +105,9 @@ app.get('/pretender', db.getUsersImg)
 app.get('/users/:id', db.getUserById)
 app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
+app.post('/like', db.like)
 app.post('/match/create', db.createMatch)
+app.post('/match/delete', db.deleteMatch)
 app.post('/notif/create', db.createNotif)
 app.get('/notif/get', db.getNotif)
 app.get('/notif/getnb', db.getNotifNb)

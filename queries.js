@@ -109,10 +109,9 @@ const getUsers = (request, response) => {
 	
 	const createNotif = (request, response) => {
 		const { notified_uid, notifier_uid, notifier_login, notif_type } = request.body
-		console.log(request.body)
 		pool.query('INSERT INTO notifications (notified_uid, notifier_uid, notifier_login, notif_type, date) VALUES ($1, $2, $3, $4, $5)', [notified_uid, notifier_uid, notifier_login, notif_type, moment().format('YYYY/MM/DD')], (error, results) => {
 			if (error){
-				response.status(401).json({error: error});
+				throw error
 			} else {
 				response.status(200).json({message: 'New Notif'});
 			}
@@ -133,7 +132,6 @@ const getUsers = (request, response) => {
 	const createMatch = (request, response) => {
 		const user_uid = request.cookies.info.uid;
 		const pretender_uid = request.body.pretenderUid;
-		console.log("Back")
 		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [pretender_uid, user_uid], (error, results) => {
 			if (error){
 				response
@@ -145,18 +143,68 @@ const getUsers = (request, response) => {
 						response.status(400)
 					}
 					response
-					.json({info: 'Match'})
+					.json({info: 'match'})
 					.status(200)
 				})
 			} else {
 				response
-				.json({ info: 'NoMatch'})
+				.json({ info: 'nothing'})
 				.status(200)
 			}
 		});
 	};
-	
 
+	const deleteMatch = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		const pretender_uid = request.body.pretenderUid;
+		pool.query('SELECT * FROM match WHERE uid_1 = $1 AND uid_2 = $2 OR uid_1 = $2 AND uid_2 = $1', [user_uid, pretender_uid], (error, results) => {
+			if (error){
+				throw error;
+			} else if (results.rows.length){
+				pool.query('DELETE FROM match WHERE uid_1 = $1 AND uid_2 = $2 OR uid_1 = $2 AND uid_2 = $1', [user_uid, pretender_uid], (error, results) => {
+					if (error){
+						throw error
+					}
+					response
+						.json({info: 'unmatch'})
+						.status(200)
+				});
+			} else {
+				response
+					.json({info: "nothing"})
+					.status(200)
+			}
+		});
+	}
+
+	const like = (req, res) => {
+		const liker = req.cookies.info.uid;
+		const liked = req.body.likedUid;
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
+			if (error){
+				throw error
+			} else if (results.rows.length){
+			 pool.query('DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
+				 if (error){
+					res.status(400)
+				 }
+				 res
+					.json({info: 'unlike'})
+					.status(200)
+			 });
+			} else {
+				pool.query('INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)', [liker, liked], (error, results) => {
+					if (error){
+						res.status(400)
+					}
+				res
+				.json({ info: 'like'})
+				.status(200)
+				});
+			}
+		});
+	};
+	
 	module.exports = {
 		pool,
 		getUsers,
@@ -172,4 +220,6 @@ const getUsers = (request, response) => {
 		setNotifSeen,
 		updateLocation,
 		createMatch,
+		deleteMatch,
+		like,
 	}

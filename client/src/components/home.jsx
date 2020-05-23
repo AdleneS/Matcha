@@ -7,6 +7,7 @@ import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 class Home extends Component {
+	_isMounted = false;
 	constructor(props){
 		super(props);
 		this.state = {
@@ -18,16 +19,24 @@ class Home extends Component {
 	}
 
 	componentDidMount(){
-		fetch('/cookie/')
-			.then(res => res.json())
-			.then (cookie => this.setState({cookie}))
-		fetch('/pretender/')
-			.then(res => res.json())
-			.then (pretender => this.setState({pretender}))
-		fetch('/users/likes')
-			.then(res => res.json())
-			.then (likes => this.setState({likes}))
-		this.setState({notification:this.context.nb_notif});
+		this._isMounted = true;
+		if (this._isMounted === true){
+			fetch('/cookie/')
+				.then(res => res.json())
+				.then (cookie => this.setState({cookie}))
+			fetch('/pretender/')
+				.then(res => res.json())
+				.then (pretender => this.setState({pretender}))
+			fetch('/users/likes')
+				.then(res => res.json())
+				.then (likes => this.setState({likes}))
+			this.setState({notification:this.context.nb_notif});
+		}
+	}
+
+	componentWillUnmount(){
+		this._isMounted = false;
+
 	}
 
 	 addNotif = (data) => {
@@ -40,8 +49,7 @@ class Home extends Component {
 		})
 	}
 
-	addMatch = (pretenderUid) => {
-		console.log("Front")
+	addMatch = (pretenderUid, data) => {
 		fetch('/match/create', {
 			method: 'POST',
 			body: JSON.stringify({pretenderUid: pretenderUid}),
@@ -49,6 +57,49 @@ class Home extends Component {
 				'Content-type': 'application/json'
 			}
 		})
+		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
+		.then(res => {
+			if (res.status === 200){
+				if (res.body.info === "match"){
+					data.notif_type = "match"
+					this.props.socket.emit('sendNotif', pretenderUid)
+					this.addNotif(data)
+				}
+			} else {
+				const error = new Error(res.body.error);
+				throw error;
+			}
+		})
+		.catch(error => {
+			alert(error);
+		});
+	}
+
+	deleteMatch = (pretenderUid, data) => {
+		
+		fetch('/match/delete', {
+			method: 'POST',
+			body: JSON.stringify({pretenderUid: pretenderUid}),
+			headers:{
+				'Content-type': 'application/json'
+			}
+		})
+		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
+		.then(res => {
+			if (res.status === 200){
+				if (res.body.info === "unmatch"){
+					data.notif_type = "unmatch"
+					this.props.socket.emit('sendNotif', pretenderUid)
+					this.addNotif(data)
+				}
+			} else {
+				const error = new Error(res.body.error);
+				throw error;
+			}
+		})
+		.catch(error => {
+			alert(error);
+		});
 	}
 
 
@@ -67,7 +118,10 @@ class Home extends Component {
 				const data = {notifier_uid: this.state.cookie.info.uid, notified_uid: pretenderUid, notifier_login: this.state.cookie.info.login, notif_type: res.body.info}
 				this.props.socket.emit('sendNotif', pretenderUid)
 				this.addNotif(data);
-				this.addMatch(pretenderUid);
+				if (res.body.info === "like")
+					this.addMatch(pretenderUid, data);
+				else if (res.body.info === "unlike")
+					this.deleteMatch(pretenderUid, data)
 				fetch('/users/likes')
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))
@@ -76,8 +130,8 @@ class Home extends Component {
 				throw error;
 			}
 		})
-		.catch(err => {
-			alert(err);
+		.catch(error => {
+			alert(error);
 		});
 	}
 

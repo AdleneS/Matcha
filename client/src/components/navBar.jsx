@@ -68,6 +68,9 @@ export default function Mynav (props) {
 				throw error;
 			}
 		})
+		.catch(err => {
+			alert("err");
+		});
 	}
 
 	return (
