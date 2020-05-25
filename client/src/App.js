@@ -4,6 +4,7 @@ import Customers from './components/customers';
 import NavBar from './components/navBar';
 import Login from './components/Login';
 import Home from './components/home';
+import Chat from './components/chat';
 import Register from './components/register';
 import ErrorPage from './components/404';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
@@ -66,6 +67,7 @@ export default function App() {
 								<Route path="/home" component={withAuth(Home, socket)}/>
 								<Route path="/testupload" component={withAuth(testupload)} />
 								<Route path="/customers" component={withAuth(Customers)} />
+								<Route path="/chat" component={withAuth(Chat)} />
 								<Route path="/login">
 									<Login socket={socket}/>
 								</Route>

@@ -176,6 +176,27 @@ const getUsers = (request, response) => {
 			}
 		});
 	}
+	const getMatch = (request, response) => {
+		const user_uid = request.cookies.info.uid;
+		pool.query('SELECT *\
+					FROM match\
+					INNER JOIN users ON match.uid_1 = users.uid\
+					INNER JOIN img ON img.uid = match.uid_1\
+					WHERE uid_2 = $1\
+					UNION\
+					SELECT *\
+					FROM match\
+					INNER JOIN users ON match.uid_2 = users.uid\
+					INNER JOIN img ON img.uid = match.uid_2\
+					WHERE uid_1 = $1', [user_uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				console.log(results.rows)
+				response.status(200).json(results.rows)
+			}
+		})
+	}
 
 	const like = (req, res) => {
 		const liker = req.cookies.info.uid;
@@ -222,4 +243,5 @@ const getUsers = (request, response) => {
 		createMatch,
 		deleteMatch,
 		like,
+		getMatch,
 	}

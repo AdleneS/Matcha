@@ -1,0 +1,22 @@
+.containerDiv{
+    padding-top: 100px;
+    margin: auto;
+    height: auto;
+    background-color: cadetblue;
+    height: 100vh;
+
+}
+
+.containerMatch{
+    width: 30%;
+    height: 100%;
+    background-color: chocolate;
+}
+
+.containerChat{
+    position: absolute;
+    padding: 10px;
+    width: 50%;
+    background-color: crimson;
+}
+

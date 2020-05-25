@@ -1,10 +1,9 @@
 .cardContainer{
-    width: 65vw;
-    display: grid;
     flex-wrap: wrap;
     margin: auto;
+    padding-top: 100px;
+    padding-left: 30px;
     display: flex;
-    padding: 30px;
   }
 
   .item {

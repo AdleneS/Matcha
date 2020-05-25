@@ -72,9 +72,16 @@ export default function Mynav (props) {
 			alert("err");
 		});
 	}
+	
+	const navBarStyle = {
+		position: "absolute",
+		width: "100%",
+		zIndex: 1,
+		margin: "auto"
+	};
 
 	return (
-		<Navbar className="nav-flat" variant="dark">
+		<Navbar className="nav-flat" style={navBarStyle} variant="dark">
 			<Link to={"/home"}>
 				<Navbar.Brand>
 					<img
@@ -90,9 +97,9 @@ export default function Mynav (props) {
 			<Nav className="mr-auto">
 				<Link className="nav-link" to={"/home"}> Home </Link>
 				{!islogged && <Link className="nav-link" to={"/login"}> Login </Link>}
-				<Link className="nav-link" to={"/customers"}> Customers </Link>
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
+				{islogged && (<Link className="nav-link" to={"/chat"}> Chat </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
 			{islogged &&
