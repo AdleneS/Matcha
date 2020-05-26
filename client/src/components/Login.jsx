@@ -51,6 +51,7 @@ export default function Login (props) {
 		height: "320px",
 		backgroundColor: "#1a1a1a",
 		padding: "9px",
+		paddingTop: "100px",
 		color: "white",
 		borderBottom: "15px solid #111111",
 		margin:"Auto",

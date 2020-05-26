@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import Moment from 'moment';
 import "./animation.css";
 import Media from 'react-bootstrap/Media'
+import FormControl from 'react-bootstrap/FormControl'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Button from 'react-bootstrap/Button'
+
 import './chat.css';
 import "./animation.css";
 
@@ -30,7 +34,7 @@ class Chat extends Component {
 			<div className="containerDiv fade">
 				<div className="containerMatch">
 					{this.state.matches.map(matches => {
-						return <Media key={matches.id} style={{color:"white"}}>
+						return <Media key={matches.id} style={{color:"white", padding:"5px"}}>
 							<img
 								width={64}
 								height={64}
@@ -38,11 +42,26 @@ class Chat extends Component {
 								src={process.env.PUBLIC_URL + matches.path}
 								alt="Generic placeholder"
 							/>
+							
 							<Media.Body>
 								<h5>{matches.login}</h5>
 							</Media.Body>
-						</Media>
+						</Media>	
 					})}
+				</div>
+				<div className="containerChat">
+					<div className="containerInput">
+						<InputGroup className="mb-3">
+							<FormControl
+							placeholder="Message"
+							aria-label="Recipient's username"
+							aria-describedby="basic-addon2"
+							/>
+							<InputGroup.Append>
+							<Button variant="primary">Button</Button>
+							</InputGroup.Append>
+						</InputGroup>					
+					</div>
 				</div>
 			</div>
 		);
