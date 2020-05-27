@@ -2,32 +2,15 @@
   height: 100%;
 }
 
-.myLogo{
-  width: 200px;
-  height: 75px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.App-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  background-color: #4d1b35;
-  height: 100px;
-  padding: 10px;
-  color: rgb(255, 255, 255);
-}
-
 .myBody{
-  background-color: #252525;
+  background-color: #31303a;
 }
 
-.nav-flat {
-  background-color: #1a1a1a;
-  border-bottom: 15px solid #111111;
-  color: white;
+.nav-flat{
+  background-color: #1d1c22;
 }
+
+
 
 .myForm{
   display: flex;
@@ -58,4 +41,15 @@
 
 .App-link {
   color: #61dafb;
+}
+
+input {
+  border-color: rgb(26, 26, 26) !important;;
+  background-color: rgb(24, 24, 24) !important;
+  color: rgb(185, 185, 185) !important;
+}
+
+input:focus {
+  border-color: rgb(77, 77, 77) !important;;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(53, 53, 53, 0.6) !important;
 }

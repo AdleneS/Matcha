@@ -146,7 +146,7 @@ class Home extends Component {
 					
 					{this.state.pretender.map(pretender =>
 					<Link key={pretender.id} to={"#/user/page/" + pretender.id}>
-						<Card className="item" key={ pretender.id } style={{ width: '15rem', margin: '10px'}}>
+						<Card className="item" key={ pretender.id }>
 						<Card.Img className="myPic" variant="top" src= {process.env.PUBLIC_URL + pretender.path} />
 						<div className="overlay">
 							<Card.Title className="title">{ pretender.login }</Card.Title>

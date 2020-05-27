@@ -56,7 +56,6 @@ export default function App() {
 
 	return (
 		<MyContext.Provider value={{islogged: islogged, setIsLogged:setIsLogged}}>
-			
 				<div className="app">
 						<BrowserRouter>
 							<NavBar socket={socket}/>
@@ -76,7 +75,6 @@ export default function App() {
 							</Switch>
 						</BrowserRouter>
 				</div>
-			
 		</MyContext.Provider>
 	 );
 }

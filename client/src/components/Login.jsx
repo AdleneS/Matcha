@@ -49,13 +49,12 @@ export default function Login (props) {
 	const divLog = {
 		width: "400px",
 		height: "320px",
-		backgroundColor: "#1a1a1a",
+		backgroundColor: "#1d1c22",
 		padding: "9px",
-		paddingTop: "100px",
 		color: "white",
-		borderBottom: "15px solid #111111",
+		borderBottom: "1px solid #111111",
 		margin:"Auto",
-		marginTop:"30px",
+		marginTop:"100px",
 	};
 
 	if(islogged){

@@ -65,7 +65,6 @@ const getUsers = (request, response) => {
 	}
 	const updateLocation = (request, response) => {
 		const user_uid = request.cookies.info.uid;
-		console.log(request.body.location)
 		pool.query('UPDATE users SET country = $2 WHERE uid = $1', [user_uid, request.body.location], (error, results) => {
 			if (error) {
 				throw error
@@ -192,7 +191,6 @@ const getUsers = (request, response) => {
 			if (error) {
 				throw error
 			}else{
-				console.log(results.rows)
 				response.status(200).json(results.rows)
 			}
 		})

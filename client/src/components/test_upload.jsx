@@ -32,7 +32,7 @@ class Test_upload extends Component {
 	render(){
 		return (
 			<div>
-				<form  onSubmit={this.onSubmit}>
+				<form  onSubmit={this.onSubmit} style={{paddingTop: "90px"}}>
 					<input type="file" name="file" onChange={this.onFileChange}/>
 					<input type="submit"/>
 				</form>

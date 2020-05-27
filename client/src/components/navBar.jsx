@@ -74,14 +74,16 @@ export default function Mynav (props) {
 	}
 	
 	const navBarStyle = {
-		position: "absolute",
+		
 		width: "100%",
 		zIndex: 1,
-		margin: "auto"
+		margin: "auto",
+		borderBottom: "1px solid rgb(13, 13, 14)",
+		color: "white"
 	};
 
 	return (
-		<Navbar className="nav-flat" style={navBarStyle} variant="dark">
+		<Navbar className="nav-flat fixed-top" style={navBarStyle} variant="dark">
 			<Link to={"/home"}>
 				<Navbar.Brand>
 					<img

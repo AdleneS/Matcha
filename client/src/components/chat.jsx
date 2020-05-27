@@ -50,18 +50,18 @@ class Chat extends Component {
 					})}
 				</div>
 				<div className="containerChat">
-					<div className="containerInput">
-						<InputGroup className="mb-3">
-							<FormControl
-							placeholder="Message"
-							aria-label="Recipient's username"
-							aria-describedby="basic-addon2"
-							/>
-							<InputGroup.Append>
-							<Button variant="primary">Button</Button>
-							</InputGroup.Append>
-						</InputGroup>					
-					</div>
+				</div>
+				<div className="containerInput">
+					<InputGroup className="mb-3">
+						<FormControl
+						placeholder="Message"
+						aria-label="Recipient's username"
+						aria-describedby="basic-addon2"
+						/>
+						<InputGroup.Append>
+						<Button variant="dark">Send</Button>
+						</InputGroup.Append>
+					</InputGroup>
 				</div>
 			</div>
 		);
