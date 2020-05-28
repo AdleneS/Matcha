@@ -66,7 +66,7 @@ export default function App() {
 								<Route path="/home" component={withAuth(Home, socket)}/>
 								<Route path="/testupload" component={withAuth(testupload)} />
 								<Route path="/customers" component={withAuth(Customers)} />
-								<Route path="/chat" component={withAuth(Chat)} />
+								<Route path="/chat/:match_uid" component={withAuth(Chat)} />
 								<Route path="/login">
 									<Login socket={socket}/>
 								</Route>

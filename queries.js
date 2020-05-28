@@ -223,7 +223,34 @@ const getUsers = (request, response) => {
 			}
 		});
 	};
-	
+
+	const getMessages = (request, response) => {
+		console.log("wqdqwd", request.params)
+		const	user_uid = request.cookies.info.uid
+		const	match_uid = request.params.match_uid
+		pool.query('SELECT * FROM chat WHERE (uid_sender = $1 AND uid_receiver = $2) OR (uid_sender = $2 AND uid_receiver = $1)', [user_uid, match_uid], (error, results) => {
+			if (error) {
+				throw error
+			}
+			response.status(200).json(results.rows)
+		})
+	}
+
+	const createMessages = (request, response) => {
+		console.log("wqdqwd", request.params)
+
+		const	user_uid = request.cookies.info.uid
+		const	match_uid = request.params.match_uid
+		const	msg = request.body.msg
+		pool.query('INSERT INTO chat (uid_sender, uid_receiver, msg, date) VALUES ($1, $2, $3, $4)', [user_uid, match_uid, msg, moment()], (error, results) => {
+			if (error){
+				throw error
+			} else {
+				response.status(200).json({message: 'Sent'});
+			}
+		});
+	}
+
 	module.exports = {
 		pool,
 		getUsers,
@@ -242,4 +269,6 @@ const getUsers = (request, response) => {
 		deleteMatch,
 		like,
 		getMatch,
+		getMessages,
+		createMessages,
 	}

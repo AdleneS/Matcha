@@ -101,7 +101,7 @@ export default function Mynav (props) {
 				{!islogged && <Link className="nav-link" to={"/login"}> Login </Link>}
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
-				{islogged && (<Link className="nav-link" to={"/chat"}> Chat </Link>)}
+				{islogged && (<Link className="nav-link" to={"/chat/match_uid="}> Chat </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
 			{islogged &&
