@@ -6,6 +6,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import {Link} from 'react-router-dom';
 
 import './chat.css';
 import "./animation.css";
@@ -30,13 +31,13 @@ class Chat extends Component {
 		fetch('/match/get')
 			.then(res => res.json())
 			.then (matches => this.setState({matches}, () => {
-					if (this.state.matches.length)
+					if (this.state.matches.length){
 						this.props.history.push("/chat/" + this.state.matches[0].uid);
-			}, () => {
-				fetch('/chat/get/' + this.props.match.params.match_uid)
-				.then(res => res.json())
-				.then (messages => this.setState({messages}))}
-			))
+					fetch('/chat/get/' + this.state.matches[0].uid)
+						.then(res => res.json())
+						.then (messages => this.setState({messages}), () => console.log(this.state.messages))
+				}
+			}))
 	}
 	
 	onClickMatch = (event, match_uid) => {
@@ -66,8 +67,10 @@ class Chat extends Component {
 
 	render() {
 		Moment.locale('fr');
+		if (!this.state.matches.length){
+				return (<div className="noMatch"> NO MATCH TRY TO MATCH SOMEONE HERE <Link to="/home"> HOME </Link> </div>)
+			}
 		return (
-	
 			<div className="containerDiv fade">
 				<div className="containerMatch">
 					{this.state.matches.map(matches => {
@@ -87,7 +90,7 @@ class Chat extends Component {
 				</div>
 				<div className="containerChat">
 				{this.state.messages.map(message => {
-					return	<p>{message.msg}</p>
+					return	<div key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}</div>
 					})}
 				</div>
 				<div className="containerInput">

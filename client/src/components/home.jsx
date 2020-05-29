@@ -102,7 +102,6 @@ class Home extends Component {
 		});
 	}
 
-
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
 		fetch('/like/', {
@@ -151,7 +150,7 @@ class Home extends Component {
 						<div className="overlay">
 							<Card.Title className="title">{ pretender.login }</Card.Title>
 								<Card.Text>
-									{ Moment(pretender.birthday).format('DD/MM/YYYY') }
+									{ Moment().diff(pretender.birthday, 'years') } years old
 									<br></br>
 									{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
 								</Card.Text>

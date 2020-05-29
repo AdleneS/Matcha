@@ -55,8 +55,19 @@ app.get('/cookie', (req, res) => {
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
-	res .json({uid: req.cookies.info.uid})
-		.status(200);
+	pool.query('SELECT uid FROM users ORDER BY id ASC', (error, results) => {
+		if (error) {
+			throw error
+		} else if (results.rowCount){
+			res .status(200)
+				.json(results.rows)
+		} else {
+			res.clearCookie('ssid');
+			res.clearCookie('info');
+			res .json({error: "Bad Cookies"})
+				.status(200);
+		}
+	})
 });
 
 app.get('/logout', function(req, res){

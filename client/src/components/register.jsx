@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useContext} from 'react'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
@@ -54,10 +54,6 @@ export default function Register () {
 			.catch(err => {
 		});
 	}
-	
-	useEffect(() => {
-		console.log(sError)
-	  }, [sError])
 
 	const divReg = {
 		width: "600px",
@@ -66,9 +62,9 @@ export default function Register () {
 		display: "flex",
 		flexDirection: "column",
 		color: "white",
-		borderBottom: "15px solid #111111",
+		borderBottom: "1px solid #111111",
 		margin:"Auto",
-		marginTop:"30px",
+		marginTop:"90px",
 	};
 
 	if(islogged){
