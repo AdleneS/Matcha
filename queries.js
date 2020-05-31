@@ -58,6 +58,7 @@ const getUsers = (request, response) => {
 		const notif_id = request.body.notif_id;
 		pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false and id = $2', [user_uid, notif_id], (error, results) => {
 			if (error) {
+				console.log(error)
 				throw error
 			}else{
 				response.status(200)
@@ -233,11 +234,7 @@ const getUsers = (request, response) => {
 			if (error) {
 				throw error
 			}
-			if (results.rowCount)
-				response.status(200).json(results.rows)
-			else
-				response.status(400)
-
+			response.status(200).json(results.rows)
 		})
 	}
 

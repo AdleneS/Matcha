@@ -12,6 +12,7 @@ import './chat.css';
 import "./animation.css";
 
 class Chat extends Component {
+	messagesEnd = null;
 	constructor(props){
 		super(props);
 		this.state = {
@@ -20,8 +21,17 @@ class Chat extends Component {
 			messages: [],
 			msg:'',
 			msgUrl: '',
-			
+			loading: true,
 		}
+	}
+
+	scrollToBottom = () => {
+		if (this.messagesEnd)
+			this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+	}
+	
+	componentDidUpdate() {
+		this.scrollToBottom();
 	}
 
 	componentDidMount(){
@@ -31,15 +41,24 @@ class Chat extends Component {
 		fetch('/match/get')
 			.then(res => res.json())
 			.then (matches => this.setState({matches}, () => {
+					this.setState({loading: false})
 					if (this.state.matches.length){
 						this.props.history.push("/chat/" + this.state.matches[0].uid);
 					fetch('/chat/get/' + this.state.matches[0].uid)
-						.then(res => res.json())
-						.then (messages => this.setState({messages}), () => console.log(this.state.messages))
+						.then (res => res.json())
+						.then (messages => this.setState({messages}, () => console.log(this.state.messages)))
+					this.scrollToBottom();
 				}
 			}))
 	}
 	
+	addMessage(match_uid){
+		fetch('/chat/get/' + match_uid)
+		.then (res => res.json())
+		.then (messages => this.setState({messages}, () => console.log(this.state.messages)))
+		this.scrollToBottom();
+	}
+
 	onClickMatch = (event, match_uid) => {
 		event.preventDefault();
 		fetch('/chat/get/' + match_uid)
@@ -54,19 +73,29 @@ class Chat extends Component {
 
 	onSubmit = (event) => {
 		event.preventDefault();
-		fetch('/chat/create/' + this.props.match.params.match_uid, {
+		const match_uid = this.props.match.params.match_uid;
+		if (this.state.msg){
+			fetch('/chat/create/' + match_uid, {
 			method: 'POST',
 			body: JSON.stringify({ match_uid: this.state.matches[0].uid ,msg: this.state.msg}),
 			headers:{
 				'Content-type': 'application/json'
 			}
-		}, () => this.setState({msg: ''}))
-		console.log(this.state.msg);
+		},)
+		.then (res => {
+			if (res.status === 200)
+				this.addMessage(match_uid)
+		})
+		this.setState({msg: ''})
 		console.log("Submited");
+		}
 	}
 
 	render() {
 		Moment.locale('fr');
+		if (this.state.loading){
+			return (null)
+		}
 		if (!this.state.matches.length){
 				return (<div className="noMatch"> NO MATCH TRY TO MATCH SOMEONE HERE <Link to="/home"> HOME </Link> </div>)
 			}
@@ -90,7 +119,7 @@ class Chat extends Component {
 				</div>
 				<div className="containerChat">
 				{this.state.messages.map(message => {
-					return	<div key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}</div>
+					return	<div ref={(el) => { this.messagesEnd = el;}} key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}</div>
 					})}
 				</div>
 				<div className="containerInput">

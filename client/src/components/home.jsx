@@ -7,7 +7,6 @@ import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 class Home extends Component {
-	_isMounted = false;
 	constructor(props){
 		super(props);
 		this.state = {
@@ -19,24 +18,15 @@ class Home extends Component {
 	}
 
 	componentDidMount(){
-		this._isMounted = true;
-		if (this._isMounted === true){
-			fetch('/cookie/')
-				.then(res => res.json())
-				.then (cookie => this.setState({cookie}))
-			fetch('/pretender/')
-				.then(res => res.json())
-				.then (pretender => this.setState({pretender}))
-			fetch('/users/likes')
-				.then(res => res.json())
-				.then (likes => this.setState({likes}))
-			this.setState({notification:this.context.nb_notif});
-		}
-	}
-
-	componentWillUnmount(){
-		this._isMounted = false;
-
+		fetch('/cookie/')
+			.then(res => res.json())
+			.then (cookie => this.setState({cookie}))
+		fetch('/pretender/')
+			.then(res => res.json())
+			.then (pretender => this.setState({pretender}))
+		fetch('/users/likes')
+			.then(res => res.json())
+			.then (likes => this.setState({likes}))
 	}
 
 	 addNotif = (data) => {
@@ -136,7 +126,6 @@ class Home extends Component {
 
 	render() {
 		Moment.locale('fr');
-
 		return (
 			<div>
 				<div style={{color:"red"}}>

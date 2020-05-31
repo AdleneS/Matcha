@@ -35,6 +35,7 @@ app.use(cookieParser());
 io.on("connection", (socket) => {
 	socket.on('FromAPI', (uid) => {
 		socketArray[socket.id] = uid;
+		console.log(socketArray)
 	});
 	socket.on("sendNotif", (notified_uid) => {
 		found = Object.keys(socketArray).find(key => socketArray[key] === notified_uid);
@@ -55,7 +56,7 @@ app.get('/cookie', (req, res) => {
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
-	pool.query('SELECT uid FROM users ORDER BY id ASC', (error, results) => {
+	pool.query('SELECT uid FROM users WHERE uid = $1',[req.cookies.info.uid], (error, results) => {
 		if (error) {
 			throw error
 		} else if (results.rowCount){

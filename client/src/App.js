@@ -30,8 +30,9 @@ export default function App() {
 					.then(res => res.json())
 					.then (geo => setGeo(geo.results[5].address_components[1].long_name))
 				  }, function() {console.log("Enable Geolocation")});
+				socket.emit('FromAPI', res.body[0].uid)
 				setIsLogged(true);
-				socket.emit('FromAPI', res.body.uid)
+				
 			} else {
 				const error = new Error(res.body.error);
 				throw error;
@@ -66,7 +67,7 @@ export default function App() {
 								<Route path="/home" component={withAuth(Home, socket)}/>
 								<Route path="/testupload" component={withAuth(testupload)} />
 								<Route path="/customers" component={withAuth(Customers)} />
-								<Route path="/chat/:match_uid" component={withAuth(Chat)} />
+								<Route exact path="/chat/:match_uid" component={withAuth(Chat)} />
 								<Route path="/login">
 									<Login socket={socket}/>
 								</Route>

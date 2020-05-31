@@ -62,15 +62,6 @@ export default function Mynav (props) {
 				'Content-type': 'application/json'
 			}
 		})
-		.then(res => {
-			if (res.status !== 200){
-				const error = new Error(res.error);
-				throw error;
-			}
-		})
-		.catch(err => {
-			alert("err");
-		});
 	}
 	
 	const navBarStyle = {
@@ -101,7 +92,7 @@ export default function Mynav (props) {
 				{!islogged && <Link className="nav-link" to={"/login"}> Login </Link>}
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
 				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
-				{islogged && (<Link className="nav-link" to={"/chat/match_uid="}> Chat </Link>)}
+				{islogged && (<Link className="nav-link" to={"/chat/0"}> Chat </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
 			{islogged &&
