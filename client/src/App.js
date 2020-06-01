@@ -10,8 +10,9 @@ import ErrorPage from './components/404';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import withAuth from './withAuth';
 import MyContext from './components/appcontext';
+import ChangeInfo from './components/change_info'
+import Profile from './components/profile'
 
-import testupload from './components/test_upload'
 import io from 'socket.io-client'
 const ENDPOINT = "127.0.0.1:5000"
 const socket = io(ENDPOINT);
@@ -65,7 +66,9 @@ export default function App() {
 									<Redirect to="/home"/>
 								</Route>
 								<Route path="/home" component={withAuth(Home, socket)}/>
-								<Route path="/testupload" component={withAuth(testupload)} />
+								<Route path="/profile" component={withAuth(Profile)} />
+								<Route path="/profile" component={withAuth(Profile)} />
+								<Route path="/changeinfo" component={withAuth(ChangeInfo)} />
 								<Route path="/customers" component={withAuth(Customers)} />
 								<Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
 								<Route path="/login">

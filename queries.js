@@ -247,7 +247,49 @@ const getUsers = (request, response) => {
 			}
 		});
 	}
+	const getUsersProfile = (request, response) => {
+        console.log(request.params);
+        const uid = request.params.uid
+        pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND img.n_pic = 1', [uid], (error, results) => {
+            if (error) {
+                throw error
+            }else{
+                response.status(200).json(results.rows)
+            }
+        })
+    }
 
+    const getAllImg = (request, response) => {
+        const uid = request.params.uid
+        pool.query('SELECT * FROM img WHERE uid = $1 AND NOT n_pic = 1', [uid], (error, results) => {
+            if (error) {
+                throw error
+            }else{
+                response.status(200).json(results.rows)
+            }
+        })
+    }
+
+    const getOneLike = (request, response) => {
+        pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.cookies.info.uid, request.params.uid], (error, results) => {
+            if (error) {
+                throw error
+            }else{
+                response.status(200).json(results.rows)
+            }
+        })
+    }
+
+    const getYouLike = (request, response) => {
+        pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.params.uid, request.cookies.info.uid], (error, results) => {
+            if (error) {
+                throw error
+            }else{
+                response.status(200).json(results.rows)
+            }
+        })
+	}
+	
 	module.exports = {
 		pool,
 		getUsers,
@@ -268,4 +310,8 @@ const getUsers = (request, response) => {
 		getMatch,
 		getMessages,
 		createMessages,
+		getUsersProfile,
+		getAllImg,
+		getOneLike,
+		getYouLike,
 	}

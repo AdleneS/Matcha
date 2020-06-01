@@ -7,14 +7,14 @@ const app = express();
 const db = require('./queries');
 const cookieParser = require('cookie-parser');
 const withAuth = require('./middleware');
-const fs = require('fs');
 var auth = require('./auth');
-const multer = require('multer');
-const path = require('path');
 const pool = require('./db');
+const info = require('./change_info');
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 var socketArray = {};
+const multer = require('multer');
+
 
 app.use(bodyParser.json())
 app.use(
@@ -23,14 +23,6 @@ app.use(
 	})
 )
 app.use(cookieParser());
-//app.set('trust proxy', 1)
-//app.use(session({
-//  name: '_leCookie',
-//  secret: 'keyboard cat',
-//  resave: true,
-//  saveUninitialized: true,
-//  cookie: { secure: false, maxAge: 7200000 }
-//}))
 
 io.on("connection", (socket) => {
 	socket.on('FromAPI', (uid) => {
@@ -80,39 +72,46 @@ app.get('/logout', function(req, res){
 	res.sendStatus(200);
  });
 
+ const upload = multer({
+	dest: "./client/public/img_container/tmp"
+	});
+
+ app.post("/imgupload", upload.single("file"),(req, res) => {
+	const tempPath = req.file.path;
+	const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+	if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
+		fs.rename(tempPath, targetPath, err => {
+			if (err) return handleError(err, res);
+			
+			pool.query('SELECT * FROM img WHERE uid = $1', [req.cookies.info.uid], (error, check_img) => {
+				if (error) throw error;
+				if (check_img.rowCount < 5) {
+					pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, check_img.rowCount + 1], (error, results) => {
+						if (error) throw error;});
+					res
+						.status(200)
+						.json({ info: 'File uploaded!' })
+				}
+			});
+
+		});
+	} else {
+			fs.unlink(tempPath, err => {
+			if (err) return handleError(err, res);
+
+			res
+				.status(403)
+		.json({ info: "Only .png and .jpg files are allowed!" })
+		});
+	}
+}
+)
  const handleError = (err, res) => {
 	res
 		.status(500)
 		.json({ info: 'Oops! Something went wrong!' })
 	};
 	
-	const upload = multer({
-	dest: "./client/public/img_container/tmp"
-	});
-
-app.post("/imgupload", upload.single("file"),(req, res) => {
-		const tempPath = req.file.path;
-		const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
-		if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
-			fs.rename(tempPath, targetPath, err => {
-				if (err) return handleError(err, res);
-				pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, 1], (error, results) => {
-					if (error) throw error;});
-				res
-					.status(200)
-					.json({ info: 'File uploaded!' })
-			});
-		} else {
-				fs.unlink(tempPath, err => {
-				if (err) return handleError(err, res);
-					res
-						.status(403)
-						.json({ info: "Only .png and .jpg files are allowed!" })
-			});
-		}
-	}
-);
-
 app.use('/auth', auth)
 app.get('/users', db.getUsers)
 app.get('/users/likes', db.getLikes)
@@ -132,6 +131,15 @@ app.get('/notif/getnb', db.getNotifNb)
 app.post('/notif/setseen', db.setNotifSeen)
 app.post('/users/location', db.updateLocation)
 app.delete('/users/:id', db.deleteUser)
+app.get('/profile/gallery/:uid', db.getAllImg)
+app.get('/profile/:uid', db.getUsersProfile)
+app.get('/profile/like/:uid', db.getOneLike)
+app.get('/profile/likeYou/:uid', db.getYouLike)
+app.get('/change/sortImage', info.sortImage)
+app.post('/change/deleteImage', info.deleteImage)
+app.post('/change/deleteTag', info.deleteTag)
+app.get('/change/tag', info.sortTags)
+app.post('/change/login', info.updateLogin)
 app.use(function(err, req, res, next){
 		res.status(err.status || 500);
 		res.json({

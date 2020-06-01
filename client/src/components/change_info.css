@@ -1,0 +1,41 @@
+.thumbnail {
+		width: 200px;
+		height: 200px;
+		display: inline-block;
+		margin-right: 10px;
+}
+
+.submitChange{
+  border-color: rgb(26, 26, 26) !important;;
+  background-color: #1d1c22 !important;
+	color: rgb(185, 185, 185) !important;
+}
+
+.custom-file-label{
+  border-color: rgb(26, 26, 26) !important;;
+  background-color: #1d1c22 !important;
+	color: rgb(185, 185, 185) !important;
+}
+
+.custom-file-label::after{
+  border-color: rgb(68, 68, 68) !important;;
+  background-color: #3e3c49 !important;
+	color: rgb(185, 185, 185) !important;
+}
+
+.containerChange{
+	margin-top: 90px;
+	color: white;
+}
+/*.overlay_2 {
+		height: 100%;
+		width: 100%;
+		background-color: tomato;
+		opacity: 1;
+		box-sizing: border-box;
+		position: absolute;
+}*/
+
+/*.thumbnail:hover .overlay {
+	opacity: 1;
+}*/
