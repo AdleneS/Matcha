@@ -25,6 +25,16 @@ class Chat extends Component {
 		}
 	}
 
+	createNotif = (data) => {
+			fetch('/notif/create', {
+			method: 'POST',
+			body: JSON.stringify({ notified_uid: data.notified_uid , notifier_uid: data.notifier_uid ,notifier_login: data.notifier_login, notif_type: data.notif_type}),
+			headers:{
+				'Content-type': 'application/json'
+			}
+		})
+	}
+
 	scrollToBottom = () => {
 		if (this.messagesEnd)
 			this.messagesEnd.scrollIntoView({ behavior: "smooth" });
@@ -46,13 +56,13 @@ class Chat extends Component {
 						this.props.history.push("/chat/" + this.state.matches[0].uid);
 					fetch('/chat/get/' + this.state.matches[0].uid)
 						.then (res => res.json())
-						.then (messages => this.setState({messages}, () => console.log(this.state.messages)))
+						.then (messages => this.setState({messages}))
 					this.scrollToBottom();
 				}
 			}))
 	}
-	
-	addMessage(match_uid){
+
+	getMessage(match_uid){
 		fetch('/chat/get/' + match_uid)
 		.then (res => res.json())
 		.then (messages => this.setState({messages}, () => console.log(this.state.messages)))
@@ -82,12 +92,16 @@ class Chat extends Component {
 				'Content-type': 'application/json'
 			}
 		},)
-		.then (res => {
-			if (res.status === 200)
-				this.addMessage(match_uid)
-		})
-		this.setState({msg: ''})
-		console.log("Submited");
+		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
+		.then(res => {
+				if (res.status === 200){
+					const data = {notifier_uid: this.state.cookie.info.uid, notified_uid: match_uid, notifier_login: this.state.cookie.info.login, notif_type: res.body.info}
+					this.getMessage(match_uid)
+					this.createNotif(data)
+					this.setState({msg: ''})
+					console.log("Submited");
+				}
+			})
 		}
 	}
 

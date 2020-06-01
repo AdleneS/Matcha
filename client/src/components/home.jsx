@@ -53,6 +53,7 @@ class Home extends Component {
 				if (res.body.info === "match"){
 					data.notif_type = "match"
 					this.props.socket.emit('sendNotif', pretenderUid)
+					this.props.socket.emit('sendNotif', this.state.cookie.uid)
 					this.addNotif(data)
 				}
 			} else {
@@ -66,7 +67,6 @@ class Home extends Component {
 	}
 
 	deleteMatch = (pretenderUid, data) => {
-		
 		fetch('/match/delete', {
 			method: 'POST',
 			body: JSON.stringify({pretenderUid: pretenderUid}),
@@ -135,22 +135,22 @@ class Home extends Component {
 					{this.state.pretender.map(pretender =>
 					<Link key={pretender.id} to={"#/user/page/" + pretender.id}>
 						<Card className="item" key={ pretender.id }>
-						<Card.Img className="myPic" variant="top" src= {process.env.PUBLIC_URL + pretender.path} />
-						<div className="overlay">
-							<Card.Title className="title">{ pretender.login }</Card.Title>
-								<Card.Text>
-									{ Moment().diff(pretender.birthday, 'years') } years old
-									<br></br>
-									{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
-								</Card.Text>
-								{this.state.likes.map(likes => 
-									<Card.Text key={likes.id}> {likes.uid_liked === pretender.uid ?
-										(<BsHeartFill onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333",  width: "30px", height: "30px", position: "absolute"}}/>) : null}
-									
+							<Card.Img className="myPic" variant="top" src= {process.env.PUBLIC_URL + pretender.path} />
+							<div className="overlay">
+								<Card.Title className="title">{ pretender.login }</Card.Title>
+									<Card.Text>
+										{ Moment().diff(pretender.birthday, 'years') } years old
+										<br></br>
+										{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
 									</Card.Text>
-								)}
-								<BsHeart onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333", width: "30px", height: "30px", position: "absolute"}}/>
-						</div>
+									{this.state.likes.map(likes => 
+										<Card.Text key={likes.id}> {likes.uid_liked === pretender.uid ?
+											(<BsHeartFill onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333",  width: "30px", height: "30px", position: "absolute"}}/>) : null}
+
+										</Card.Text>
+									)}
+									<BsHeart onClick={(event) => {this.onClick(event, pretender.uid)}} style={{color: "#ff3333", width: "30px", height: "30px", position: "absolute"}}/>
+							</div>
 						</Card>
 						</Link>
 					)}

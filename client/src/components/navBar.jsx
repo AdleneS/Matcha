@@ -56,7 +56,7 @@ export default function Mynav (props) {
 	function onHover(e, notif_id) {
 		e.preventDefault()
 		fetch('/notif/setseen', {
-			method: 'PUT',
+			method: 'POST',
 			body: JSON.stringify({notif_id: notif_id}),
 			headers:{
 				'Content-type': 'application/json'

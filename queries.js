@@ -8,7 +8,7 @@ const getUsers = (request, response) => {
 			if (error) {
 				throw error
 			}else{
-								response.status(200).json(results.rows)
+				response.status(200).json(results.rows)
 			}
 		})
 	}
@@ -57,12 +57,10 @@ const getUsers = (request, response) => {
 		const user_uid = request.cookies.info.uid;
 		const notif_id = request.body.notif_id;
 		pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false and id = $2', [user_uid, notif_id], (error, results) => {
-			if (error) {
-				console.log(error)
+			if (error)
 				throw error
-			}else{
-				response.status(200)
-			}
+			else 
+				response.status(200).json({info: results.rowCount});
 		})
 	}
 	const updateLocation = (request, response) => {
@@ -141,7 +139,7 @@ const getUsers = (request, response) => {
 			} else if (results.rows.length){
 				pool.query('INSERT INTO match (uid_1, uid_2, date) VALUES ($1, $2, $3)', [user_uid, pretender_uid, moment().format('LLL')], (error, results) => {
 					if (error){
-						response.status(400)
+						throw error
 					}
 					response
 					.json({info: 'match'})
@@ -207,7 +205,7 @@ const getUsers = (request, response) => {
 			} else if (results.rows.length){
 			 pool.query('DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [liker, liked], (error, results) => {
 				 if (error){
-					res.status(400)
+					throw error
 				 }
 				 res
 					.json({info: 'unlike'})
@@ -216,7 +214,7 @@ const getUsers = (request, response) => {
 			} else {
 				pool.query('INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)', [liker, liked], (error, results) => {
 					if (error){
-						res.status(400)
+						throw error
 					}
 				res
 				.json({ info: 'like'})
@@ -227,7 +225,6 @@ const getUsers = (request, response) => {
 	};
 
 	const getMessages = (request, response) => {
-		console.log("wqdqwd", request.params)
 		const	user_uid = request.cookies.info.uid
 		const	match_uid = request.params.match_uid
 		pool.query('SELECT * FROM chat WHERE (uid_sender = $1 AND uid_receiver = $2) OR (uid_sender = $2 AND uid_receiver = $1)', [user_uid, match_uid], (error, results) => {
@@ -239,8 +236,6 @@ const getUsers = (request, response) => {
 	}
 
 	const createMessages = (request, response) => {
-		console.log("wqdqwd", request.params)
-
 		const	user_uid = request.cookies.info.uid
 		const	match_uid = request.params.match_uid
 		const	msg = request.body.msg
@@ -248,7 +243,7 @@ const getUsers = (request, response) => {
 			if (error){
 				throw error
 			} else {
-				response.status(200).json({message: 'Sent'});
+				response.status(200).json({message: 'Sent', info: 'message'});
 			}
 		});
 	}

@@ -46,7 +46,7 @@ export default function App() {
 	useEffect(() => {
 		if ("geolocation" in navigator && geo) {
 			fetch('/users/location', {
-				method: 'PUT',
+				method: 'POST',
 				body: JSON.stringify({location: geo}),
 				headers:{
 					'Content-type': 'application/json'

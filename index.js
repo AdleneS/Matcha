@@ -35,7 +35,6 @@ app.use(cookieParser());
 io.on("connection", (socket) => {
 	socket.on('FromAPI', (uid) => {
 		socketArray[socket.id] = uid;
-		console.log(socketArray)
 	});
 	socket.on("sendNotif", (notified_uid) => {
 		found = Object.keys(socketArray).find(key => socketArray[key] === notified_uid);
@@ -126,8 +125,8 @@ app.post('/chat/create/:match_uid', db.createMessages)
 app.post('/notif/create', db.createNotif)
 app.get('/notif/get', db.getNotif)
 app.get('/notif/getnb', db.getNotifNb)
-app.put('/notif/setseen', db.setNotifSeen)
-app.put('/users/location', db.updateLocation)
+app.post('/notif/setseen', db.setNotifSeen)
+app.post('/users/location', db.updateLocation)
 app.delete('/users/:id', db.deleteUser)
 app.use(function(err, req, res, next){
 		res.status(err.status || 500);
