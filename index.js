@@ -40,6 +40,10 @@ io.on("connection", (socket) => {
 		found = Object.keys(socketArray).find(key => socketArray[key] === notified_uid);
 		io.to(found).emit('getNotif')
 	});
+	socket.on("sendMessage", (receiver_uid) => {
+		found = Object.keys(socketArray).find(key => socketArray[key] === receiver_uid);
+		io.to(found).emit('getMessage', socketArray[socket.id])
+	});
 	socket.on('disconnect', () => {
 		delete socketArray[socket.id]
 		console.log('user disconnected');

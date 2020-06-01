@@ -1,4 +1,5 @@
 .containerDiv{
+    font-size: medium;
     padding-top: 78px;
     background-color: rgb(26, 26, 26);
     height: 100vh;
@@ -38,17 +39,34 @@
 }
 
 .matchMsg{
+    float: left;
+    clear: both;
+    max-width: 65%;
+    margin-top: 5px;
     margin-left: 10px;
+    margin-right: auto;
+    margin-bottom: 5px;
     text-align: left;
     padding: 10px;
-    background-color: rgb(94, 94, 94);
+    border-radius: 15px;
+    background-color: rgb(61, 65, 78);
+    word-wrap: break-word;
+
 }
 
 .userMsg{
-    margin-left: 10px;
-    text-align: right;
+    float: right;
+    clear: both;
+    max-width: 65%;
+    word-wrap: break-word;
+    margin-top: 5px;
+    margin-left: auto;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    text-align: left;
     padding: 10px;
-    background-color: rgb(51, 51, 51);
+    border-radius: 15px;
+    background-color: rgb(65, 57, 66);
 
 }
 
@@ -58,3 +76,17 @@
     padding-top: 90px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
+
+.myPicMini {
+    position: relative;
+    object-fit: cover;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 1;
+  }
+
+  .dateMsg {
+      font-size: small;
+      font-style: italic;
+      color: rgb(163, 163, 163);
+  }

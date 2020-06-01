@@ -6,6 +6,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import Image from 'react-bootstrap/Image'
 import {Link} from 'react-router-dom';
 
 import './chat.css';
@@ -20,7 +21,7 @@ class Chat extends Component {
 			cookie: {},
 			messages: [],
 			msg:'',
-			msgUrl: '',
+			currentRoom: '',
 			loading: true,
 		}
 	}
@@ -33,6 +34,7 @@ class Chat extends Component {
 				'Content-type': 'application/json'
 			}
 		})
+		this.props.socket.emit('sendNotif', data.notified_uid)
 	}
 
 	scrollToBottom = () => {
@@ -53,6 +55,7 @@ class Chat extends Component {
 			.then (matches => this.setState({matches}, () => {
 					this.setState({loading: false})
 					if (this.state.matches.length){
+						this.setState({currentRoom: this.state.matches[0].uid})
 						this.props.history.push("/chat/" + this.state.matches[0].uid);
 					fetch('/chat/get/' + this.state.matches[0].uid)
 						.then (res => res.json())
@@ -75,15 +78,22 @@ class Chat extends Component {
 		.then(res => res.json())
 		.then (messages => this.setState({messages}, () => console.log(this.state.messages)))
 		this.props.history.push("/chat/" + match_uid);
+		this.setState({currentRoom: match_uid})
 	}
 
 	handleInputChange = (event) => {
 		this.setState({msg: event.target.value})
 	}
 
+	socketGetMessage =	this.props.socket.on('getMessage', (match_uid) => {
+							if (this.state.currentRoom === match_uid)
+								this.getMessage(match_uid)
+						});
+
+
 	onSubmit = (event) => {
 		event.preventDefault();
-		const match_uid = this.props.match.params.match_uid;
+		const match_uid = this.state.currentRoom
 		if (this.state.msg){
 			fetch('/chat/create/' + match_uid, {
 			method: 'POST',
@@ -97,9 +107,9 @@ class Chat extends Component {
 				if (res.status === 200){
 					const data = {notifier_uid: this.state.cookie.info.uid, notified_uid: match_uid, notifier_login: this.state.cookie.info.login, notif_type: res.body.info}
 					this.getMessage(match_uid)
+					this.props.socket.emit('sendMessage', match_uid)
 					this.createNotif(data)
 					this.setState({msg: ''})
-					console.log("Submited");
 				}
 			})
 		}
@@ -118,12 +128,11 @@ class Chat extends Component {
 				<div className="containerMatch">
 					{this.state.matches.map(matches => {
 					return	<Media onClick={(event) => {this.onClickMatch(event, matches.uid)}} key={matches.id} style={{color:"white", padding:"5px", cursor: "pointer"}}>
-								<img
-									width={64}
-									height={64}
-									className="mr-3"
+								<Image
+									className="mr-3 myPicMini"
 									src={process.env.PUBLIC_URL + matches.path}
 									alt="Generic placeholder"
+									
 								/>
 								<Media.Body>
 									<h5>{matches.login}</h5>
@@ -133,7 +142,7 @@ class Chat extends Component {
 				</div>
 				<div className="containerChat">
 				{this.state.messages.map(message => {
-					return	<div ref={(el) => { this.messagesEnd = el;}} key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}</div>
+					return	<div ref={(el) => { this.messagesEnd = el;}} key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}<div className="dateMsg">{Moment(message.date).format('MMMM Do YYYY, h:mm a')}</div></div>
 					})}
 				</div>
 				<div className="containerInput">

@@ -97,9 +97,15 @@ export default function Mynav (props) {
 			</Nav>
 			{islogged &&
 			<DropdownButton onClick={nb_notif => set_nbNotif(0)} variant={nb_notif ? "danger" : "secondary"} id="dropdown-button-drop-left" drop='left' title={ nb_notif ? nb_notif + " Notifications" : 'Notification' }>
-				{notifs.length ? notifs.map((notifs) => (
-					<Dropdown.Item onMouseEnter={(event) => {onHover(event, notifs.id)}} key={notifs.id} href="#/action-1">{notifs.notifier_login} vous a {notifs.notif_type}</Dropdown.Item>
-				)): 	<Dropdown.Item> Vous n'avez pas de notification <span role="img" aria-label="bad">☹️</span> </Dropdown.Item>}
+				{notifs.length ? 
+				notifs.map((notifs) => (
+					notifs.notif_type === 'message' ?
+						<Link className="dropdown-item" to={"/chat/" + notifs.notifier_uid} onMouseEnter={(event) => {onHover(event, notifs.id)}} key={notifs.id}><span role="img" aria-label="speech">💬</span> {notifs.notifier_login} sent you a {notifs.notif_type} </Link>
+					:
+						<Link className="dropdown-item" to={"#/profile/" + notifs.notifier_uid} onMouseEnter={(event) => {onHover(event, notifs.id)}} key={notifs.id}><span role="img" aria-label="heart">❤️</span> {notifs.notifier_login} {notifs.notif_type}ed you  </Link>
+				)):
+				<Dropdown.Item> Vous n'avez pas de notification <span role="img" aria-label="bad">☹️</span> </Dropdown.Item>
+				}
 			</DropdownButton>}
 		</Navbar>
 	);
