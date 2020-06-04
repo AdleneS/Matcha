@@ -94,10 +94,10 @@ class Test_upload extends Component {
 			})
 			.then(response => response.json())
 			.then(data => {
-			  console.log(data)
+			  console.log("lol", data)
 			})
 			.catch(error => {
-			  console.error(error)
+			  console.error("error", error)
 			})
 		}
 		fetch('/change/login', {
@@ -117,10 +117,10 @@ class Test_upload extends Component {
 		})
 		fetch('/change/tag')
 			.then(response => response.json())
-			.then(tag => this.setState({tag}, () => console.log('tag = ', tag)));
+			.then(tag => this.setState({tag}));
 		fetch('/change/sortImage')
 			.then(response => response.json())
-			.then(image => this.setState({image}, () => console.log('image = ', image)));
+			.then(image => this.setState({image}));
 		
 	}
 

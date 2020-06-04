@@ -25,7 +25,6 @@ const updateLogin = (request, response) => {
 			})
 		}
 	 
-		 console.log("tes", request.body);
 		if (request.body.login && request.body.login != user_log[0].rows.login) {
 			pool.query('SELECT * FROM users WHERE login = $1', [request.body.login], (error, check_login) => {
 				console.log('test_col', request.body.login)
@@ -44,9 +43,7 @@ const updateLogin = (request, response) => {
 		}
 	 
 		if (request.body.email && request.body.email !=  user_log.rows[0].login) {
-			console.log('tu rentre la ?')
 			pool.query('SELECT * FROM users WHERE email = $1', [request.body.email], (error, check_email) => {
-				console.log('test_col', request.body.email)
 				if (error) {
 					throw error
 				} else {
@@ -86,7 +83,6 @@ const updateLogin = (request, response) => {
 		}
 
 		if (request.body.description && request.body.description != user_log.rows[0].description) {
-			console.log('des = ', request.body.description)
 		   pool.query('UPDATE users SET description = $1 WHERE uid = $2', [request.body.description, request.cookies.info.uid], (error, results) => {
 			   if (error) {
 				   throw error
@@ -96,8 +92,6 @@ const updateLogin = (request, response) => {
 
 		if (request.body.addTag) {
 			var word = request.body.addTag.split(' ')
-			console.log('tag = : ', word[1])
-
 			for (let i = 0; word[i]; i++) {
 				 pool.query('INSERT INTO tag(uid, tag) VALUES ($1, $2)', [request.cookies.info.uid, word[i]], (error, results) => {
 					if (error) {
@@ -121,7 +115,7 @@ const updateLogin = (request, response) => {
 const sortTags = (request, response) => {
 	pool.query('SELECT * FROM tag WHERE uid = $1', [request.cookies.info.uid], (error, results) => {
 		if (error) {
-			response.status(400)
+			throw error;
 		}else{
 			response.status(200).json(results.rows)
 		}
@@ -131,7 +125,7 @@ const sortTags = (request, response) => {
 const deleteTag = (request, response) => {
 	pool.query('DELETE FROM tag WHERE uid = $1 AND tag = $2', [request.cookies.info.uid, request.body.tag], (error, results) => {
 		if (error) {
-			response.status(400)
+			throw error;
 		}else{
 			response.status(200).json(results.rows)
 		}
@@ -139,10 +133,9 @@ const deleteTag = (request, response) => {
 }
 
 const sortImage = (request, response) => {
-	console.log('TEST 121212 TEST')
 	pool.query('SELECT * FROM img WHERE uid = $1', [request.cookies.info.uid], (error, results) => {
 		if (error) {
-			response.status(400)
+			throw error;
 		}else{
 			response.status(200).json(results.rows)
 		}
@@ -151,10 +144,9 @@ const sortImage = (request, response) => {
 }
 
 const deleteImage = (request, response) => {
-	console.log('TEST 2 TEST', request.body)
 	pool.query('DELETE FROM img WHERE uid = $1 AND n_pic = $2', [request.cookies.info.uid, request.body.img], (error, results) => {
 		if (error) {
-			response.status(400)
+			throw error;
 		}else{
 			response.status(200).json(results.rows)
 		}

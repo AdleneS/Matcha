@@ -66,8 +66,8 @@ export default function App() {
 									<Redirect to="/home"/>
 								</Route>
 								<Route path="/home" component={withAuth(Home, socket)}/>
-								<Route path="/profile" component={withAuth(Profile)} />
-								<Route path="/profile" component={withAuth(Profile)} />
+								<Route exact path ="/profile" component={withAuth(Profile)} />
+								<Route exact path ="/profile/user/" component={withAuth(Profile)} />
 								<Route path="/changeinfo" component={withAuth(ChangeInfo)} />
 								<Route path="/customers" component={withAuth(Customers)} />
 								<Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />

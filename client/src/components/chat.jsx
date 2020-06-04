@@ -85,7 +85,7 @@ class Chat extends Component {
 		this.setState({msg: event.target.value})
 	}
 
-	socketGetMessage =	this.props.socket.on('getMessage', (match_uid) => {
+	socketGetMessage = this.props.socket.on('getMessage', (match_uid) => {
 							if (this.state.currentRoom === match_uid)
 								this.getMessage(match_uid)
 						});

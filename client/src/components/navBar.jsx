@@ -10,6 +10,7 @@ import {Link} from 'react-router-dom';
 export default function Mynav (props) {
 	const {islogged, setIsLogged} = useContext(MyContext);
 	const [nb_notif, set_nbNotif] = useState(0);
+	const [cookie, setCookie] = useState(null)
 	const [notifs, setNotif] = useState([])
 	const socket = props.socket;
 
@@ -21,6 +22,9 @@ export default function Mynav (props) {
 
 	useEffect(() => {
 	if (islogged){
+		fetch('/cookie/')
+			.then(response => response.json())
+			.then (cookie => setCookie(cookie))
 		fetch('/notif/getnb')
 			.then(response => response.json())
 			.then(response => set_nbNotif(response));
@@ -35,10 +39,6 @@ export default function Mynav (props) {
 			.then(response => response.json())
 			.then(response => setNotif(response));
 	}, [nb_notif])
-
-	useEffect(() => {
-		console.log(notifs)
-	}, [notifs])
 
 	function handleClick(e) {
 		e.preventDefault();
@@ -63,7 +63,7 @@ export default function Mynav (props) {
 			}
 		})
 	}
-	
+
 	const navBarStyle = {
 		
 		width: "100%",
@@ -89,9 +89,10 @@ export default function Mynav (props) {
 
 			<Nav className="mr-auto">
 				<Link className="nav-link" to={"/home"}> Home </Link>
+				
 				{!islogged && <Link className="nav-link" to={"/login"}> Login </Link>}
 				{!islogged && (<Link className="nav-link" to={"/register"}> Sign In </Link>)}
-				{islogged && (<Link className="nav-link" to={"/testupload"}> Profil </Link>)}
+				{islogged && cookie && (<Link className="nav-link" to={"/profile/user/?uid=" + cookie.info.uid}> Profil </Link>)}
 				{islogged && (<Link className="nav-link" to={"/chat/0"}> Chat </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>

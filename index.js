@@ -14,7 +14,8 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 var socketArray = {};
 const multer = require('multer');
-
+const path = require('path');
+const fs = require('fs');
 
 app.use(bodyParser.json())
 app.use(
@@ -76,36 +77,40 @@ app.get('/logout', function(req, res){
 	dest: "./client/public/img_container/tmp"
 	});
 
- app.post("/imgupload", upload.single("file"),(req, res) => {
-	const tempPath = req.file.path;
-	const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
-	if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
-		fs.rename(tempPath, targetPath, err => {
-			if (err) return handleError(err, res);
-			
-			pool.query('SELECT * FROM img WHERE uid = $1', [req.cookies.info.uid], (error, check_img) => {
-				if (error) throw error;
-				if (check_img.rowCount < 5) {
-					pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, check_img.rowCount + 1], (error, results) => {
-						if (error) throw error;});
-					res
-						.status(200)
-						.json({ info: 'File uploaded!' })
+	app.post("/imgupload", upload.single("file"),(req, res) => {
+        const tempPath = req.file.path;
+		const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+        if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
+            fs.rename(tempPath, targetPath, err => {
+                if (err){
+					return handleError(err, res);
 				}
-			});
+                pool.query('SELECT * FROM img WHERE uid = $1', [req.cookies.info.uid], (error, check_img) => {
+                    if (error) throw error;
+                    if (check_img.rowCount < 5) {
+                        pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, check_img.rowCount + 1], (error, results) => {
+                            if (error) throw error;});
+                        res
+                            .status(200)
+                            .json({ info: 'File uploaded!' })
+                    }
+                });
 
-		});
-	} else {
-			fs.unlink(tempPath, err => {
-			if (err) return handleError(err, res);
-
-			res
-				.status(403)
-		.json({ info: "Only .png and .jpg files are allowed!" })
-		});
-	}
-}
-)
+            });
+        } else {
+                fs.unlink(tempPath, err => {
+				if (err) {
+					console.log("here")
+					//return handleError(err, res);
+				}
+				
+                res
+                    .status(403)
+            .json({ info: "Only .png and .jpg files are allowed!" })
+            });
+        }
+    }
+);
  const handleError = (err, res) => {
 	res
 		.status(500)

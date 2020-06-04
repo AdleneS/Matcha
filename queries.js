@@ -248,7 +248,6 @@ const getUsers = (request, response) => {
 		});
 	}
 	const getUsersProfile = (request, response) => {
-        console.log(request.params);
         const uid = request.params.uid
         pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND img.n_pic = 1', [uid], (error, results) => {
             if (error) {

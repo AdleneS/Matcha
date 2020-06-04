@@ -24,19 +24,18 @@ class profile extends Component {
 	}
 
     componentDidMount() {
-        const queryString = window.location.search
+		const queryString = window.location.search
         const urlParam = new URLSearchParams(queryString)
-		fetch('/profile/'+urlParam.get('uid'))
+		fetch('/profile/' + urlParam.get('uid'))
 			.then(response => response.json())
-			.then (user => this.setState({user}, () => console.log('user fetched..', user)));
-		fetch('/profile/like/'+urlParam.get('uid'))
+			.then (user => this.setState({user}));
+		fetch('/profile/like/' + urlParam.get('uid'))
 			.then(res => res.json())
-			.then (likes => this.setState({likes}, () => console.log("couocu likes : ", likes)))
+			.then (likes => this.setState({likes}))
 			.then (likes => {
 				if (this.state.likes[0] && this.state.user[0]) {
 					if (this.state.likes[0].uid_liked === this.state.user[0].uid){
 						this.setState({is_like : 1});
-						console.log("test vous a like : ", this.state.likes);
 					}
 					else 
 						this.setState({is_like : 0});
@@ -46,18 +45,17 @@ class profile extends Component {
 			})
 			fetch('/profile/likeYou/'+urlParam.get('uid'))
 				.then(response => response.json())
-				.then (likes_you => this.setState({likes_you}, () => console.log('you like + =', likes_you)))
+				.then (likes_you => this.setState({likes_you}))
 				.then (likes_you => {
 					if (this.state.likes_you[0]) {
 						this.setState({is_likes_you : 1});
 					} else {
 						this.setState({is_likes_you : 0});
 					}
-					console.log("is_you_likes = ", this.state.is_likes_you)
 				})
 		fetch('/profile/gallery/'+urlParam.get('uid'))
 			.then(res => res.json())
-			.then(gallery => this.setState({gallery}, () => console.log('gallery', gallery)));
+			.then(gallery => this.setState({gallery}));
 	}
 	
 	onClick = (event, pretenderUid) => {
@@ -73,14 +71,11 @@ class profile extends Component {
 		})
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
-			console.log(res);
-			console.log("Responses:", res);
 			if (res.status === 200) {
-				fetch('/profile/like/'+urlParam.get('uid'))
+				fetch('/profile/like/' + urlParam.get('uid'))
 				.then(res => res.json())
 				.then (likes => this.setState({likes}))
 				if (this.state.likes[0]) {
-					console.log("test 0:", this.state.likes[0]);
 					if (this.state.likes[0].uid_liked === this.state.user[0].uid)
 						this.setState({is_like : 0});
 					else 
@@ -88,7 +83,6 @@ class profile extends Component {
 				} else {
 					this.setState({is_like : 1});
 				}
-				console.log("test 1 :",  this.state.is_like)
 			} else {
 				const error = new Error(res.body.error);
 				throw error;
@@ -153,16 +147,12 @@ class profile extends Component {
 
 					<Carousel>
 					{this.state.gallery.map(gallery =>
-  						<Carousel.Item>
+  						<Carousel.Item key={gallery.id}>
   						  <img
   						    className="d-block w-100 h-100 img_size"
   						    src={process.env.PUBLIC_URL + gallery.path}
   						    alt="First slide"
   						  />
-  						  <Carousel.Caption>
-  						    <h3>First slide label</h3>
-  						    <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-  						  </Carousel.Caption>
   						</Carousel.Item>
 					)}
 						</Carousel>
