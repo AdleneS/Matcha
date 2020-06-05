@@ -63,13 +63,14 @@ const getUsers = (request, response) => {
 				response.status(200).json({info: results.rowCount});
 		})
 	}
+
 	const updateLocation = (request, response) => {
 		const user_uid = request.cookies.info.uid;
 		pool.query('UPDATE users SET country = $2 WHERE uid = $1', [user_uid, request.body.location], (error, results) => {
 			if (error) {
 				throw error
 			}else{
-				response.status(200)
+				response.status(200).json({info: "Location Modified"});
 			}
 		})
 	}
@@ -248,47 +249,85 @@ const getUsers = (request, response) => {
 		});
 	}
 	const getUsersProfile = (request, response) => {
-        const uid = request.params.uid
-        pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND img.n_pic = 1', [uid], (error, results) => {
-            if (error) {
-                throw error
-            }else{
-                response.status(200).json(results.rows)
-            }
-        })
-    }
-
-    const getAllImg = (request, response) => {
-        const uid = request.params.uid
-        pool.query('SELECT * FROM img WHERE uid = $1 AND NOT n_pic = 1', [uid], (error, results) => {
-            if (error) {
-                throw error
-            }else{
-                response.status(200).json(results.rows)
-            }
-        })
-    }
-
-    const getOneLike = (request, response) => {
-        pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.cookies.info.uid, request.params.uid], (error, results) => {
-            if (error) {
-                throw error
-            }else{
-                response.status(200).json(results.rows)
-            }
-        })
-    }
-
-    const getYouLike = (request, response) => {
-        pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.params.uid, request.cookies.info.uid], (error, results) => {
-            if (error) {
-                throw error
-            }else{
-                response.status(200).json(results.rows)
-            }
-        })
+		const uid = request.params.uid
+		pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND img.n_pic = 1', [uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
 	}
-	
+
+	const getAllImg = (request, response) => {
+		const uid = request.params.uid
+		pool.query('SELECT * FROM img WHERE uid = $1 AND NOT n_pic = 1', [uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
+
+	const getOneLike = (request, response) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.cookies.info.uid, request.params.uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
+
+	const getYouLike = (request, response) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.params.uid, request.cookies.info.uid], (error, results) => {
+			if (error) {
+				throw error
+			}else{
+				response.status(200).json(results.rows)
+			}
+		})
+	}
+
+	const updatePopularity = (request, response) => {
+		const uid = request.cookies.info.uid
+		const popularity = request.cookies.info.popularity
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1', [uid], (error, resultsLike) => {
+			if (error) {
+				throw error
+			}else{
+				nb_likes = resultsLike.rowCount;
+				pool.query('SELECT * FROM match WHERE uid_1 = $1 OR uid_2 = $1', [uid], (error, resultsMatch) => {
+					if (error) {
+						throw error
+					}else{
+						var nb_match = resultsMatch.rowCount;
+						var ratio = nb_match / nb_likes
+						var newPopularity = popularity;
+						if (ratio < 0.25)
+							newPopularity += ratio * -10
+						else if (ratio > 0.75)
+							newPopularity += ratio * 2
+						if (newPopularity < 0 || newPopularity > 100)
+							newPopularity = newPopularity < 0 ? 0 : 100;
+						pool.query('UPDATE users SET popularity = $2 WHERE uid = $1', [uid, newPopularity], (error, results) => {
+								if (error) {
+									throw error
+								}else{
+									response
+											.status(200).json({info: newPopularity});
+								}
+							})
+						console.log("match ", nb_match);
+						console.log("like ", nb_likes);
+						console.log("ratio ", ratio);
+						console.log("pop ", newPopularity);
+					}
+				})
+			}
+		})
+	}
 	module.exports = {
 		pool,
 		getUsers,
@@ -313,4 +352,5 @@ const getUsers = (request, response) => {
 		getAllImg,
 		getOneLike,
 		getYouLike,
+		updatePopularity,
 	}

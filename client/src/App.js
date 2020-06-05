@@ -82,3 +82,9 @@ export default function App() {
 		</MyContext.Provider>
 	 );
 }
+
+// {islogged && 
+// 	<Route path="/home">
+// 		<Home socket={socket}/>
+// 	</Route>
+// }

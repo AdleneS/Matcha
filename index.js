@@ -52,6 +52,7 @@ app.get('/cookie', (req, res) => {
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
+	console.log(req.cookies.info)
 	pool.query('SELECT uid FROM users WHERE uid = $1',[req.cookies.info.uid], (error, results) => {
 		if (error) {
 			throw error
@@ -120,9 +121,8 @@ app.get('/logout', function(req, res){
 app.use('/auth', auth)
 app.get('/users', db.getUsers)
 app.get('/users/likes', db.getLikes)
+app.get('/users/popularity', db.updatePopularity)
 app.get('/pretender', db.getUsersImg)
-app.get('/users/:id', db.getUserById)
-app.get('/users/:email', db.getUserByEmail)
 app.post('/users', db.createUser)
 app.post('/like', db.like)
 app.post('/match/create', db.createMatch)
@@ -135,7 +135,6 @@ app.get('/notif/get', db.getNotif)
 app.get('/notif/getnb', db.getNotifNb)
 app.post('/notif/setseen', db.setNotifSeen)
 app.post('/users/location', db.updateLocation)
-app.delete('/users/:id', db.deleteUser)
 app.get('/profile/gallery/:uid', db.getAllImg)
 app.get('/profile/:uid', db.getUsersProfile)
 app.get('/profile/like/:uid', db.getOneLike)

@@ -50,6 +50,7 @@ class Home extends Component {
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
 			if (res.status === 200){
+				this.updatePopularity();
 				if (res.body.info === "match"){
 					data.notif_type = "match"
 					this.props.socket.emit('sendNotif', pretenderUid)
@@ -77,6 +78,7 @@ class Home extends Component {
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
 			if (res.status === 200){
+				this.updatePopularity();
 				if (res.body.info === "unmatch"){
 					data.notif_type = "unmatch"
 					this.props.socket.emit('sendNotif', pretenderUid)
@@ -92,6 +94,10 @@ class Home extends Component {
 		});
 	}
 
+	updatePopularity = () => {
+		fetch('/users/popularity')
+	}
+	
 	onClick = (event, pretenderUid) => {
 		event.preventDefault();
 		fetch('/like/', {
@@ -142,6 +148,8 @@ class Home extends Component {
 										{ Moment().diff(pretender.birthday, 'years') } years old
 										<br></br>
 										{ pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1) } { pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
+										<br></br>
+										Popularity: {pretender.popularity}
 									</Card.Text>
 									{this.state.likes.map(likes => 
 										<Card.Text key={likes.id}> {likes.uid_liked === pretender.uid ?

@@ -39,7 +39,7 @@ class Chat extends Component {
 
 	scrollToBottom = () => {
 		if (this.messagesEnd)
-			this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+			this.messagesEnd.scrollIntoView({behavior: "smooth"});
 	}
 	
 	componentDidUpdate() {
@@ -132,7 +132,7 @@ class Chat extends Component {
 									className="mr-3 myPicMini"
 									src={process.env.PUBLIC_URL + matches.path}
 									alt="Generic placeholder"
-									
+									rounded
 								/>
 								<Media.Body>
 									<h5>{matches.login}</h5>
@@ -140,7 +140,7 @@ class Chat extends Component {
 							</Media>
 					})}
 				</div>
-				<div className="containerChat">
+				<div className="containerChat fade">
 				{this.state.messages.map(message => {
 					return	<div ref={(el) => { this.messagesEnd = el;}} key={message.id} className={message.uid_sender === this.state.cookie.info.uid ? "userMsg" : "matchMsg"}>{message.msg}<div className="dateMsg">{Moment(message.date).format('MMMM Do YYYY, h:mm a')}</div></div>
 					})}
