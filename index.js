@@ -84,10 +84,10 @@ app.get('/logout', function(req, res){
                 if (err){
 					return handleError(err, res);
 				}
-                pool.query('SELECT * FROM img WHERE uid = $1', [req.cookies.info.uid], (error, check_img) => {
+                pool.query('SELECT * FROM img WHERE uid = $1', [req.signedCookies.info.uid], (error, check_img) => {
                     if (error) throw error;
                     if (check_img.rowCount < 5) {
-                        pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.cookies.info.uid, check_img.rowCount + 1], (error, results) => {
+                        pool.query('INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)', [targetPath.slice(15), req.signedCookies.info.uid, check_img.rowCount + 1], (error, results) => {
                             if (error) throw error;});
                         res
                             .status(200)

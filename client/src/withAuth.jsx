@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
+import Login from './components/Login';
+import MyContext from './appcontext';
 
-export default function withAuth(ComponentToProtect, socket){
-
-	return class extends Component{
+export default function withAuth(ComponentToProtect, socket) {
+	
+	return class extends Component {
 		_isMounted = false;
-		constructor(props){
+		constructor(props) {
 			super(props);
 			this.state = {
 				loading: true,
@@ -14,24 +15,26 @@ export default function withAuth(ComponentToProtect, socket){
 			};
 		}
 
-		componentDidMount(){
+		componentDidMount() {
 			this._isMounted = true;
-				fetch('/checkCookie')
+			fetch('/checkCookie')
 				.then(res => {
-					if (res.status === 200){
+					if (res.status === 200) {
 						this.setState({ loading: false });
 					} else {
 						const error = new Error(res.error);
-						this.setState({ loading: false, redirect: true});
-
+						throw error;
 					}
 				})
+				.catch(err => {
+					this.setState({ loading: false, redirect: true });
+				});
 		}
 
-		componentWillUnmount(){
+		componentWillUnmount() {
 			this._isMounted = false;
 		}
-		render(){
+		render() {
 			const spin = {
 				margin: "0 auto",
 				width: "100px",
@@ -39,19 +42,19 @@ export default function withAuth(ComponentToProtect, socket){
 			};
 
 			const { loading, redirect } = this.state;
-			if (loading){
+			if (loading) {
 				return (
-					<div style={{display : "flex", marginTop: "100px"}}>
-						<Spinner style={spin} animation="border" variant="dark"/>
+					<div style={{ display: "flex", marginTop: "100px" }}>
+						<Spinner style={spin} animation="border" variant="dark" />
 					</div>
-					
+
 				)
 			}
-			if (redirect){
-				return <Redirect to="/login"/>;
+			if (redirect) {
+				return <Login />;
 			}
-			if (this._isMounted && !loading)
-				return <ComponentToProtect {...this.props} socket={socket}/>
+			if (this._isMounted && !loading && !redirect)
+				return <ComponentToProtect {...this.props} socket={socket} />
 		}
 	}
 }
