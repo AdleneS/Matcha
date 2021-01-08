@@ -22,12 +22,10 @@ export default function withAuth(ComponentToProtect, socket){
 						this.setState({ loading: false });
 					} else {
 						const error = new Error(res.error);
-						throw error;
+						this.setState({ loading: false, redirect: true});
+
 					}
 				})
-				.catch(err => {
-					this.setState({ loading: false, redirect: true});
-				});
 		}
 
 		componentWillUnmount(){

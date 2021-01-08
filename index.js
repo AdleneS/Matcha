@@ -11,19 +11,18 @@ var auth = require('./auth');
 const pool = require('./db');
 const info = require('./change_info');
 const server = http.createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {cookie: false});
 var socketArray = {};
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
 app.use(bodyParser.json())
 app.use(
 	bodyParser.urlencoded({
 		extended: true,
 	})
 )
-app.use(cookieParser());
+app.use(cookieParser("secret"));
 
 io.on("connection", (socket) => {
 	socket.on('FromAPI', (uid) => {
@@ -48,12 +47,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/cookie', (req, res) => {
-	res.json({info: req.cookies.info});
+	res.json({info: req.signedCookies.info});
 });
 
 app.get('/checkCookie', withAuth, function (req, res) {
-	console.log(req.cookies.info)
-	pool.query('SELECT uid FROM users WHERE uid = $1',[req.cookies.info.uid], (error, results) => {
+	pool.query('SELECT uid FROM users WHERE uid = $1 AND session = $2',[req.signedCookies.info.uid, req.signedCookies.info.session], (error, results) => {
 		if (error) {
 			throw error
 		} else if (results.rowCount){
@@ -63,7 +61,7 @@ app.get('/checkCookie', withAuth, function (req, res) {
 			res.clearCookie('ssid');
 			res.clearCookie('info');
 			res .json({error: "Bad Cookies"})
-				.status(200);
+				.status(400);
 		}
 	})
 });

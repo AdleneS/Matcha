@@ -14,7 +14,7 @@ const getUsers = (request, response) => {
 	}
 
 	const getUsersImg = (request, response) => {
-		pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1', [request.cookies.info.uid], (error, results) => {
+		pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1', [request.signedCookies.info.uid], (error, results) => {
 			if (error) {
 				throw error
 			}else{
@@ -24,7 +24,7 @@ const getUsers = (request, response) => {
 	}
 
 	const getLikes = (request, response) => {
-		pool.query('SELECT * FROM likes WHERE uid_liker = $1', [request.cookies.info.uid], (error, results) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1', [request.signedCookies.info.uid], (error, results) => {
 			if (error) {
 				throw error
 			}else{
@@ -34,7 +34,7 @@ const getUsers = (request, response) => {
 	}
 
 	const getNotif = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		pool.query('SELECT * FROM notifications  WHERE notified_uid = $1 ORDER BY id DESC LIMIT 10' , [user_uid], (error, results) => {
 			if (error) {
 				throw error
@@ -44,7 +44,7 @@ const getUsers = (request, response) => {
 		})
 	}
 	const getNotifNb = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		pool.query('SELECT * FROM notifications WHERE notified_uid = $1 AND seen = false', [user_uid], (error, results) => {
 			if (error) {
 				throw error
@@ -54,7 +54,7 @@ const getUsers = (request, response) => {
 		})
 	}
 	const setNotifSeen = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		const notif_id = request.body.notif_id;
 		pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false and id = $2', [user_uid, notif_id], (error, results) => {
 			if (error)
@@ -65,7 +65,7 @@ const getUsers = (request, response) => {
 	}
 
 	const updateLocation = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		pool.query('UPDATE users SET country = $2 WHERE uid = $1', [user_uid, request.body.location], (error, results) => {
 			if (error) {
 				throw error
@@ -130,7 +130,7 @@ const getUsers = (request, response) => {
 	}
 
 	const createMatch = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		const pretender_uid = request.body.pretenderUid;
 		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [pretender_uid, user_uid], (error, results) => {
 			if (error){
@@ -155,7 +155,7 @@ const getUsers = (request, response) => {
 	};
 
 	const deleteMatch = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		const pretender_uid = request.body.pretenderUid;
 		pool.query('SELECT * FROM match WHERE uid_1 = $1 AND uid_2 = $2 OR uid_1 = $2 AND uid_2 = $1', [user_uid, pretender_uid], (error, results) => {
 			if (error){
@@ -177,7 +177,7 @@ const getUsers = (request, response) => {
 		});
 	}
 	const getMatch = (request, response) => {
-		const user_uid = request.cookies.info.uid;
+		const user_uid = request.signedCookies.info.uid;
 		pool.query('SELECT *\
 					FROM match\
 					INNER JOIN users ON match.uid_1 = users.uid\
@@ -226,7 +226,7 @@ const getUsers = (request, response) => {
 	};
 
 	const getMessages = (request, response) => {
-		const	user_uid = request.cookies.info.uid
+		const	user_uid = request.signedCookies.info.uid
 		const	match_uid = request.params.match_uid
 		pool.query('SELECT * FROM chat WHERE (uid_sender = $1 AND uid_receiver = $2) OR (uid_sender = $2 AND uid_receiver = $1)', [user_uid, match_uid], (error, results) => {
 			if (error) {
@@ -237,7 +237,7 @@ const getUsers = (request, response) => {
 	}
 
 	const createMessages = (request, response) => {
-		const	user_uid = request.cookies.info.uid
+		const	user_uid = request.signedCookies.info.uid
 		const	match_uid = request.params.match_uid
 		const	msg = request.body.msg
 		pool.query('INSERT INTO chat (uid_sender, uid_receiver, msg, date) VALUES ($1, $2, $3, $4)', [user_uid, match_uid, msg, moment()], (error, results) => {
@@ -271,7 +271,7 @@ const getUsers = (request, response) => {
 	}
 
 	const getOneLike = (request, response) => {
-		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.cookies.info.uid, request.params.uid], (error, results) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.signedCookies.info.uid, request.params.uid], (error, results) => {
 			if (error) {
 				throw error
 			}else{
@@ -281,7 +281,7 @@ const getUsers = (request, response) => {
 	}
 
 	const getYouLike = (request, response) => {
-		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.params.uid, request.cookies.info.uid], (error, results) => {
+		pool.query('SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2', [request.params.uid, request.signedCookies.info.uid], (error, results) => {
 			if (error) {
 				throw error
 			}else{
@@ -291,8 +291,8 @@ const getUsers = (request, response) => {
 	}
 
 	const updatePopularity = (request, response) => {
-		const uid = request.cookies.info.uid
-		const popularity = request.cookies.info.popularity
+		const uid = request.signedCookies.info.uid
+		const popularity = request.signedCookies.info.popularity
 		pool.query('SELECT * FROM likes WHERE uid_liker = $1', [uid], (error, resultsLike) => {
 			if (error) {
 				throw error

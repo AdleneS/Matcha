@@ -31,8 +31,7 @@ export default function Login (props) {
 		})
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
-			console.log(res);
-			console.log("Responses:", res);
+			//console.log("Responses:", res);
 			if (res.status === 200) {
 				setIsLoggedTrue();
 				history.push('/home');

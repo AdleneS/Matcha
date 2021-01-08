@@ -22,6 +22,7 @@ export default function App() {
 	const [geo, setGeo] = useState();
 
 	useEffect(() => {
+
 		fetch('/checkCookie')
 		.then(res =>  res.json().then(data => ({status: res.status, body: data})))
 		.then(res => {
@@ -42,6 +43,7 @@ export default function App() {
 		.catch(err => {
 			setIsLogged(false);
 		});
+
 	}, []);
 
 	useEffect(() => {

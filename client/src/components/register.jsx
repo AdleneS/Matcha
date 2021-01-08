@@ -32,7 +32,6 @@ export default function Register () {
 			if (res.status === 200) {
 				history.push('/login');
 			} else {
-				console.log(res.body.error);
 				if (res.body.error.constraint === 'login')
 					setError({...sError, err_same_login: true});
 				if (res.body.error.constraint === 'email')

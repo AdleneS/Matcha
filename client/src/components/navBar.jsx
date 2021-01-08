@@ -34,11 +34,11 @@ export default function Mynav (props) {
 		}
 	},[islogged])
 
-	useEffect(() => {
-		fetch('/notif/get')
-			.then(response => response.json())
-			.then(response => setNotif(response));
-	}, [nb_notif])
+	//useEffect(() => {
+	//	fetch('/notif/get')
+	//		.then(response => response.json())
+	//		.then(response => setNotif(response));
+	//}, [nb_notif])
 
 	function handleClick(e) {
 		e.preventDefault();
