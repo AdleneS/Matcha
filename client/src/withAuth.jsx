@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import Login from './components/Login';
-import MyContext from './appcontext';
+//import MyContext from './components/appcontext';
 
 export default function withAuth(ComponentToProtect, socket) {
 	

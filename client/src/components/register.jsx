@@ -126,7 +126,7 @@ export default function Register () {
 				</Button>
 			</Form>
 			
-			{sError.err_login && <Alert key="1" style={{marginTop: "15px"}} variant="danger"> Your login is too small <span role="img" aria-label="bad">☹️</span> </Alert>}
+			{sError.err_login && <Alert key="1" style={{marginTop: "15px"}} variant="danger"> Your login must be between 5-12 characters <span role="img" aria-label="bad">☹️</span> </Alert>}
 			{sError.err_email && <Alert key="1" style={{marginTop: "15px"}} variant="danger"> Your email is not good <span role="img" aria-label="bad">☹️</span> </Alert>}
 			{sError.err_same_email && <Alert key="1" style={{marginTop: "15px"}} variant="warning"> This email is already used <span role="img" aria-label="oups">😵</span></Alert>}
 			{sError.err_same_login && <Alert key="1" style={{marginTop: "15px"}} variant="warning"> This login is already used <span role="img" aria-label="oups">😵</span></Alert>}

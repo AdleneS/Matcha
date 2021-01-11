@@ -55,8 +55,7 @@ const getNotifNb = (request, response) => {
 }
 const setNotifSeen = (request, response) => {
 	const user_uid = request.signedCookies.info.uid;
-	const notif_id = request.body.notif_id;
-	pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false and id = $2', [user_uid, notif_id], (error, results) => {
+	pool.query('UPDATE notifications SET seen = true WHERE notified_uid = $1 AND seen = false', [user_uid], (error, results) => {
 		if (error)
 			throw error
 		else

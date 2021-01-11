@@ -45,8 +45,8 @@ router.post('/signup', (req, res, next) => {
 							res.status(500).json({ error: error });
 						} else {
 							res
-							.cookie('ssid', token, { httpOnly: true, secure: true, sameSite: 'strict', signed: true })
-							.cookie('info', info, { httpOnly: true, secure: true, sameSite: 'strict', signed: true })
+							.cookie('ssid', token, { httpOnly: true, secure: false, sameSite: 'strict', signed: true })
+							.cookie('info', info, { httpOnly: true, secure: false, sameSite: 'strict', signed: true })
 							.json({ message: 'Logged !', uid: rows.uid })
 							.status(200);
 						}
@@ -72,19 +72,19 @@ router.post('/signup', (req, res, next) => {
 function validateRegistration(user) {
 	const validLogin = typeof user.login == 'string' &&
 		user.login.trim() != '' &&
-		user.login.trim().length >= 3;
+		user.login.trim().match(/^(?=[a-zA-Z0-9]{5,12}$)/);
+		;
 	const validEmail = typeof user.email == 'string' &&
-		user.email.trim() != '';
-	const validBirthday = typeof user.birthday == 'string';
+		user.email.trim() != '' && user.email.trim().match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/);
+	const validBirthday = typeof user.birthday == 'date';
 	const validPassword = typeof user.password == 'string' &&
 		user.password.trim() != '' &&
-		user.password.trim().length >= 3;
+		user.password.trim().match(/"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"/);
 	const verifyPassword = user.password == user.verify_password;
-
 	return { login: validLogin, email: validEmail, pass: validPassword, v_pass: verifyPassword, birthday: validBirthday };
 }
 
-router.post('/register', (req, res, next) => {
+router.post('/register', (req, res) => {
 
 	const { login, email, password, birthday, gender, sexual_orientation } = req.body;
 	var err = validateRegistration(req.body)
@@ -97,15 +97,16 @@ router.post('/register', (req, res, next) => {
 			}
 		});
 	} else {
-		if (!err.email)
-			res.status(401).json({ error: 'email' });
-		if (!err.pass)
-			res.status(401).json({ error: 'pass' });
-		if (!err.v_pass)
-			res.status(401).json({ error: 'v_pass' });
-		if (!err.login)
+		console.log(err.login);
+		if (!err.login || err.login === null)
 			res.status(401).json({ error: 'login' });
-		if (!err.birthday)
+		else if (!err.email)
+			res.status(401).json({ error: 'email' });
+		else if (!err.pass)
+			res.status(401).json({ error: 'pass' });
+		else if (!err.v_pass)
+			res.status(401).json({ error: 'v_pass' });
+		else if (!err.birthday)
 			res.status(401).json({ error: 'birthday' });
 	}
 });
