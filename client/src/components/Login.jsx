@@ -73,9 +73,6 @@ export default function Login (props) {
 					<Form.Label>Password</Form.Label>
 					<Form.Control type="password" name="password" value={sValue.password} onChange={(event) => {handleInputChange(event)}} placeholder="Password" required/>
 				</Form.Group>
-				<Form.Group controlId="formBasicCheckbox">
-					<Form.Check type="checkbox" label="Check me out" required />
-				</Form.Group>
 				<Button variant="primary" type="submit">
 					Submit
 				</Button>

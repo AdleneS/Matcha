@@ -13,6 +13,16 @@ const getUsers = (request, response) => {
 	})
 }
 
+const getUsersByUid = (request, response) => {
+	pool.query('SELECT email, firstname, gender, popularity, sexual_orientation, name, login, gender, description FROM users WHERE uid = $1',[request.signedCookies.info.uid], (error, results) => {
+		if (error) {
+			throw error
+		} else {
+			response.status(200).json(results.rows)
+		}
+	})
+}
+
 const getUsersImg = (request, response) => {
 	pool.query('SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1', [request.signedCookies.info.uid], (error, results) => {
 		if (error) {
@@ -35,7 +45,7 @@ const getLikes = (request, response) => {
 
 const getNotif = (request, response) => {
 	const user_uid = request.signedCookies.info.uid;
-	pool.query('SELECT * FROM notifications  WHERE notified_uid = $1 ORDER BY id DESC LIMIT 10', [user_uid], (error, results) => {
+	pool.query('SELECT * FROM notifications WHERE notified_uid = $1 ORDER BY id DESC LIMIT 10', [user_uid], (error, results) => {
 		if (error) {
 			throw error
 		} else {
@@ -78,7 +88,7 @@ const getUserById = (request, response) => {
 	const id = parseInt(request.params.id)
 	pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
 		if (error) {
-			getUserByEmail(request, response)
+			throw error;
 		} else {
 			response.status(200).json(results.rows)
 		}
@@ -332,6 +342,7 @@ module.exports = {
 	getUsers,
 	getUsersImg,
 	getLikes,
+	getUsersByUid,
 	getUserById,
 	createUser,
 	deleteUser,

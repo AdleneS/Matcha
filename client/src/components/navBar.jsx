@@ -6,6 +6,7 @@ import MyContext from './appcontext';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import {Link} from 'react-router-dom';
+import { BsGearFill } from "react-icons/bs";
 
 export default function Mynav (props) {
 	const {islogged, setIsLogged} = useContext(MyContext);
@@ -100,18 +101,20 @@ export default function Mynav (props) {
 				{islogged && (<Link className="nav-link" to={"/chat/0"}> Chat </Link>)}
 				{islogged && (<Navbar.Text className="nav-link" style={{cursor: "pointer"}} onClick={handleClick}> Log Out </Navbar.Text>)}
 			</Nav>
+			{islogged && <Link to={"/changeinfo"}><BsGearFill  style={{cursor: "pointer", color: "#6c757d", width: "30px", height: "30px",  marginRight: "10px"}}></BsGearFill></Link>}
 			{islogged &&
-			<DropdownButton onClick={(event) => {onNotifClick(event)}} variant={nb_notif ? "danger" : "secondary"} id="dropdown-button-drop-left" drop='left' title={ nb_notif ? nb_notif + " Notifications" : 'Notification' }>
+			(<DropdownButton onClick={(event) => {onNotifClick(event)}} variant={nb_notif ? "danger" : "secondary"} id="dropdown-button-drop-left" drop='left' title={ nb_notif ? nb_notif + " Notifications" : 'Notification' }>
 				{notifs.length ? 
 				notifs.map((notifs) => (
 					notifs.notif_type === 'message' ?
 						<Link className="dropdown-item" to={"/chat/" + notifs.notifier_uid} key={notifs.id}><span role="img" aria-label="speech">💬</span> {notifs.notifier_login} sent you a {notifs.notif_type} </Link>
 					:
-						<Link className="dropdown-item" to={"#/profile/" + notifs.notifier_uid} key={notifs.id}><span role="img" aria-label="heart">❤️</span> {notifs.notifier_login} {notifs.notif_type}ed you  </Link>
+						<Link className="dropdown-item" to={"/profile/?uid=" + notifs.notifier_uid} key={notifs.id}><span role="img" aria-label="heart">❤️</span> {notifs.notifier_login} {notifs.notif_type}ed you  </Link>
 				)):
 				<Dropdown.Item> Vous n'avez pas de notification <span role="img" aria-label="bad">☹️</span> </Dropdown.Item>
 				}
-			</DropdownButton>}
+			</DropdownButton>)
+			}
 		</Navbar>
 	);
 }
