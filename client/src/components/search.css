@@ -1,5 +1,5 @@
-.cardContainer {
-  margin-top: 100px;
+.cardContainerSearch {
+  margin-top: 200px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 260px);
   justify-content: center;
@@ -48,4 +48,8 @@
 
 .item:hover .myPic {
   filter: blur(6px);
+}
+
+.select {
+  margin-right: 8px;
 }
