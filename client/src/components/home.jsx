@@ -203,6 +203,8 @@ class Home extends Component {
                       {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
                       <br></br>
                       Popularity: {pretender.popularity}
+                      <br></br>
+                      Location: {pretender.country}
                     </Card.Text>
                     {this.state.likes.map((likes) => (
                       <Card.Text key={likes.id}>

@@ -7,6 +7,10 @@ import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { gender, orientation } from "../enum/genderOrientation.js";
 import Form from "react-bootstrap/Form";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+const { createSliderWithTooltip } = Slider;
+const Range = createSliderWithTooltip(Slider.Range);
 
 class Search extends Component {
   constructor(props) {
@@ -55,6 +59,9 @@ class Search extends Component {
       ],
       genderValue: "",
       orientationValue: "",
+      locationValue: "",
+      popularityValue: [0, 100],
+      ageValue: [18, 100],
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -192,8 +199,23 @@ class Search extends Component {
     this.filteringPretender();
   };
 
+  handleLocation = async (event) => {
+    await this.setState({ locationValue: event.target.value });
+    this.filteringPretender();
+  };
+
   handleOrientation = async (event) => {
     await this.setState({ orientationValue: event.target.value });
+    this.filteringPretender();
+  };
+
+  handlePopularity = async (event) => {
+    await this.setState({ popularityValue: event });
+    this.filteringPretender();
+  };
+
+  handleAge = async (event) => {
+    await this.setState({ ageValue: event });
     this.filteringPretender();
   };
 
@@ -204,6 +226,33 @@ class Search extends Component {
     }
     if (this.state.orientationValue) {
       filter = filter.filter((pretender) => pretender.sexual_orientation === this.state.orientationValue);
+    }
+    if (this.state.locationValue) {
+      filter = filter.filter((pretender) =>
+        pretender.country
+          .toLocaleLowerCase("en-US")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .includes(
+            this.state.locationValue
+              .toLocaleLowerCase("en-US")
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+          )
+      );
+    }
+    if (this.state.popularityValue) {
+      filter = filter.filter(
+        (pretender) =>
+          pretender.popularity >= this.state.popularityValue[0] && pretender.popularity <= this.state.popularityValue[1]
+      );
+    }
+    if (this.state.ageValue) {
+      filter = filter.filter(
+        (pretender) =>
+          Moment().diff(pretender.birthday, "years") >= this.state.ageValue[0] &&
+          Moment().diff(pretender.birthday, "years") <= this.state.ageValue[1]
+      );
     }
     this.setState({
       filtredPretender: filter,
@@ -254,7 +303,10 @@ class Search extends Component {
     backgroundColor: "#27262e",
     display: "flex",
     alignItems: "center",
+    position: "sticky",
   };
+
+  wrapperStyle = { width: 200, marginLeft: "10px" };
 
   render() {
     const { gender, genderValue, orientation, orientationValue } = this.state;
@@ -272,7 +324,7 @@ class Search extends Component {
               padding: "8px",
             }}
           >
-            <Form.Group className="select" controlId="exampleForm.SelectCustom">
+            <Form.Group className="select" controlId="formGender">
               <Form.Label>Gender</Form.Label>
               <Form.Control as="select" onChange={this.handleGender} value={genderValue} custom>
                 {gender.map((item) => (
@@ -283,7 +335,7 @@ class Search extends Component {
               </Form.Control>
             </Form.Group>
 
-            <Form.Group className="select" controlId="exampleForm.SelectCustom">
+            <Form.Group className="select" controlId="formOrientation">
               <Form.Label>Sexual Orientation</Form.Label>
               <Form.Control as="select" onChange={this.handleOrientation} value={orientationValue} custom>
                 {orientation.map((item) => (
@@ -292,6 +344,39 @@ class Search extends Component {
                   </option>
                 ))}
               </Form.Control>
+            </Form.Group>
+
+            <Form.Group className="select" controlId="formLocation">
+              <Form.Label>Location</Form.Label>
+              <Form.Control onChange={this.handleLocation} type="text" placeholder="Location" />
+            </Form.Group>
+
+            <Form.Group className="select" controlId="formPopularity">
+              <Form.Label>
+                Popularity {this.state.popularityValue[0]} - {this.state.popularityValue[1]}
+              </Form.Label>
+              <Range
+                onChange={this.handlePopularity}
+                style={this.wrapperStyle}
+                min={0}
+                max={100}
+                defaultValue={[0, 100]}
+                tipFormatter={(value) => `${value}`}
+              />
+            </Form.Group>
+
+            <Form.Group className="select" controlId="formAge">
+              <Form.Label>
+                Age {this.state.ageValue[0]} - {this.state.ageValue[1]}
+              </Form.Label>
+              <Range
+                onChange={this.handleAge}
+                style={this.wrapperStyle}
+                min={18}
+                max={100}
+                defaultValue={[18, 100]}
+                tipFormatter={(value) => `${value}`}
+              />
             </Form.Group>
           </Form>
         </div>
@@ -311,6 +396,8 @@ class Search extends Component {
                       {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
                       <br></br>
                       Popularity: {pretender.popularity}
+                      <br></br>
+                      Location: {pretender.country}
                     </Card.Text>
                     {this.state.likes.map((likes) => (
                       <Card.Text key={likes.id}>
