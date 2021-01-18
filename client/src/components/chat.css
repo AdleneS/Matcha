@@ -1,92 +1,93 @@
-.containerDiv{
-    font-size: medium;
-    padding-top: 78px;
-    background-color: rgb(26, 26, 26);
-    height: 100vh;
-    width: 100vw;
-    display: inline-grid;
-    grid-template-columns: minmax(200px, 20%) minmax(100px, 80%);
-    grid-template-rows:  minmax(100px, 97%)  minmax(40px, 3%);
+.containerDiv {
+  font-size: medium;
+  padding-top: 78px;
+  background-color: rgb(26, 26, 26);
+  height: 100vh;
+  width: 100vw;
+  display: inline-grid;
+  grid-template-columns: minmax(200px, 20%) minmax(100px, 80%);
+  grid-template-rows: minmax(100px, 97%) minmax(40px, 3%);
 }
 
-.containerMatch{
-    grid-column-start: 1;
-    grid-column-end:  1;
-    grid-row-start: 1;
-    grid-row-end: span 2;
-    border-right: 1px solid rgb(13, 13, 14);
-    background-color: #31303a;
+.containerMatch {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  grid-row-start: 1;
+  grid-row-end: span 2;
+  background-color: #31303a;
 }
 
-.containerChat{
-    color: white;
-    grid-column-start: 2;
-    grid-column-end:  2;
-    grid-row-start: 1;
-    grid-row-end: 1;
-    background-color: #1a191f;
-    overflow-y: scroll;
-    scrollbar-width: thin;
+.containerChat {
+  color: white;
+  grid-column-start: 2;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  background-color: #1a191f;
+  overflow-y: scroll;
+  scrollbar-width: thin;
 }
 
 .containerInput {
-    overflow: hidden;
-    grid-column-start: 2;
-    grid-column-end:  2;
-    grid-row-start: 2;
-    grid-row-end: 2;
-    color: white;
+  overflow: hidden;
+  grid-column-start: 2;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 2;
+  color: white;
 }
 
-.matchMsg{
-    float: left;
-    clear: both;
-    max-width: 65%;
-    margin-top: 5px;
-    margin-left: 10px;
-    margin-right: auto;
-    margin-bottom: 5px;
-    text-align: left;
-    padding: 10px;
-    border-radius: 15px;
-    background-color: rgb(61, 65, 78);
-    word-wrap: break-word;
-
+.matchMsg {
+  float: left;
+  clear: both;
+  max-width: 65%;
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-right: auto;
+  margin-bottom: 5px;
+  text-align: left;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: rgb(61, 65, 78);
+  word-wrap: break-word;
 }
 
-.userMsg{
-    float: right;
-    clear: both;
-    max-width: 65%;
-    word-wrap: break-word;
-    margin-top: 5px;
-    margin-left: auto;
-    margin-right: 10px;
-    margin-bottom: 5px;
-    text-align: left;
-    padding: 10px;
-    border-radius: 15px;
-    background-color: rgb(65, 57, 66);
-
+.userMsg {
+  float: right;
+  clear: both;
+  max-width: 65%;
+  word-wrap: break-word;
+  margin-top: 5px;
+  margin-left: auto;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  text-align: left;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: rgb(65, 57, 66);
 }
 
-.noMatch{
-    color: white;
-    text-align: center;
-    padding-top: 90px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+.noMatch {
+  color: white;
+  text-align: center;
+  padding-top: 90px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .myPicMini {
-    position: relative;
-    object-fit: cover;
-    width: 64px;
-    height: 64px;
-    flex-shrink: 1;
-  }
+  position: relative;
+  object-fit: cover;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 1;
+}
 
-  .dateMsg {
-      font-size: small;
-      font-style: italic;
-      color: rgb(163, 163, 163);
-  }
+.dateMsg {
+  font-size: small;
+  font-style: italic;
+  color: rgb(163, 163, 163);
+}
+
+.selectedRoom {
+  background-color: #23222d;
+}

@@ -82,7 +82,7 @@ export default function App() {
             <Route path="/changeinfo" component={withAuth(ChangeInfo)} />
             <Route path="/customers" component={withAuth(Customers)} />
             <Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
-            <Route path="/search/" component={withAuth(Search)} />
+            <Route path="/search/" component={withAuth(Search, socket)} />
             <Route path="/login">
               <Login socket={socket} />
             </Route>

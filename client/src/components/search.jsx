@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import "./search.css";
 import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
-import { gender, orientation } from "../enum/genderOrientation.js";
 import Form from "react-bootstrap/Form";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
@@ -16,7 +15,6 @@ class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pretender: [],
       filtredPretender: [],
       likes: [],
       cookie: {},
@@ -75,12 +73,7 @@ class Search extends Component {
       .then((user) => {
         this.setState({ user });
       });
-    fetch("/pretender/")
-      .then((res) => res.json())
-      .then((pretender) => {
-        this.setState({ pretender });
-        this.setState({ filtredPretender: pretender });
-      });
+    this.setState({ filtredPretender: this.filteringPretender() });
     fetch("/users/likes")
       .then((res) => res.json())
       .then((likes) => this.setState({ likes }));
@@ -99,40 +92,6 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     });
-  };
-
-  filterPretender = (pretender) => {
-    if (this.state.user[0].sexual_orientation === orientation.bi || this.state.user[0].gender === gender.other) {
-      return pretender;
-    } else if (this.state.user[0].gender === gender.man) {
-      if (this.state.user[0].sexual_orientation === orientation.hetero) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.woman || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.hetero || pretender.sexual_orientation === orientation.bi)
-        );
-      } else if (this.state.user[0].sexual_orientation === orientation.homo) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.man || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.homo || pretender.sexual_orientation === orientation.bi)
-        );
-      }
-    } else if (this.state.user[0].gender === gender.woman) {
-      if (this.state.user[0].sexual_orientation === orientation.hetero) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.man || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.hetero || pretender.sexual_orientation === orientation.bi)
-        );
-      } else if (this.state.user[0].sexual_orientation === orientation.homo) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.woman || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.homo || pretender.sexual_orientation === orientation.bi)
-        );
-      }
-    }
   };
 
   addMatch = (pretenderUid, data) => {
@@ -220,43 +179,29 @@ class Search extends Component {
   };
 
   filteringPretender = () => {
-    let filter = this.state.pretender;
-    if (this.state.genderValue) {
-      filter = filter.filter((pretender) => pretender.gender === this.state.genderValue);
-    }
-    if (this.state.orientationValue) {
-      filter = filter.filter((pretender) => pretender.sexual_orientation === this.state.orientationValue);
-    }
-    if (this.state.locationValue) {
-      filter = filter.filter((pretender) =>
-        pretender.country
-          .toLocaleLowerCase("en-US")
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .includes(
-            this.state.locationValue
-              .toLocaleLowerCase("en-US")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-          )
-      );
-    }
-    if (this.state.popularityValue) {
-      filter = filter.filter(
-        (pretender) =>
-          pretender.popularity >= this.state.popularityValue[0] && pretender.popularity <= this.state.popularityValue[1]
-      );
-    }
-    if (this.state.ageValue) {
-      filter = filter.filter(
-        (pretender) =>
-          Moment().diff(pretender.birthday, "years") >= this.state.ageValue[0] &&
-          Moment().diff(pretender.birthday, "years") <= this.state.ageValue[1]
-      );
-    }
-    this.setState({
-      filtredPretender: filter,
-    });
+    setTimeout(() => {
+      fetch("/search", {
+        method: "POST",
+        body: JSON.stringify({
+          gender: this.state.genderValue,
+          sexual_orientation: this.state.orientationValue,
+          age: this.state.ageValue,
+          popularity: this.state.popularityValue,
+          country: this.state.locationValue,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      })
+        .then((res) =>
+          res.json().then((data) => {
+            this.setState({ filtredPretender: data });
+          })
+        )
+        .catch((error) => {
+          alert(error);
+        });
+    }, 200);
   };
 
   onClick = (event, pretenderUid) => {
@@ -383,8 +328,8 @@ class Search extends Component {
         <div style={{ color: "red" }}></div>
         <div className="cardContainerSearch fade">
           {this.state.filtredPretender &&
-            this.state.filtredPretender.map((pretender) => (
-              <Link key={pretender.id} to={"profile/?uid=" + pretender.uid}>
+            this.state.filtredPretender.map((pretender, i) => (
+              <Link key={i} to={"profile/?uid=" + pretender.uid}>
                 <Card className="item" key={pretender.id}>
                   <Card.Img className="myPic" variant="top" src={process.env.PUBLIC_URL + pretender.path} />
                   <div className="overlay">

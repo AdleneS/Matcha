@@ -32,7 +32,7 @@ class Home extends Component {
       .then((res) => res.json())
       .then(async (pretender) => {
         if (this.state.user[0]) {
-          this.setState({ pretender: await this.filterPretender(pretender) });
+          this.setState({ pretender });
         }
       });
     fetch("/users/likes")
