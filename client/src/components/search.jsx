@@ -8,6 +8,8 @@ import { BsHeart, BsHeartFill } from "react-icons/bs";
 import Form from "react-bootstrap/Form";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { FaCircle } from "react-icons/fa";
+
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
 
@@ -84,8 +86,6 @@ class Search extends Component {
       method: "POST",
       body: JSON.stringify({
         notified_uid: data.notified_uid,
-        notifier_uid: data.notifier_uid,
-        notifier_login: data.notifier_login,
         notif_type: data.notif_type,
       }),
       headers: {
@@ -217,9 +217,7 @@ class Search extends Component {
       .then((res) => {
         if (res.status === 200) {
           const data = {
-            notifier_uid: this.state.cookie.info.uid,
             notified_uid: pretenderUid,
-            notifier_login: this.state.cookie.info.login,
             notif_type: res.body.info,
           };
           this.props.socket.emit("sendNotif", pretenderUid);
@@ -333,7 +331,17 @@ class Search extends Component {
                 <Card className="item" key={pretender.id}>
                   <Card.Img className="myPic" variant="top" src={process.env.PUBLIC_URL + pretender.path} />
                   <div className="overlay">
-                    <Card.Title className="title">{pretender.login}</Card.Title>
+                    <Card.Title className="title">
+                      {" "}
+                      {pretender.login}{" "}
+                      <span>
+                        {pretender.connected ? (
+                          <FaCircle style={{ color: "green", width: "10px" }} />
+                        ) : (
+                          <FaCircle style={{ color: "red", width: "10px" }} />
+                        )}
+                      </span>
+                    </Card.Title>
                     <Card.Text>
                       {Moment().diff(pretender.birthday, "years")} years old
                       <br></br>

@@ -26,7 +26,9 @@ app.use(cookieParser("secret"));
 
 io.on("connection", (socket) => {
   socket.on("FromAPI", (uid) => {
+    db.setConnected(uid);
     socketArray[socket.id] = uid;
+    console.log("connected");
   });
   socket.on("sendNotif", (notified_uid) => {
     found = Object.keys(socketArray).find((key) => socketArray[key] === notified_uid);
@@ -37,6 +39,7 @@ io.on("connection", (socket) => {
     io.to(found).emit("getMessage", socketArray[socket.id]);
   });
   socket.on("disconnect", () => {
+    db.setDisconnected(socketArray[socket.id]);
     delete socketArray[socket.id];
     console.log("user disconnected");
   });
@@ -69,8 +72,9 @@ app.get("/checkCookie", withAuth, function (req, res) {
 });
 
 app.get("/logout", function (req, res) {
-  res.clearCookie("ssid");
-  res.clearCookie("info");
+  db.setDisconnected(req.signedCookies.info.uid);
+  res.clearCookie("ssid", { maxAge: 72000000, httpOnly: true, secure: false, sameSite: "strict", signed: true });
+  res.clearCookie("info", { maxAge: 72000000, httpOnly: true, secure: false, sameSite: "strict", signed: true });
   res.sendStatus(200);
 });
 

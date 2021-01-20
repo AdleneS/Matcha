@@ -5,7 +5,7 @@ import logo from "../imgs/logoMatcha.png";
 import MyContext from "./appcontext";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { BsGearFill } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 
@@ -15,6 +15,7 @@ export default function Mynav(props) {
   const [cookie, setCookie] = useState(null);
   const [notifs, setNotif] = useState([]);
   const socket = props.socket;
+  let history = useHistory();
 
   useEffect(() => {
     socket.on("getNotif", () => {
@@ -49,6 +50,7 @@ export default function Mynav(props) {
     e.preventDefault();
     fetch("/logout").then((res) => {
       if (res.status === 200) {
+        history.push("/login");
         setIsLogged(false);
       } else {
         const error = new Error(res.error);

@@ -2,9 +2,9 @@ import React, { useState, useContext } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import MyContext from "./appcontext";
-import { useHistory, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
-export default function Login() {
+export default function Login(props) {
   const [sValue, setValue] = useState({ email: "", password: "" });
 
   const { islogged, setIsLogged } = useContext(MyContext);
@@ -16,10 +16,8 @@ export default function Login() {
     setValue({ ...sValue, [name]: value });
   };
 
-  let history = useHistory();
-  const onSubmit = (event) => {
+  const onSubmit = (event, socket) => {
     event.preventDefault();
-
     fetch("/auth/signup", {
       method: "POST",
       body: JSON.stringify(sValue),
@@ -29,10 +27,9 @@ export default function Login() {
     })
       .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
-        //console.log("Responses:", res);
         if (res.status === 200) {
+          props.socket.emit("FromAPI", res.body.uid);
           setIsLoggedTrue();
-          history.push("/home");
         } else {
           const error = new Error(res.body.error);
           throw error;
@@ -55,7 +52,7 @@ export default function Login() {
   };
 
   if (islogged) {
-    return <Redirect to="/Home" />;
+    return <Redirect to="/home" />;
   }
   return (
     <div style={divLog}>

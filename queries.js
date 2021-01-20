@@ -30,7 +30,7 @@ const getUsersByUid = (request, response) => {
 const getUsersInfo = (uid) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, description, country FROM users WHERE uid = $1",
+      "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected FROM users WHERE uid = $1",
       [uid],
       (error, results) => {
         if (error) {
@@ -106,7 +106,7 @@ const postSearch = async (request, response) => {
   const { gender, sexual_orientation, age, popularity, country } = request.body;
   let filter = null;
   pool.query(
-    "SELECT firstname, gender, popularity, sexual_orientation, name, login, description, country, birthday, path, users.uid FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1",
+    "SELECT firstname, gender, popularity, sexual_orientation, name, login, description, country, birthday, path, users.uid, connected FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1",
     [request.signedCookies.info.uid],
     (error, results) => {
       if (error) {
@@ -185,6 +185,7 @@ const getNotifNb = (request, response) => {
     }
   });
 };
+
 const setNotifSeen = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   pool.query(
@@ -195,6 +196,20 @@ const setNotifSeen = (request, response) => {
       else response.status(200).json({ info: results.rowCount });
     }
   );
+};
+
+const setConnected = (uid) => {
+  pool.query("UPDATE users SET connected = true WHERE uid = $1 AND connected = false", [uid], (error, results) => {
+    if (error) throw error;
+    else return "connected";
+  });
+};
+
+const setDisconnected = (uid) => {
+  pool.query("UPDATE users SET connected = false WHERE uid = $1 AND connected = true", [uid], (error, results) => {
+    if (error) throw error;
+    else return "disconnected";
+  });
 };
 
 const updateLocation = (request, response) => {
@@ -251,11 +266,12 @@ const createUser = (request, response) => {
   );
 };
 
-const createNotif = (request, response) => {
-  const { notified_uid, notifier_uid, notifier_login, notif_type } = request.body;
+const createNotif = async (request, response) => {
+  const user = await getUsersInfo(request.signedCookies.info.uid);
+  const { notified_uid, notif_type } = request.body;
   pool.query(
     "INSERT INTO notifications (notified_uid, notifier_uid, notifier_login, notif_type, date) VALUES ($1, $2, $3, $4, $5)",
-    [notified_uid, notifier_uid, notifier_login, notif_type, moment().format("YYYY/MM/DD")],
+    [notified_uid, user.uid, user.login, notif_type, moment().format("YYYY/MM/DD")],
     (error, results) => {
       if (error) {
         throw error;
@@ -333,17 +349,17 @@ const deleteMatch = (request, response) => {
 const getMatch = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   pool.query(
-    "SELECT a.firstname, a.gender, a.popularity, a.sexual_orientation, a.name, a.login ,b.*, c.*\
-					FROM users a\
+    "SELECT a.firstname, a.gender, a.popularity, a.sexual_orientation, a.name, a.login, a.connected ,b.*, c.*\
+          FROM users a \
 					INNER JOIN match c ON a.uid = c.uid_1\
-					INNER JOIN(SELECT uid, path, n_pic FROM img ) b ON c.uid_1 = b.uid AND b.n_pic = 1 \
+					INNER JOIN(SELECT uid, path, n_pic FROM img) b ON c.uid_1 = b.uid AND b.n_pic = 1 \
 					WHERE uid_2 = $1\
 					UNION\
-					SELECT a.firstname, a.gender, a.popularity, a.sexual_orientation, a.name, a.login ,b.*, c.*\
-					FROM users a \
+					SELECT a.firstname, a.gender, a.popularity, a.sexual_orientation, a.name, a.login, a.connected ,b.*, c.*\
+          FROM users a \
 					INNER JOIN match c ON c.uid_2 = a.uid\
-					INNER JOIN(SELECT uid, path, n_pic FROM img) b ON c.uid_2 = b.uid AND b.n_pic = 1\
-					WHERE uid_1 = $1",
+					INNER JOIN(SELECT uid, path, n_pic FROM img ) b ON c.uid_2 = b.uid AND b.n_pic = 1\
+          WHERE uid_1 = $1",
 
     [user_uid],
     (error, results) => {
@@ -490,10 +506,6 @@ const updatePopularity = (request, response) => {
               response.status(200).json({ info: newPopularity });
             }
           });
-          console.log("match ", nb_match);
-          console.log("like ", nb_likes);
-          console.log("ratio ", ratio);
-          console.log("pop ", newPopularity);
         }
       });
     }
@@ -506,6 +518,8 @@ module.exports = {
   getLikes,
   getUsersByUid,
   postSearch,
+  setConnected,
+  setDisconnected,
   getUserById,
   createUser,
   deleteUser,

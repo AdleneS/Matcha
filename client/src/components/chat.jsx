@@ -31,8 +31,6 @@ class Chat extends Component {
       method: "POST",
       body: JSON.stringify({
         notified_uid: data.notified_uid,
-        notifier_uid: data.notifier_uid,
-        notifier_login: data.notifier_login,
         notif_type: data.notif_type,
       }),
       headers: {
@@ -56,10 +54,11 @@ class Chat extends Component {
       .then((cookie) => this.setState({ cookie }));
     fetch("/match/get")
       .then((res) => res.json())
-      .then((matches) =>
-        this.setState({ matches }, () => {
+      .then(async (matches) => {
+        return this.setState({ matches }, () => {
           this.setState({ loading: false });
           if (this.state.matches.length) {
+            this.state.matches.sort((a, b) => this.sortByTitleConsistentASC(b, a));
             this.setState({ currentRoom: this.state.matches[0].uid });
             this.props.history.push("/chat/" + this.state.matches[0].uid);
             fetch("/chat/get/" + this.state.matches[0].uid)
@@ -67,8 +66,18 @@ class Chat extends Component {
               .then((messages) => this.setState({ messages }));
             this.scrollToBottom();
           }
-        })
-      );
+        });
+      });
+  }
+
+  sortByTitleConsistentASC(itemA, itemB) {
+    var a = itemA.connected;
+    var b = itemB.connected;
+    var r = a > b ? 1 : a < b ? -1 : 0;
+    if (r === 0) {
+      r = typeof itemA.id !== "undefined" && typeof itemB.id !== "undefined" ? itemA.id - itemB.id : 0;
+    }
+    return r;
   }
 
   getMessage(match_uid) {
@@ -110,9 +119,7 @@ class Chat extends Component {
         .then((res) => {
           if (res.status === 200) {
             const data = {
-              notifier_uid: this.state.cookie.info.uid,
               notified_uid: match_uid,
-              notifier_login: this.state.cookie.info.login,
               notif_type: res.body.info,
             };
             this.getMessage(match_uid);
@@ -140,24 +147,24 @@ class Chat extends Component {
     return (
       <div className="containerDiv fade">
         <div className="containerMatch">
-          {this.state.matches.map((matches) => {
+          {this.state.matches.map((match) => {
             return (
               <Media
                 onClick={(event) => {
-                  this.onClickMatch(event, matches.uid);
+                  this.onClickMatch(event, match.uid);
                 }}
-                className={this.state.currentRoom === matches.uid ? "selectedRoom" : null}
-                key={matches.id}
-                style={{ color: "white", padding: "5px", cursor: "pointer" }}
+                className={this.state.currentRoom === match.uid ? "selectedRoom" : null}
+                key={match.id}
+                style={{ color: "white", padding: "10px", cursor: "pointer", alignItems: "center" }}
               >
                 <Image
-                  className="mr-3 myPicMini"
-                  src={process.env.PUBLIC_URL + matches.path}
+                  className={`mr-3 myPicMini ${match.connected ? "connected " : " disconnected"}`}
+                  src={process.env.PUBLIC_URL + match.path}
                   alt="Generic placeholder"
-                  rounded
+                  roundedCircle
                 />
                 <Media.Body>
-                  <h5>{matches.login}</h5>
+                  <h5>{match.login}</h5>
                 </Media.Body>
               </Media>
             );

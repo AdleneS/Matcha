@@ -1,22 +1,31 @@
 .test {
-    color: white;
+  color: white;
 }
 
 .block {
-    background-color: #1d1c22;
-    border: 1px solid black;
-    border-radius: 1%;
-    margin-top: 15px;
+  background-color: #1d1c22;
+  border: 1px solid black;
+  border-radius: 1%;
+  margin-top: 15px;
+  padding: 10px;
 }
 
 .img_size {
-    position: relative;
-    object-fit: cover;
-    width: 100%;
-    height: 250px;
-    flex-shrink: 1;
+  object-fit: cover;
+  flex-shrink: 1;
+  display: inline-block;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
 }
 
-.containerDivProfile{
-    margin-top: 90px;
+.containerDivProfile {
+  margin-top: 90px;
+}
+
+.col-md-3 {
+  -ms-flex: 0 0 25%;
+  flex: 0 0 0%;
+  max-width: 100%;
 }

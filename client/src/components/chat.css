@@ -79,7 +79,19 @@
   object-fit: cover;
   width: 64px;
   height: 64px;
-  flex-shrink: 1;
+  flex-shrink: 0;
+}
+
+.connected {
+  border: 3px solid;
+  color: #56fd56c7;
+  padding: 2px;
+}
+
+.disconnected {
+  border: 3px solid;
+  padding: 2px;
+  color: #aaa;
 }
 
 .dateMsg {
@@ -90,4 +102,11 @@
 
 .selectedRoom {
   background-color: #23222d;
+}
+
+h5 {
+  width: 100px;
+  overflow: hidden;
+  font-size: 1.25rem;
+  font-size-adjust: 0.5;
 }

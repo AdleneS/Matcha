@@ -7,7 +7,6 @@ const jwt = require("jsonwebtoken");
 const secret = "keyboard cat";
 var moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
-const cookieParser = require("cookie-parser");
 
 router.get("/", (req, res) => {
   res.json({
@@ -48,12 +47,14 @@ router.post("/signup", (req, res, next) => {
             } else {
               res
                 .cookie("ssid", token, {
+                  maxAge: 72000000,
                   httpOnly: true,
                   secure: false,
                   sameSite: "strict",
                   signed: true,
                 })
                 .cookie("info", info, {
+                  maxAge: 72000000,
                   httpOnly: true,
                   secure: false,
                   sameSite: "strict",

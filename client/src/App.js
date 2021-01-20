@@ -27,25 +27,28 @@ export default function App() {
       .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
-          navigator.geolocation.getCurrentPosition(
-            function (position) {
-              fetch(
-                "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
-                  position.coords.latitude +
-                  "," +
-                  position.coords.longitude +
-                  "&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI"
-              )
-                .then((res) => res.json())
-                .then((geo) => setGeo(geo.results[5].address_components[1].long_name));
-            },
-            function () {
-              console.log("Enable Geolocation");
-            }
-          );
+          navigator.geolocation.getCurrentPosition(function (position) {
+            fetch(
+              "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
+                position.coords.latitude +
+                "," +
+                position.coords.longitude +
+                "&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI"
+            )
+              .then((res) => res.json())
+              .then((geo) => setGeo(geo.results[5].address_components[1].long_name));
+          });
+          fetch("https://ipapi.co/json?token=b938095cfb7a67")
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (data) {
+              console.log(data);
+            });
           socket.emit("FromAPI", res.body[0].uid);
           setIsLogged(true);
         } else {
+          setIsLogged(false);
           const error = new Error(res.body.error);
           throw error;
         }
@@ -77,14 +80,14 @@ export default function App() {
               <Redirect to="/home" />
             </Route>
             <Route path="/home" component={withAuth(Home, socket)} />
-            <Route exact path="/profile" component={withAuth(Profile)} />
+            <Route exact path="/profile" component={withAuth(Profile, socket)} />
             <Route exact path="/profile/user/" component={withAuth(Profile)} />
             <Route path="/changeinfo" component={withAuth(ChangeInfo)} />
             <Route path="/customers" component={withAuth(Customers)} />
             <Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
             <Route path="/search/" component={withAuth(Search, socket)} />
             <Route path="/login">
-              <Login socket={socket} />
+              <Login socket={socket}></Login>
             </Route>
             <Route path="/register" component={Register} />
             <Route path="*" component={ErrorPage} />

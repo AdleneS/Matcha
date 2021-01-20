@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import "./home.css";
 import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
-import { gender, orientation } from "../enum/genderOrientation.js";
+import { FaCircle } from "react-icons/fa";
 
 class Home extends Component {
   constructor(props) {
@@ -45,48 +45,12 @@ class Home extends Component {
       method: "POST",
       body: JSON.stringify({
         notified_uid: data.notified_uid,
-        notifier_uid: data.notifier_uid,
-        notifier_login: data.notifier_login,
         notif_type: data.notif_type,
       }),
       headers: {
         "Content-type": "application/json",
       },
     });
-  };
-
-  filterPretender = (pretender) => {
-    if (this.state.user[0].sexual_orientation === orientation.bi || this.state.user[0].gender === gender.other) {
-      return pretender;
-    } else if (this.state.user[0].gender === gender.man) {
-      if (this.state.user[0].sexual_orientation === orientation.hetero) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.woman || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.hetero || pretender.sexual_orientation === orientation.bi)
-        );
-      } else if (this.state.user[0].sexual_orientation === orientation.homo) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.man || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.homo || pretender.sexual_orientation === orientation.bi)
-        );
-      }
-    } else if (this.state.user[0].gender === gender.woman) {
-      if (this.state.user[0].sexual_orientation === orientation.hetero) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.man || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.hetero || pretender.sexual_orientation === orientation.bi)
-        );
-      } else if (this.state.user[0].sexual_orientation === orientation.homo) {
-        return pretender.filter(
-          (pretender) =>
-            (pretender.gender === gender.woman || pretender.gender === gender.other) &&
-            (pretender.sexual_orientation === orientation.homo || pretender.sexual_orientation === orientation.bi)
-        );
-      }
-    }
   };
 
   addMatch = (pretenderUid, data) => {
@@ -161,9 +125,7 @@ class Home extends Component {
       .then((res) => {
         if (res.status === 200) {
           const data = {
-            notifier_uid: this.state.cookie.info.uid,
             notified_uid: pretenderUid,
-            notifier_login: this.state.cookie.info.login,
             notif_type: res.body.info,
           };
           this.props.socket.emit("sendNotif", pretenderUid);
@@ -195,7 +157,17 @@ class Home extends Component {
                 <Card className="item" key={pretender.id}>
                   <Card.Img className="myPic" variant="top" src={process.env.PUBLIC_URL + pretender.path} />
                   <div className="overlay">
-                    <Card.Title className="title">{pretender.login}</Card.Title>
+                    <Card.Title className="title">
+                      {pretender.login}{" "}
+                      <span>
+                        {pretender.connected ? (
+                          <FaCircle style={{ color: "green", width: "10px" }} />
+                        ) : (
+                          <FaCircle style={{ color: "red", width: "10px" }} />
+                        )}
+                      </span>
+                    </Card.Title>
+
                     <Card.Text>
                       {Moment().diff(pretender.birthday, "years")} years old
                       <br></br>
