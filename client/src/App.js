@@ -27,24 +27,29 @@ export default function App() {
       .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
-          navigator.geolocation.getCurrentPosition(function (position) {
-            fetch(
-              "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
-                position.coords.latitude +
-                "," +
-                position.coords.longitude +
-                "&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI"
-            )
-              .then((res) => res.json())
-              .then((geo) => setGeo(geo.results[5].address_components[1].long_name));
-          });
-          fetch("https://ipapi.co/json?token=b938095cfb7a67")
-            .then(function (response) {
-              return response.json();
-            })
-            .then(function (data) {
-              console.log(data);
-            });
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              fetch(
+                "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
+                  position.coords.latitude +
+                  "," +
+                  position.coords.longitude +
+                  "&sensor=true&key=AIzaSyBB5VTQyz6e47nmfW6VxZjj4_hb3ONitrI"
+              )
+                .then((res) => res.json())
+                .then((geo) => setGeo(geo.results[5].address_components[1].long_name));
+            },
+            function () {
+              console.log("Enable Geolocation");
+            }
+            // fetch("https://ipapi.co/json?token=b938095cfb7a67")
+            // .then(function (response) {
+            //   return response.json();
+            // })
+            // .then(function (data) {
+            //   console.log(data);
+            // });
+          );
           socket.emit("FromAPI", res.body[0].uid);
           setIsLogged(true);
         } else {
