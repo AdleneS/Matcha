@@ -80,17 +80,13 @@
   width: 64px;
   height: 64px;
   flex-shrink: 0;
-}
-
-.connected {
-  border: 3px solid;
-  color: #56fd56c7;
-  padding: 2px;
+  background: #23222d;
+  padding: 3px;
 }
 
 .disconnected {
   border: 3px solid;
-  padding: 2px;
+  border-radius: 50%;
   color: #aaa;
 }
 
@@ -109,4 +105,26 @@ h5 {
   overflow: hidden;
   font-size: 1.25rem;
   font-size-adjust: 0.5;
+}
+
+.gradient {
+  border-radius: 50%;
+  padding: 1rem;
+  position: relative;
+  background-image: linear-gradient(
+    to left bottom,
+    #d16ba5,
+    #d16fb1,
+    #d073bd,
+    #cd78ca,
+    #c97ed6,
+    #c085e1,
+    #b58cea,
+    #a993f3,
+    #969cf9,
+    #83a4fc,
+    #70abfd,
+    #5fb1fb
+  );
+  padding: 3px;
 }

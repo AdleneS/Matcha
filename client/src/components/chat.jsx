@@ -157,13 +157,15 @@ class Chat extends Component {
                 key={match.id}
                 style={{ color: "white", padding: "10px", cursor: "pointer", alignItems: "center" }}
               >
-                <Image
-                  className={`mr-3 myPicMini ${match.connected ? "connected " : " disconnected"}`}
-                  src={process.env.PUBLIC_URL + match.path}
-                  alt="Generic placeholder"
-                  roundedCircle
-                />
-                <Media.Body>
+                <div className={`${match.connected ? "gradient " : " disconnected"}`}>
+                  <Image
+                    className={`myPicMini`}
+                    src={process.env.PUBLIC_URL + match.path}
+                    alt="Generic placeholder"
+                    roundedCircle
+                  />
+                </div>
+                <Media.Body style={{ marginLeft: "10px" }}>
                   <h5>{match.login}</h5>
                 </Media.Body>
               </Media>

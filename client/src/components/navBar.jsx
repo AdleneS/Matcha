@@ -73,7 +73,7 @@ export default function Mynav(props) {
 
   const navBarStyle = {
     width: "100%",
-    zIndex: 1,
+    zIndex: 2,
     margin: "auto",
     borderBottom: "1px solid rgb(13, 13, 14)",
     color: "white",

@@ -240,13 +240,14 @@ class Search extends Component {
   navBarStyle = {
     width: "100%",
     marginTop: "77px",
+    marginBottom: "77px",
     minHeight: "77px",
     zIndex: 1,
     color: "white",
     backgroundColor: "#27262e",
     display: "flex",
     alignItems: "center",
-    position: "sticky",
+    position: "fixed",
   };
 
   wrapperStyle = { width: 200, marginLeft: "10px" };

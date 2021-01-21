@@ -30,7 +30,7 @@ const getUsersByUid = (request, response) => {
 const getUsersInfo = (uid) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected FROM users WHERE uid = $1",
+      "SELECT uid, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected FROM users WHERE uid = $1",
       [uid],
       (error, results) => {
         if (error) {
@@ -157,6 +157,20 @@ const getLikes = (request, response) => {
       throw error;
     } else {
       response.status(200).json(results.rows);
+    }
+  });
+};
+
+const checkPic = (request, response) => {
+  pool.query("SELECT * FROM img WHERE uid = $1", [request.signedCookies.info.uid], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      if (results.rows.length) {
+        response.status(200).json(results.rows);
+      } else {
+        response.status(401).json();
+      }
     }
   });
 };
@@ -520,6 +534,7 @@ module.exports = {
   postSearch,
   setConnected,
   setDisconnected,
+  checkPic,
   getUserById,
   createUser,
   deleteUser,

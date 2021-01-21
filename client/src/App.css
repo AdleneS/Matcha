@@ -1,18 +1,16 @@
-.app{
+.app {
   height: 100%;
 }
 
-.myBody{
+.myBody {
   background-color: #31303a;
 }
 
-.nav-flat{
+.nav-flat {
   background-color: #1d1c22;
 }
 
-
-
-.myForm{
+.myForm {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -21,8 +19,8 @@
   background-color: #4d1b35;
 }
 
-.inForm{
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+.inForm {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   color: white;
   right: 0px;
   margin-top: auto;
@@ -31,12 +29,12 @@
   background-color: #4d1b35;
 }
 
-.loveImg{
+.loveImg {
   position: absolute;
   width: 40%;
   left: 0;
   bottom: 0;
-  z-index:-2
+  z-index: -2;
 }
 
 .App-link {
@@ -44,7 +42,7 @@
 }
 
 input {
-  border-color: rgb(26, 26, 26) !important;;
+  border-color: rgb(26, 26, 26) !important;
   background-color: #1d1c22 !important;
   color: rgb(185, 185, 185) !important;
 }
@@ -54,18 +52,18 @@ label.error {
 }
 
 input:focus {
-  border-color: rgb(48, 43, 49) !important;;
+  border-color: rgb(48, 43, 49) !important;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(53, 53, 53, 0.6) !important;
 }
 
-select{
-  border-color: rgb(26, 26, 26) !important;;
+select {
+  border-color: rgb(26, 26, 26) !important;
   background-color: #1d1c22 !important;
   color: rgb(185, 185, 185) !important;
 }
 
-textarea{
-  border-color: rgb(26, 26, 26) !important;;
+textarea {
+  border-color: rgb(26, 26, 26) !important;
   background-color: #1d1c22 !important;
   color: rgb(185, 185, 185) !important;
 }

@@ -141,6 +141,7 @@ app.post("/notif/setseen", db.setNotifSeen);
 app.post("/users/location", db.updateLocation);
 app.get("/profile/gallery/:uid", db.getAllImg);
 app.get("/profile/:uid", db.getUsersProfile);
+app.get("/checkpic", db.checkPic);
 app.get("/profile/like/:uid", db.getOneLike);
 app.get("/profile/likeYou/:uid", db.getYouLike);
 app.get("/change/sortImage", info.sortImage);
