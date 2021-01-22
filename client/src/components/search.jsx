@@ -330,7 +330,15 @@ class Search extends Component {
             this.state.filtredPretender.map((pretender, i) => (
               <Link key={i} to={"profile/?uid=" + pretender.uid}>
                 <Card className="item" key={pretender.id}>
-                  <Card.Img className="myPic" variant="top" src={process.env.PUBLIC_URL + pretender.path} />
+                  <Card.Img
+                    className="myPic"
+                    variant="top"
+                    src={
+                      pretender.path
+                        ? process.env.PUBLIC_URL + pretender.path
+                        : "https://source.unsplash.com/collection/159213/sig=" + i
+                    }
+                  />
                   <div className="overlay">
                     <Card.Title className="title">
                       {" "}

@@ -47,8 +47,8 @@ const getUsersImg = async (request, response) => {
   const user = await getUsersInfo(request.signedCookies.info.uid);
   let pretenders = null;
   pool.query(
-    "SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1",
-    [request.signedCookies.info.uid],
+    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, path FROM users LEFT JOIN img ON users.uid = img.uid WHERE NOT users.uid = $1 LIMIT $2 OFFSET $3",
+    [request.signedCookies.info.uid, request.params.limit, request.params.offset],
     (error, results) => {
       if (error) {
         throw error;
@@ -96,7 +96,11 @@ const getUsersImg = async (request, response) => {
             );
           }
         }
-        response.status(200).json(pretenders);
+        if (results.rows.length) {
+          response.status(200).json(pretenders);
+        } else {
+          response.status(401).json(pretenders);
+        }
       }
     }
   );
@@ -106,13 +110,15 @@ const postSearch = async (request, response) => {
   const { gender, sexual_orientation, age, popularity, country } = request.body;
   let filter = null;
   pool.query(
-    "SELECT firstname, gender, popularity, sexual_orientation, name, login, description, country, birthday, path, users.uid, connected FROM users INNER JOIN img ON img.uid = users.uid WHERE img.n_pic = 1 AND NOT users.uid = $1",
+    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, path  FROM users LEFT JOIN img ON img.uid = users.uid WHERE NOT users.uid = $1",
     [request.signedCookies.info.uid],
     (error, results) => {
       if (error) {
         throw error;
       } else {
         filter = results.rows;
+        console.log(results.rows);
+
         if (gender) {
           filter = filter.filter((pretender) => pretender.gender === gender);
         }
@@ -444,7 +450,7 @@ const createMessages = (request, response) => {
 const getUsersProfile = (request, response) => {
   const uid = request.params.uid;
   pool.query(
-    "SELECT * FROM users INNER JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND img.n_pic = 1",
+    "SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1",
     [uid],
     (error, results) => {
       if (error) {

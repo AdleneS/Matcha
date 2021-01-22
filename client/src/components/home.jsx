@@ -6,6 +6,7 @@ import "./home.css";
 import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaCircle } from "react-icons/fa";
+import InfiniteScroll from "react-infinite-scroller";
 
 class Home extends Component {
   constructor(props) {
@@ -15,6 +16,10 @@ class Home extends Component {
       likes: [],
       cookie: {},
       user: {},
+      limit: 50,
+      offset: 0,
+      hasMore: true,
+      loading: null,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -28,16 +33,17 @@ class Home extends Component {
       .then((user) => {
         this.setState({ user });
       });
-    fetch("/pretender/")
+    fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
       .then((res) => res.json())
       .then(async (pretender) => {
         if (this.state.user[0]) {
-          this.setState({ pretender });
+          this.setState({ pretender, offset: (this.state.offset += 25) });
         }
       });
     fetch("/users/likes")
       .then((res) => res.json())
       .then((likes) => this.setState({ likes }));
+    this.setState({ isMounted: true });
   }
 
   addNotif = (data) => {
@@ -145,73 +151,115 @@ class Home extends Component {
       });
   };
 
+  loadMore = async () => {
+    if (this.state.loading) {
+      return;
+    }
+    this.setState({ loading: true });
+    await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then(async (res) => {
+        if (res.status === 200) {
+          this.setState({ offset: (this.state.offset += 25), limit: (this.state.limit += 25) });
+          if (this.state.user[0]) {
+            this.setState({
+              pretender: [...this.state.pretender, ...res.body],
+            });
+          }
+        } else {
+          this.setState({ hasMore: false });
+        }
+      });
+    this.setState({ loading: false });
+  };
+
   render() {
     Moment.locale("fr");
     return (
-      <div>
-        <div style={{ color: "red" }}></div>
-        <div className="cardContainer fade">
-          {this.state.pretender &&
-            this.state.pretender.map((pretender) => (
-              <Link key={pretender.id} to={"profile/?uid=" + pretender.uid}>
-                <Card className="item" key={pretender.id}>
-                  <Card.Img className="myPic" variant="top" src={process.env.PUBLIC_URL + pretender.path} />
-                  <div className="overlay">
-                    <Card.Title className="title">
-                      {pretender.login}{" "}
-                      <span>
-                        {pretender.connected ? (
-                          <FaCircle style={{ color: "green", width: "10px" }} />
-                        ) : (
-                          <FaCircle style={{ color: "red", width: "10px" }} />
-                        )}
-                      </span>
-                    </Card.Title>
-
-                    <Card.Text>
-                      {Moment().diff(pretender.birthday, "years")} years old
-                      <br></br>
-                      {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
-                      {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
-                      <br></br>
-                      Popularity: {pretender.popularity}
-                      <br></br>
-                      Location: {pretender.country}
-                    </Card.Text>
-                    {this.state.likes.map((likes) => (
-                      <Card.Text key={likes.id}>
-                        {" "}
-                        {likes.uid_liked === pretender.uid ? (
-                          <BsHeartFill
-                            onClick={(event) => {
-                              this.onClick(event, pretender.uid);
-                            }}
-                            style={{
-                              color: "#ff3333",
-                              width: "30px",
-                              height: "30px",
-                              position: "absolute",
-                            }}
-                          />
-                        ) : null}
-                      </Card.Text>
-                    ))}
-                    <BsHeart
-                      onClick={(event) => {
-                        this.onClick(event, pretender.uid);
-                      }}
-                      style={{
-                        color: "#ff3333",
-                        width: "30px",
-                        height: "30px",
-                        position: "absolute",
-                      }}
+      <div style={{ height: "100vh", overflow: "auto" }}>
+        <InfiniteScroll
+          loadMore={this.loadMore.bind(this)}
+          hasMore={this.state.hasMore}
+          loader={
+            <div key={0} className="loader">
+              {" "}
+              Loading...{" "}
+            </div>
+          }
+          useWindow={false}
+          threshold={250}
+        >
+          <div className="cardContainer fade">
+            {this.state.pretender &&
+              this.state.pretender.map((pretender, i) => (
+                <Link key={i} to={"profile/?uid=" + pretender.uid}>
+                  <Card className="item" key={i}>
+                    <Card.Img
+                      className="myPic"
+                      variant="top"
+                      src={
+                        pretender.path
+                          ? process.env.PUBLIC_URL + pretender.path
+                          : "https://source.unsplash.com/collection/159213/sig=" + i
+                      }
                     />
-                  </div>
-                </Card>
-              </Link>
-            ))}
-        </div>
+                    <div className="overlay">
+                      <Card.Title className="title">
+                        {pretender.login}{" "}
+                        <span>
+                          {pretender.connected ? (
+                            <FaCircle style={{ color: "green", width: "10px" }} />
+                          ) : (
+                            <FaCircle style={{ color: "red", width: "10px" }} />
+                          )}
+                        </span>
+                      </Card.Title>
+
+                      <Card.Text>
+                        {Moment().diff(pretender.birthday, "years")} years old
+                        <br></br>
+                        {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
+                        {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
+                        <br></br>
+                        Popularity: {pretender.popularity}
+                        <br></br>
+                        Location: {pretender.country}
+                      </Card.Text>
+                      {this.state.likes.map((likes, i) => (
+                        <Card.Text key={i}>
+                          {" "}
+                          {likes.uid_liked === pretender.uid ? (
+                            <BsHeartFill
+                              onClick={(event) => {
+                                this.onClick(event, pretender.uid);
+                              }}
+                              style={{
+                                color: "#ff3333",
+                                width: "30px",
+                                height: "30px",
+                                position: "absolute",
+                              }}
+                            />
+                          ) : null}
+                        </Card.Text>
+                      ))}
+                      <BsHeart
+                        onClick={(event) => {
+                          this.onClick(event, pretender.uid);
+                        }}
+                        style={{
+                          color: "#ff3333",
+                          width: "30px",
+                          height: "30px",
+                          position: "absolute",
+                        }}
+                      />
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+          </div>
+        </InfiniteScroll>
       </div>
     );
   }

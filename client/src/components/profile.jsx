@@ -123,7 +123,11 @@ class profile extends Component {
               <Container fluid>
                 <Row className="test block">
                   <Col md={3}>
-                    <Image className="img_size" src={process.env.PUBLIC_URL + user.path} roundedCircle />
+                    <Image
+                      className="img_size"
+                      src={user.path ? process.env.PUBLIC_URL + user.path : this.state.src}
+                      roundedCircle
+                    />
                   </Col>
                   <Col>
                     <Row>

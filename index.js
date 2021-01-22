@@ -124,7 +124,7 @@ app.use("/auth", auth);
 app.get("/users", db.getUsers);
 app.get("/users/likes", db.getLikes);
 app.get("/users/popularity", db.updatePopularity);
-app.get("/pretender", db.getUsersImg);
+app.get("/pretender/:offset/:limit", db.getUsersImg);
 app.get("/users/uid/", db.getUsersByUid);
 app.post("/users", db.createUser);
 app.post("/search", db.postSearch);
