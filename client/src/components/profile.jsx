@@ -91,14 +91,17 @@ class profile extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           fetch("/profile/like/" + urlParam.get("uid"))
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
           if (this.state.likes[0]) {
-            if (this.state.likes[0].uid_liked === this.state.user[0].uid) this.setState({ is_like: 0 });
+            if (this.state.likes[0].uid_liked === this.state.user[0].uid)
+              this.setState({ is_like: 0 });
             else this.setState({ is_like: 1 });
           } else {
             this.setState({ is_like: 1 });
@@ -125,7 +128,12 @@ class profile extends Component {
                   <Col md={3}>
                     <Image
                       className="img_size"
-                      src={user.path ? process.env.PUBLIC_URL + user.path : this.state.src}
+                      src={
+                        user.path
+                          ? process.env.PUBLIC_URL + user.path
+                          : "https://source.unsplash.com/collection/159213/sig=" +
+                            Math.random()
+                      }
                       roundedCircle
                     />
                   </Col>
@@ -170,7 +178,9 @@ class profile extends Component {
                       }}
                     />
                     <div style={{ marginLeft: "40px", marginTop: "10px" }}>
-                      {this.state.is_likes_you === 1 ? <p>{user.login} vous a like</p> : null}
+                      {this.state.is_likes_you === 1 ? (
+                        <p>{user.login} vous a like</p>
+                      ) : null}
                     </div>
                   </Col>
                   <Col className="test block">

@@ -23,7 +23,9 @@ export default function App() {
 
   useEffect(() => {
     fetch("/checkCookie")
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           socket.emit("FromAPI", res.body[0].uid);
@@ -40,7 +42,9 @@ export default function App() {
   }, []);
 
   return (
-    <MyContext.Provider value={{ islogged: islogged, setIsLogged: setIsLogged }}>
+    <MyContext.Provider
+      value={{ islogged: islogged, setIsLogged: setIsLogged }}
+    >
       <div className="app">
         <BrowserRouter>
           <NavBar socket={socket}></NavBar>
@@ -49,11 +53,19 @@ export default function App() {
               <Redirect to="/home" />
             </Route>
             <Route path="/home" component={withAuth(Home, socket)} />
-            <Route exact path="/profile" component={withAuth(Profile, socket)} />
+            <Route
+              exact
+              path="/profile"
+              component={withAuth(Profile, socket)}
+            />
             <Route exact path="/profile/user/" component={withAuth(Profile)} />
             <Route path="/changeinfo" component={withAuth(ChangeInfo)} />
             <Route path="/customers" component={withAuth(Customers)} />
-            <Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
+            <Route
+              exact
+              path="/chat/:match_uid"
+              component={withAuth(Chat, socket)}
+            />
             <Route path="/search/" component={withAuth(Search, socket)} />
             <Route path="/login">
               <Login socket={socket}></Login>

@@ -17,64 +17,74 @@ router.get("/", (req, res) => {
 function validateUser(user) {
   const validEmail = typeof user.email == "string" && user.email.trim() != "";
   const validPassword =
-    typeof user.password == "string" && user.password.trim() != "" && user.password.trim().length >= 3;
+    typeof user.password == "string" &&
+    user.password.trim() != "" &&
+    user.password.trim().length >= 3;
 
   return validEmail && validPassword;
 }
 
 router.post("/signup", (req, res, next) => {
   if (validateUser(req.body)) {
-    pool.query("SELECT * FROM users WHERE email = $1", [req.body.email], (error, results) => {
-      if (error) throw error;
-      else if (results.rows[0]) {
-        if (bcrypt.compareSync(req.body.password, results.rows[0].password)) {
-          const rows = results.rows[0];
-          const session = uuidv4();
-          const payload = { email: rows.email };
-          const info = {
-            email: rows.email,
-            login: rows.login,
-            uid: rows.uid,
-            session: session,
-            popularity: rows.popularity,
-          };
-          const token = jwt.sign(payload, secret, {
-            expiresIn: "2h",
-          });
-          pool.query("UPDATE users SET session = $1 WHERE email = $2", [session, req.body.email], (error, results) => {
-            if (error) {
-              res.status(500).json({ error: error });
-            } else {
-              res
-                .cookie("ssid", token, {
-                  maxAge: 72000000,
-                  httpOnly: true,
-                  secure: false,
-                  sameSite: "strict",
-                  signed: true,
-                })
-                .cookie("info", info, {
-                  maxAge: 72000000,
-                  httpOnly: true,
-                  secure: false,
-                  sameSite: "strict",
-                  signed: true,
-                })
-                .json({ message: "Logged !", uid: rows.uid })
-                .status(200);
-            }
-          });
+    pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [req.body.email],
+      (error, results) => {
+        if (error) throw error;
+        else if (results.rows[0]) {
+          if (bcrypt.compareSync(req.body.password, results.rows[0].password)) {
+            const rows = results.rows[0];
+            const session = uuidv4();
+            const payload = { email: rows.email };
+            const info = {
+              email: rows.email,
+              login: rows.login,
+              uid: rows.uid,
+              session: session,
+              popularity: rows.popularity,
+            };
+            const token = jwt.sign(payload, secret, {
+              expiresIn: "2h",
+            });
+            pool.query(
+              "UPDATE users SET session = $1 WHERE email = $2",
+              [session, req.body.email],
+              (error, results) => {
+                if (error) {
+                  res.status(500).json({ error: error });
+                } else {
+                  res
+                    .cookie("ssid", token, {
+                      maxAge: 72000000,
+                      httpOnly: true,
+                      secure: false,
+                      sameSite: "strict",
+                      signed: true,
+                    })
+                    .cookie("info", info, {
+                      maxAge: 72000000,
+                      httpOnly: true,
+                      secure: false,
+                      sameSite: "strict",
+                      signed: true,
+                    })
+                    .json({ message: "Logged !", uid: rows.uid })
+                    .status(200);
+                }
+              }
+            );
+          } else {
+            res.status(401).json({
+              error: "Incorrect password",
+            });
+          }
         } else {
           res.status(401).json({
-            error: "Incorrect password",
+            error: "Incorrect email",
           });
         }
-      } else {
-        res.status(401).json({
-          error: "Incorrect email",
-        });
       }
-    });
+    );
   } else {
     next(new Error("Invalid Users " + req.body.password));
   }
@@ -82,16 +92,24 @@ router.post("/signup", (req, res, next) => {
 
 function validateRegistration(user) {
   const validLogin =
-    typeof user.login == "string" && user.login.trim() != "" && user.login.trim().match(/^(?=[a-zA-Z0-9]{5,12}$)/);
+    typeof user.login == "string" &&
+    user.login.trim() != "" &&
+    user.login.trim().match(/^(?=[a-zA-Z0-9]{5,12}$)/);
   const validEmail =
     typeof user.email == "string" &&
     user.email.trim() != "" &&
-    user.email.trim().match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/);
+    user.email
+      .trim()
+      .match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/);
   const validBirthday = typeof user.birthday == "date";
   const validPassword =
     typeof user.password == "string" &&
     user.password.trim() != "" &&
-    user.password.trim().match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!-_%*?&+])[A-Za-z\d@$!%-_*?&+]{8,}$/);
+    user.password
+      .trim()
+      .match(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!-_%*?&+])[A-Za-z\d@$!%-_*?&+]{8,}$/
+      );
   const verifyPassword = user.password == user.verify_password;
   return {
     login: validLogin,
@@ -103,7 +121,14 @@ function validateRegistration(user) {
 }
 
 router.post("/register", (req, res) => {
-  const { login, email, password, birthday, gender, sexual_orientation } = req.body;
+  const {
+    login,
+    email,
+    password,
+    birthday,
+    gender,
+    sexual_orientation,
+  } = req.body;
   var err = validateRegistration(req.body);
   if (err.email && err.pass && err.v_pass && err.login) {
     pool.query(
@@ -129,7 +154,8 @@ router.post("/register", (req, res) => {
   } else {
     console.log(err.pass);
     console.log(err.v_pass);
-    if (!err.login || err.login === null) res.status(401).json({ error: "login" });
+    if (!err.login || err.login === null)
+      res.status(401).json({ error: "login" });
     else if (!err.email) res.status(401).json({ error: "email" });
     else if (!err.pass) res.status(401).json({ error: "pass" });
     else if (!err.v_pass) res.status(401).json({ error: "v_pass" });

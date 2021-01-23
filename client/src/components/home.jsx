@@ -19,7 +19,7 @@ class Home extends Component {
       limit: 50,
       offset: 0,
       hasMore: true,
-      loading: null,
+      loading: true,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -35,10 +35,13 @@ class Home extends Component {
       });
     fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
       .then((res) => res.json())
-      .then(async (pretender) => {
-        if (this.state.user[0]) {
-          this.setState({ pretender, offset: (this.state.offset += 25) });
-        }
+      .then((pretender) => {
+        this.setState({
+          pretender,
+          offset: this.state.offset + 50,
+          limit: this.state.limit + 25,
+          loading: false,
+        });
       });
     fetch("/users/likes")
       .then((res) => res.json())
@@ -67,7 +70,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -95,7 +100,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -127,7 +134,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           const data = {
@@ -137,7 +146,8 @@ class Home extends Component {
           this.props.socket.emit("sendNotif", pretenderUid);
           this.addNotif(data);
           if (res.body.info === "like") this.addMatch(pretenderUid, data);
-          else if (res.body.info === "unlike") this.deleteMatch(pretenderUid, data);
+          else if (res.body.info === "unlike")
+            this.deleteMatch(pretenderUid, data);
           fetch("/users/likes")
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
@@ -157,15 +167,18 @@ class Home extends Component {
     }
     this.setState({ loading: true });
     await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then(async (res) => {
         if (res.status === 200) {
-          this.setState({ offset: (this.state.offset += 25), limit: (this.state.limit += 25) });
-          if (this.state.user[0]) {
-            this.setState({
-              pretender: [...this.state.pretender, ...res.body],
-            });
-          }
+          this.setState({
+            offset: this.state.offset + 25,
+            limit: this.state.limit + 25,
+          });
+          this.setState({
+            pretender: [...this.state.pretender, ...res.body],
+          });
         } else {
           this.setState({ hasMore: false });
         }
@@ -176,7 +189,7 @@ class Home extends Component {
   render() {
     Moment.locale("fr");
     return (
-      <div style={{ height: "100vh", overflow: "auto" }}>
+      <div style={{ overflow: "auto" }}>
         <InfiniteScroll
           loadMore={this.loadMore.bind(this)}
           hasMore={this.state.hasMore}
@@ -186,7 +199,7 @@ class Home extends Component {
               Loading...{" "}
             </div>
           }
-          useWindow={false}
+          useWindow={true}
           threshold={250}
         >
           <div className="cardContainer fade">
@@ -200,7 +213,8 @@ class Home extends Component {
                       src={
                         pretender.path
                           ? process.env.PUBLIC_URL + pretender.path
-                          : "https://source.unsplash.com/collection/159213/sig=" + i
+                          : "https://source.unsplash.com/collection/159213/sig=" +
+                            i
                       }
                     />
                     <div className="overlay">
@@ -208,7 +222,9 @@ class Home extends Component {
                         {pretender.login}{" "}
                         <span>
                           {pretender.connected ? (
-                            <FaCircle style={{ color: "green", width: "10px" }} />
+                            <FaCircle
+                              style={{ color: "green", width: "10px" }}
+                            />
                           ) : (
                             <FaCircle style={{ color: "red", width: "10px" }} />
                           )}
@@ -218,8 +234,10 @@ class Home extends Component {
                       <Card.Text>
                         {Moment().diff(pretender.birthday, "years")} years old
                         <br></br>
-                        {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
-                        {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
+                        {pretender.gender.charAt(0).toUpperCase() +
+                          pretender.gender.slice(1)}{" "}
+                        {pretender.sexual_orientation.charAt(0).toUpperCase() +
+                          pretender.sexual_orientation.slice(1)}
                         <br></br>
                         Popularity: {pretender.popularity}
                         <br></br>

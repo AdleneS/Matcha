@@ -42,7 +42,10 @@ export default function withAuth(ComponentToProtect, socket) {
                   .then((geo) => {
                     fetch("/users/location", {
                       method: "POST",
-                      body: JSON.stringify({ location: geo.results[5].address_components[1].long_name }),
+                      body: JSON.stringify({
+                        location:
+                          geo.results[5].address_components[1].long_name,
+                      }),
                       headers: {
                         "Content-type": "application/json",
                       },
@@ -101,7 +104,9 @@ export default function withAuth(ComponentToProtect, socket) {
       };
       const { loading, redirect, alert } = this.state;
       if (alert) {
-        return <Redirect to={{ pathname: "/changeinfo", state: { alert: true } }} />;
+        return (
+          <Redirect to={{ pathname: "/changeinfo", state: { alert: true } }} />
+        );
       }
       if (loading) {
         return (
@@ -114,7 +119,8 @@ export default function withAuth(ComponentToProtect, socket) {
         setIsLogged(false);
         return <Redirect to="/login" />;
       }
-      if (this._isMounted && !loading && !redirect) return <ComponentToProtect {...this.props} socket={socket} />;
+      if (this._isMounted && !loading && !redirect)
+        return <ComponentToProtect {...this.props} socket={socket} />;
     }
   };
 }

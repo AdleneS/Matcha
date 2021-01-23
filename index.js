@@ -31,11 +31,15 @@ io.on("connection", (socket) => {
     console.log("connected");
   });
   socket.on("sendNotif", (notified_uid) => {
-    found = Object.keys(socketArray).find((key) => socketArray[key] === notified_uid);
+    found = Object.keys(socketArray).find(
+      (key) => socketArray[key] === notified_uid
+    );
     io.to(found).emit("getNotif");
   });
   socket.on("sendMessage", (receiver_uid) => {
-    found = Object.keys(socketArray).find((key) => socketArray[key] === receiver_uid);
+    found = Object.keys(socketArray).find(
+      (key) => socketArray[key] === receiver_uid
+    );
     io.to(found).emit("getMessage", socketArray[socket.id]);
   });
   socket.on("disconnect", () => {
@@ -73,8 +77,20 @@ app.get("/checkCookie", withAuth, function (req, res) {
 
 app.get("/logout", function (req, res) {
   db.setDisconnected(req.signedCookies.info.uid);
-  res.clearCookie("ssid", { maxAge: 72000000, httpOnly: true, secure: false, sameSite: "strict", signed: true });
-  res.clearCookie("info", { maxAge: 72000000, httpOnly: true, secure: false, sameSite: "strict", signed: true });
+  res.clearCookie("ssid", {
+    maxAge: 72000000,
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    signed: true,
+  });
+  res.clearCookie("info", {
+    maxAge: 72000000,
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    signed: true,
+  });
   res.sendStatus(200);
 });
 
@@ -85,25 +101,37 @@ const upload = multer({
 app.post("/imgupload", upload.single("file"), (req, res) => {
   const tempPath = req.file.path;
   const targetPath =
-    "./client/public/img_container/" + req.file.fieldname + "-" + Date.now() + path.extname(req.file.originalname);
+    "./client/public/img_container/" +
+    req.file.fieldname +
+    "-" +
+    Date.now() +
+    path.extname(req.file.originalname);
   if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
     fs.rename(tempPath, targetPath, (err) => {
       if (err) {
         return handleError(err, res);
       }
-      pool.query("SELECT * FROM img WHERE uid = $1", [req.signedCookies.info.uid], (error, check_img) => {
-        if (error) throw error;
-        if (check_img.rowCount < 5) {
-          pool.query(
-            "INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)",
-            [targetPath.slice(15), req.signedCookies.info.uid, check_img.rowCount + 1],
-            (error, results) => {
-              if (error) throw error;
-            }
-          );
-          res.status(200).json({ info: "File uploaded!" });
+      pool.query(
+        "SELECT * FROM img WHERE uid = $1",
+        [req.signedCookies.info.uid],
+        (error, check_img) => {
+          if (error) throw error;
+          if (check_img.rowCount < 5) {
+            pool.query(
+              "INSERT INTO img (path, uid, n_pic) VALUES ($1, $2, $3)",
+              [
+                targetPath.slice(15),
+                req.signedCookies.info.uid,
+                check_img.rowCount + 1,
+              ],
+              (error, results) => {
+                if (error) throw error;
+              }
+            );
+            res.status(200).json({ info: "File uploaded!" });
+          }
         }
-      });
+      );
     });
   } else {
     fs.unlink(tempPath, (err) => {
@@ -127,7 +155,7 @@ app.get("/users/popularity", db.updatePopularity);
 app.get("/pretender/:offset/:limit", db.getUsersImg);
 app.get("/users/uid/", db.getUsersByUid);
 app.post("/users", db.createUser);
-app.post("/search", db.postSearch);
+app.post("/search/:offset/:limit", db.postSearch);
 app.post("/like", db.like);
 app.post("/match/create", db.createMatch);
 app.post("/match/delete", db.deleteMatch);

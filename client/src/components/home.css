@@ -5,6 +5,7 @@
   justify-content: center;
   row-gap: 1ch;
   column-gap: 1ch;
+  margin-bottom: 25px;
 }
 
 .item {
@@ -33,11 +34,13 @@
   color: #ffffff;
   opacity: 0;
   transition: all 0.5s;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
 }
 
 .title {
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
   font-weight: bold;
   border-bottom: 1px solid white;
   font-variant: small-caps;
