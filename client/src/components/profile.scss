@@ -1,0 +1,90 @@
+.test {
+  color: white;
+}
+
+.block {
+  background-color: #1d1c22;
+  border: 1px solid black;
+  border-radius: 1%;
+  margin-top: 15px;
+  padding: 10px;
+}
+
+.img_size {
+  object-fit: cover;
+  flex-shrink: 1;
+  display: inline-block;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.containerDivProfile {
+  margin-top: 90px;
+}
+
+.col-md-3 {
+  -ms-flex: 0 0 25%;
+  flex: 0 0 0%;
+  max-width: 100%;
+}
+
+$size: 6;
+.gallery {
+  display: grid;
+  //height: calc(100vh - 77px);
+  grid-template: repeat(3, 1fr) / repeat(5, 1fr);
+  grid-gap: 0.5em;
+  margin: 10px -15px 10px -15px;
+  @media (max-width: 800px) {
+    grid-gap: 0em;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    & > div {
+      width: 48%;
+      margin: 1%;
+      @media (max-width: 350px) {
+        width: 98%;
+      }
+    }
+  }
+  & > div {
+    //Grid Structure
+    &:nth-child(#{$size}n + 1) {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    &:nth-child(2) {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+    &:nth-child(4) {
+      grid-column: span 1;
+      // grid-row: span 2;
+    }
+    & > img {
+      object-fit: cover;
+      flex-shrink: 1;
+      display: inline-block;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      min-height: 100%;
+      transition: all ease 1s;
+    }
+  }
+  & > div {
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 2px 8px 0 rgba(#000, 0.2), 0 3px 20px 0 rgba(#000, 0.19);
+  }
+  div,
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+  }
+}

@@ -24,7 +24,7 @@ class Search extends Component {
       user: {},
       limit: 50,
       offset: 0,
-      hasMore: true,
+      hasMore: false,
       loading: true,
       gender: [
         {
@@ -66,7 +66,8 @@ class Search extends Component {
       orientationValue: "",
       locationValue: "",
       popularityValue: [0, 100],
-      ageValue: [18, 100],
+      ageValue: [0, 100],
+      tagValue: [],
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -109,9 +110,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -139,9 +138,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -189,8 +186,17 @@ class Search extends Component {
     this.filteringPretender();
   };
 
+  handleTag = async (event) => {
+    console.log(event.target.value);
+    if (event.target.value === "") {
+      this.setState({ tagValue: [] });
+    }
+    await this.setState({ tagValue: event.target.value.split(" ") });
+    this.filteringPretender();
+  };
+
   filteringPretender = () => {
-    this.setState({ offset: 0, limit: 50, hasMore: true });
+    this.setState({ offset: 0, limit: 50 });
 
     setTimeout(() => {
       fetch("/search/" + this.state.offset + "/" + this.state.limit, {
@@ -201,6 +207,7 @@ class Search extends Component {
           age: this.state.ageValue,
           popularity: this.state.popularityValue,
           country: this.state.locationValue,
+          tag: this.state.tagValue,
         }),
         headers: {
           "Content-type": "application/json",
@@ -208,6 +215,10 @@ class Search extends Component {
       })
         .then((res) =>
           res.json().then((data) => {
+            console.log(data.length);
+            if (data.length >= 50) {
+              this.setState({ hasMore: true });
+            }
             this.setState({
               filtredPretender: data,
               offset: this.state.offset + 50,
@@ -231,9 +242,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           const data = {
@@ -243,8 +252,7 @@ class Search extends Component {
           this.props.socket.emit("sendNotif", pretenderUid);
           this.addNotif(data);
           if (res.body.info === "like") this.addMatch(pretenderUid, data);
-          else if (res.body.info === "unlike")
-            this.deleteMatch(pretenderUid, data);
+          else if (res.body.info === "unlike") this.deleteMatch(pretenderUid, data);
           fetch("/users/likes")
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
@@ -262,37 +270,38 @@ class Search extends Component {
     if (this.state.loading) {
       return;
     }
-    this.setState({ loading: true });
-    await fetch("/search/" + this.state.offset + "/" + this.state.limit, {
-      method: "POST",
-      body: JSON.stringify({
-        gender: this.state.genderValue,
-        sexual_orientation: this.state.orientationValue,
-        age: this.state.ageValue,
-        popularity: this.state.popularityValue,
-        country: this.state.locationValue,
-      }),
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
-      .then(async (res) => {
-        if (res.status === 200) {
-          this.setState({
-            offset: this.state.offset + 25,
-            limit: this.state.limit + 25,
-          });
-          this.setState({
-            filtredPretender: [...this.state.filtredPretender, ...res.body],
-          });
-        } else {
-          this.setState({ hasMore: false });
-        }
-      });
-    this.setState({ loading: false });
+    setTimeout(async () => {
+      this.setState({ loading: true });
+      await fetch("/search/" + this.state.offset + "/" + this.state.limit, {
+        method: "POST",
+        body: JSON.stringify({
+          gender: this.state.genderValue,
+          sexual_orientation: this.state.orientationValue,
+          age: this.state.ageValue,
+          popularity: this.state.popularityValue,
+          country: this.state.locationValue,
+          tag: this.state.tagValue,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      })
+        .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+        .then(async (res) => {
+          if (res.status === 200) {
+            this.setState({
+              offset: this.state.offset + 25,
+              limit: this.state.limit + 25,
+            });
+            this.setState({
+              filtredPretender: [...this.state.filtredPretender, ...res.body],
+            });
+          } else {
+            this.setState({ hasMore: false });
+          }
+        });
+      this.setState({ loading: false });
+    }, 200);
   };
 
   navBarStyle = {
@@ -328,12 +337,7 @@ class Search extends Component {
           >
             <Form.Group className="select" controlId="formGender">
               <Form.Label>Gender</Form.Label>
-              <Form.Control
-                as="select"
-                onChange={this.handleGender}
-                value={genderValue}
-                custom
-              >
+              <Form.Control as="select" onChange={this.handleGender} value={genderValue} custom>
                 {gender.map((item) => (
                   <option key={item.value} value={item.value}>
                     {item.name}
@@ -344,12 +348,7 @@ class Search extends Component {
 
             <Form.Group className="select" controlId="formOrientation">
               <Form.Label>Sexual Orientation</Form.Label>
-              <Form.Control
-                as="select"
-                onChange={this.handleOrientation}
-                value={orientationValue}
-                custom
-              >
+              <Form.Control as="select" onChange={this.handleOrientation} value={orientationValue} custom>
                 {orientation.map((item) => (
                   <option key={item.value} value={item.value}>
                     {item.name}
@@ -360,17 +359,17 @@ class Search extends Component {
 
             <Form.Group className="select" controlId="formLocation">
               <Form.Label>Location</Form.Label>
-              <Form.Control
-                onChange={this.handleLocation}
-                type="text"
-                placeholder="Location"
-              />
+              <Form.Control onChange={this.handleLocation} type="text" placeholder="Location" />
+            </Form.Group>
+
+            <Form.Group className="select" controlId="formTag">
+              <Form.Label>Tags</Form.Label>
+              <Form.Control onChange={this.handleTag} type="text" placeholder="Tag.. Tag.." />
             </Form.Group>
 
             <Form.Group className="select" controlId="formPopularity">
               <Form.Label>
-                Popularity {this.state.popularityValue[0]} -{" "}
-                {this.state.popularityValue[1]}
+                Popularity {this.state.popularityValue[0]} - {this.state.popularityValue[1]}
               </Form.Label>
               <Range
                 onChange={this.handlePopularity}
@@ -424,10 +423,9 @@ class Search extends Component {
                         className="myPic"
                         variant="top"
                         src={
-                          pretender.path
-                            ? process.env.PUBLIC_URL + pretender.path
-                            : "https://source.unsplash.com/collection/159213/sig=" +
-                              i
+                          pretender.path[0]
+                            ? process.env.PUBLIC_URL + pretender.path[0]
+                            : "https://source.unsplash.com/collection/159213/sig=" + i
                         }
                       />
                       <div className="overlay">
@@ -436,25 +434,17 @@ class Search extends Component {
                           {pretender.login}{" "}
                           <span>
                             {pretender.connected ? (
-                              <FaCircle
-                                style={{ color: "green", width: "10px" }}
-                              />
+                              <FaCircle style={{ color: "green", width: "10px" }} />
                             ) : (
-                              <FaCircle
-                                style={{ color: "red", width: "10px" }}
-                              />
+                              <FaCircle style={{ color: "red", width: "10px" }} />
                             )}
                           </span>
                         </Card.Title>
                         <Card.Text>
                           {Moment().diff(pretender.birthday, "years")} years old
                           <br></br>
-                          {pretender.gender.charAt(0).toUpperCase() +
-                            pretender.gender.slice(1)}{" "}
-                          {pretender.sexual_orientation
-                            .charAt(0)
-                            .toUpperCase() +
-                            pretender.sexual_orientation.slice(1)}
+                          {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
+                          {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
                           <br></br>
                           Popularity: {pretender.popularity}
                           <br></br>

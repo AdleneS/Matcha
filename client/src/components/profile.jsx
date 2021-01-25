@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import "./profile.css";
+import "./profile.scss";
 import Image from "react-bootstrap/Image";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { MdBlock, MdReport } from "react-icons/md";
-import Carousel from "react-bootstrap/Carousel";
+import { Redirect } from "react-router-dom";
 
 class profile extends Component {
   constructor(props) {
@@ -19,6 +19,7 @@ class profile extends Component {
       cookie: {},
       is_like: 0,
       is_likes_you: 0,
+      redirect: false,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -26,43 +27,53 @@ class profile extends Component {
   componentDidMount() {
     const queryString = window.location.search;
     const urlParam = new URLSearchParams(queryString);
-    fetch("/cookie/")
-      .then((res) => res.json())
-      .then((cookie) => this.setState({ cookie }));
-    fetch("/profile/" + urlParam.get("uid"))
-      .then((response) => response.json())
-      .then((user) => this.setState({ user }));
-    fetch("/profile/like/" + urlParam.get("uid"))
-      .then((res) => res.json())
-      .then((likes) => this.setState({ likes }))
-      .then((likes) => {
-        if (this.state.likes[0] && this.state.user[0]) {
-          if (this.state.likes[0].uid_liked === this.state.user[0].uid) {
-            this.setState({ is_like: 1 });
-          } else this.setState({ is_like: 0 });
-        } else {
-          this.setState({ is_like: 0 });
-        }
-      });
-    fetch("/profile/likeYou/" + urlParam.get("uid"))
-      .then((response) => response.json())
-      .then((likes_you) => this.setState({ likes_you }))
-      .then((likes_you) => {
-        if (this.state.likes_you[0]) {
-          this.setState({ is_likes_you: 1 });
-        } else {
-          this.setState({ is_likes_you: 0 });
-        }
-      });
-    fetch("/profile/gallery/" + urlParam.get("uid"))
-      .then((res) => res.json())
-      .then((gallery) => this.setState({ gallery }));
-    const data = {
-      notified_uid: urlParam.get("uid"),
-      notif_type: "view",
-    };
-    if (this.props.socket) {
-      this.createNotif(data);
+    if (urlParam.get("uid") === "") {
+      this.setState({ redirect: true });
+    } else {
+      fetch("/cookie/")
+        .then((res) => res.json())
+        .then((cookie) => this.setState({ cookie }));
+      fetch("/profile/" + urlParam.get("uid"))
+        .then((response) => response.json())
+        .then((user) => {
+          if (!user.length) {
+            this.setState({ redirect: true });
+          } else {
+            this.setState({ user });
+          }
+        });
+      fetch("/profile/like/" + urlParam.get("uid"))
+        .then((res) => res.json())
+        .then((likes) => this.setState({ likes }))
+        .then((likes) => {
+          if (this.state.likes[0] && this.state.user[0]) {
+            if (this.state.likes[0].uid_liked === this.state.user[0].uid) {
+              this.setState({ is_like: 1 });
+            } else this.setState({ is_like: 0 });
+          } else {
+            this.setState({ is_like: 0 });
+          }
+        });
+      fetch("/profile/likeYou/" + urlParam.get("uid"))
+        .then((response) => response.json())
+        .then((likes_you) => this.setState({ likes_you }))
+        .then((likes_you) => {
+          if (this.state.likes_you[0]) {
+            this.setState({ is_likes_you: 1 });
+          } else {
+            this.setState({ is_likes_you: 0 });
+          }
+        });
+      fetch("/profile/gallery/" + urlParam.get("uid"))
+        .then((res) => res.json())
+        .then((gallery) => this.setState({ gallery }));
+      const data = {
+        notified_uid: urlParam.get("uid"),
+        notif_type: "view",
+      };
+      if (this.props.socket) {
+        this.createNotif(data);
+      }
     }
   }
 
@@ -91,17 +102,14 @@ class profile extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           fetch("/profile/like/" + urlParam.get("uid"))
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
           if (this.state.likes[0]) {
-            if (this.state.likes[0].uid_liked === this.state.user[0].uid)
-              this.setState({ is_like: 0 });
+            if (this.state.likes[0].uid_liked === this.state.user[0].uid) this.setState({ is_like: 0 });
             else this.setState({ is_like: 1 });
           } else {
             this.setState({ is_like: 1 });
@@ -117,55 +125,43 @@ class profile extends Component {
   };
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect to="/home" />;
+    }
     return (
       <div>
         <Container>
           {this.state.user.map((user) => (
             <div key={user.id}>
               <div className="test containerDivProfile"></div>
-              <Container fluid>
-                <Row className="test block">
-                  <Col md={3}>
-                    <Image
-                      className="img_size"
-                      src={
-                        user.path
-                          ? process.env.PUBLIC_URL + user.path
-                          : "https://source.unsplash.com/collection/159213/sig=" +
-                            Math.random()
-                      }
-                      roundedCircle
-                    />
-                  </Col>
-                  <Col>
-                    <Row>
-                      <h1 className="test">{user.login}</h1>
-                    </Row>
-                    <Row>
-                      <p>{user.gender}</p>
-                    </Row>
-                    <Row>
-                      <p>{user.sexual_orientation}</p>
-                    </Row>
-                  </Col>
-                </Row>
-                <Row className="test">
-                  <Col className="test block">
-                    {this.state.is_like === 1 ? (
-                      <BsHeartFill
-                        onClick={(event) => {
-                          this.onClick(event, user.uid);
-                        }}
-                        style={{
-                          marginTop: "10px",
-                          color: "#ff3333",
-                          width: "30px",
-                          height: "30px",
-                          position: "absolute",
-                        }}
-                      />
-                    ) : null}
-                    <BsHeart
+              <Row className="test block">
+                <Col md={3}>
+                  <Image
+                    className="img_size"
+                    src={
+                      user.path
+                        ? process.env.PUBLIC_URL + user.path
+                        : "https://source.unsplash.com/collection/159213/sig=" + Math.random()
+                    }
+                    roundedCircle
+                  />
+                </Col>
+                <Col>
+                  <Row>
+                    <h1 className="test">{user.login}</h1>
+                  </Row>
+                  <Row>
+                    <p>{user.gender}</p>
+                  </Row>
+                  <Row>
+                    <p>{user.sexual_orientation}</p>
+                  </Row>
+                </Col>
+              </Row>
+              <Row className="test">
+                <Col className="test block">
+                  {this.state.is_like === 1 ? (
+                    <BsHeartFill
                       onClick={(event) => {
                         this.onClick(event, user.uid);
                       }}
@@ -177,58 +173,61 @@ class profile extends Component {
                         position: "absolute",
                       }}
                     />
-                    <div style={{ marginLeft: "40px", marginTop: "10px" }}>
-                      {this.state.is_likes_you === 1 ? (
-                        <p>{user.login} vous a like</p>
-                      ) : null}
-                    </div>
-                  </Col>
-                  <Col className="test block">
-                    <div style={{ marginTop: "10px" }}>{<p>565632</p>}</div>
-                  </Col>
-                  <Col className="test block">
-                    <MdBlock
-                      style={{
-                        color: "#ff3333",
-                        width: "30px",
-                        height: "30px",
-                        position: "absolute",
-                        marginTop: "10px",
-                      }}
-                    />
-                    <MdReport
-                      style={{
-                        color: "#ff3333",
-                        width: "30px",
-                        height: "30px",
-                        position: "absolute",
-                        marginLeft: "40px",
-                        marginTop: "10px",
-                      }}
-                    />
-                  </Col>
-                </Row>
+                  ) : null}
+                  <BsHeart
+                    onClick={(event) => {
+                      this.onClick(event, user.uid);
+                    }}
+                    style={{
+                      marginTop: "10px",
+                      color: "#ff3333",
+                      width: "30px",
+                      height: "30px",
+                      position: "absolute",
+                    }}
+                  />
+                  <div style={{ marginLeft: "40px", marginTop: "10px" }}>
+                    {this.state.is_likes_you === 1 ? <p>{user.login} vous a like</p> : null}
+                  </div>
+                </Col>
+                <Col className="test block">
+                  <div style={{ marginTop: "10px" }}>{<p>565632</p>}</div>
+                </Col>
+                <Col className="test block">
+                  <MdBlock
+                    style={{
+                      color: "#ff3333",
+                      width: "30px",
+                      height: "30px",
+                      position: "absolute",
+                      marginTop: "10px",
+                    }}
+                  />
+                  <MdReport
+                    style={{
+                      color: "#ff3333",
+                      width: "30px",
+                      height: "30px",
+                      position: "absolute",
+                      marginLeft: "40px",
+                      marginTop: "10px",
+                    }}
+                  />
+                </Col>
+              </Row>
 
-                <Row className="test block" style={{ height: "140px" }}>
-                  <p>{user.description}</p>
-                </Row>
-
-                <Row>
-                  <Carousel>
-                    {this.state.gallery.map((gallery) => (
-                      <Carousel.Item key={gallery.id}>
-                        <img
-                          className="d-block w-100 h-100 img_size"
-                          src={process.env.PUBLIC_URL + gallery.path}
-                          alt="First slide"
-                        />
-                      </Carousel.Item>
-                    ))}
-                  </Carousel>
-                </Row>
-              </Container>
+              <Row className="test block" style={{ height: "140px" }}>
+                <p>{user.description}</p>
+              </Row>
             </div>
           ))}
+          <div id="galery" className="gallery">
+            {this.state.gallery.map((gallery, i) => (
+              <div className="lightbox" id={"lightbox" + i} key={i}>
+                <img src={process.env.PUBLIC_URL + gallery.path} alt="First slide" />
+              </div>
+            ))}
+          </div>
         </Container>
       </div>
     );

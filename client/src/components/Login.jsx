@@ -54,6 +54,7 @@ export default function Login(props) {
   if (islogged) {
     return <Redirect to="/home" />;
   }
+
   return (
     <div style={divLog}>
       <Form
