@@ -22,6 +22,7 @@ class Test_upload extends Component {
       sexual_orientation: "",
       description: "",
       addTag: "",
+      location: "",
       tag: [],
       image: [],
     };
@@ -182,6 +183,18 @@ class Test_upload extends Component {
                     this.handleInputChange(event);
                   }}
                   placeholder="change your email"
+                ></Form.Control>
+              </Form.Group>
+              <Form.Group as={Col}>
+                <Form.Label>Location</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="location"
+                  value={this.state.location}
+                  onChange={(event) => {
+                    this.handleInputChange(event);
+                  }}
+                  placeholder="change your location"
                 ></Form.Control>
               </Form.Group>
             </Form.Row>

@@ -21,30 +21,26 @@ const socket = io(ENDPOINT);
 export default function App() {
   const [islogged, setIsLogged] = useState(false);
 
-  useEffect(() => {
-    fetch("/checkCookie")
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          socket.emit("FromAPI", res.body[0].uid);
-          setIsLogged(true);
-        } else {
-          setIsLogged(false);
-          const error = new Error(res.body.error);
-          throw error;
-        }
-      })
-      .catch((err) => {
-        setIsLogged(false);
-      });
-  }, []);
+  //useEffect(() => {
+  //  fetch("/checkCookie")
+  //    .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+  //    .then((res) => {
+  //      if (res.status === 200) {
+  //        socket.emit("FromAPI", res.body[0].uid);
+  //        setIsLogged(true);
+  //      } else {
+  //        setIsLogged(false);
+  //        const error = new Error(res.body.error);
+  //        throw error;
+  //      }
+  //    })
+  //    .catch((err) => {
+  //      setIsLogged(false);
+  //    });
+  //}, []);
 
   return (
-    <MyContext.Provider
-      value={{ islogged: islogged, setIsLogged: setIsLogged }}
-    >
+    <MyContext.Provider value={{ islogged: islogged, setIsLogged: setIsLogged }}>
       <div className="app">
         <BrowserRouter>
           <NavBar socket={socket}></NavBar>
@@ -53,19 +49,11 @@ export default function App() {
               <Redirect to="/home" />
             </Route>
             <Route path="/home" component={withAuth(Home, socket)} />
-            <Route
-              exact
-              path="/profile"
-              component={withAuth(Profile, socket)}
-            />
-            <Route exact path="/profile/user/" component={withAuth(Profile)} />
+            <Route exact path="/profile" component={withAuth(Profile, socket)} />
+            <Route exact path="/profile/user/" component={Profile} />
             <Route path="/changeinfo" component={withAuth(ChangeInfo)} />
             <Route path="/customers" component={withAuth(Customers)} />
-            <Route
-              exact
-              path="/chat/:match_uid"
-              component={withAuth(Chat, socket)}
-            />
+            <Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
             <Route path="/search/" component={withAuth(Search, socket)} />
             <Route path="/login">
               <Login socket={socket}></Login>

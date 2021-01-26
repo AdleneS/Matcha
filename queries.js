@@ -2,6 +2,7 @@ const pool = require("./db");
 var bcrypt = require("bcrypt");
 var moment = require("moment");
 var genderOrientation = require("./enum/genderOrientation.js");
+const { isElement } = require("react-dom/test-utils");
 
 const getUsers = (request, response) => {
   pool.query("SELECT * FROM users ORDER BY id ASC", (error, results) => {
@@ -48,11 +49,7 @@ const getUsersImg = async (request, response) => {
   let pretenders = null;
   pool.query(
     "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, path FROM users LEFT JOIN img ON users.uid = img.uid WHERE NOT users.uid = $1 LIMIT $2 OFFSET $3",
-    [
-      request.signedCookies.info.uid,
-      request.params.limit,
-      request.params.offset,
-    ],
+    [request.signedCookies.info.uid, request.params.limit, request.params.offset],
     (error, results) => {
       if (error) {
         throw error;
@@ -64,55 +61,39 @@ const getUsersImg = async (request, response) => {
         ) {
           pretenders = pretenders;
         } else if (user.gender === genderOrientation.gender.man) {
-          if (
-            user.sexual_orientation === genderOrientation.orientation.hetero
-          ) {
+          if (user.sexual_orientation === genderOrientation.orientation.hetero) {
             pretenders = pretenders.filter(
               (pretender) =>
                 (pretender.gender === genderOrientation.gender.woman ||
                   pretender.gender === genderOrientation.gender.other) &&
-                (pretender.sexual_orientation ===
-                  genderOrientation.orientation.hetero ||
-                  pretender.sexual_orientation ===
-                    genderOrientation.orientation.bi)
+                (pretender.sexual_orientation === genderOrientation.orientation.hetero ||
+                  pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
-          } else if (
-            user.sexual_orientation === genderOrientation.orientation.homo
-          ) {
+          } else if (user.sexual_orientation === genderOrientation.orientation.homo) {
             pretenders = pretenders.filter(
               (pretender) =>
                 (pretender.gender === genderOrientation.gender.man ||
                   pretender.gender === genderOrientation.gender.other) &&
-                (pretender.sexual_orientation ===
-                  genderOrientation.orientation.homo ||
-                  pretender.sexual_orientation ===
-                    genderOrientation.orientation.bi)
+                (pretender.sexual_orientation === genderOrientation.orientation.homo ||
+                  pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
           }
         } else if (user.gender === genderOrientation.gender.woman) {
-          if (
-            user.sexual_orientation === genderOrientation.orientation.hetero
-          ) {
+          if (user.sexual_orientation === genderOrientation.orientation.hetero) {
             pretenders = pretenders.filter(
               (pretender) =>
                 (pretender.gender === genderOrientation.gender.man ||
                   pretender.gender === genderOrientation.gender.other) &&
-                (pretender.sexual_orientation ===
-                  genderOrientation.orientation.hetero ||
-                  pretender.sexual_orientation ===
-                    genderOrientation.orientation.bi)
+                (pretender.sexual_orientation === genderOrientation.orientation.hetero ||
+                  pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
-          } else if (
-            user.sexual_orientation === genderOrientation.orientation.homo
-          ) {
+          } else if (user.sexual_orientation === genderOrientation.orientation.homo) {
             pretenders = pretenders.filter(
               (pretender) =>
                 (pretender.gender === genderOrientation.gender.woman ||
                   pretender.gender === genderOrientation.gender.other) &&
-                (pretender.sexual_orientation ===
-                  genderOrientation.orientation.homo ||
-                  pretender.sexual_orientation ===
-                    genderOrientation.orientation.bi)
+                (pretender.sexual_orientation === genderOrientation.orientation.homo ||
+                  pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
           }
         }
@@ -127,15 +108,11 @@ const getUsersImg = async (request, response) => {
 };
 
 const postSearch = async (request, response) => {
-  const { gender, sexual_orientation, age, popularity, country } = request.body;
+  const { gender, sexual_orientation, age, popularity, country, tag } = request.body;
   let filter = null;
   pool.query(
-    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, path  FROM users LEFT JOIN img ON img.uid = users.uid WHERE NOT users.uid = $1  LIMIT $2 OFFSET $3",
-    [
-      request.signedCookies.info.uid,
-      request.params.limit,
-      request.params.offset,
-    ],
+    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, array_agg(img.path) as path, array_agg(tag.tag) as tag FROM users LEFT JOIN img ON img.uid = users.uid LEFT JOIN tag ON tag.uid = users.uid WHERE NOT users.uid = $1 GROUP BY users.id LIMIT $2 OFFSET $3 ",
+    [request.signedCookies.info.uid, request.params.limit, request.params.offset],
     (error, results) => {
       if (error) {
         throw error;
@@ -145,9 +122,7 @@ const postSearch = async (request, response) => {
           filter = filter.filter((pretender) => pretender.gender === gender);
         }
         if (sexual_orientation) {
-          filter = filter.filter(
-            (pretender) => pretender.sexual_orientation === sexual_orientation
-          );
+          filter = filter.filter((pretender) => pretender.sexual_orientation === sexual_orientation);
         }
         if (country) {
           filter = filter.filter((pretender) =>
@@ -165,9 +140,7 @@ const postSearch = async (request, response) => {
         }
         if (popularity) {
           filter = filter.filter(
-            (pretender) =>
-              pretender.popularity >= popularity[0] &&
-              pretender.popularity <= popularity[1]
+            (pretender) => pretender.popularity >= popularity[0] && pretender.popularity <= popularity[1]
           );
         }
         if (age) {
@@ -177,8 +150,14 @@ const postSearch = async (request, response) => {
               moment().diff(pretender.birthday, "years") <= age[1]
           );
         }
+        if (tag && tag.length && tag[0] !== "") {
+          console.log(tag);
+          filter = filter.filter((pretender) => {
+            return pretender.tag.some((ptag) => tag.includes(ptag));
+          });
+        }
       }
-      if (results.rows.length) {
+      if (results.rows.length && filter.length) {
         response.status(200).json(filter);
       } else {
         response.status(401).json(filter);
@@ -188,35 +167,27 @@ const postSearch = async (request, response) => {
 };
 
 const getLikes = (request, response) => {
-  pool.query(
-    "SELECT * FROM likes WHERE uid_liker = $1",
-    [request.signedCookies.info.uid],
-    (error, results) => {
-      if (error) {
-        throw error;
-      } else {
-        response.status(200).json(results.rows);
-      }
+  pool.query("SELECT * FROM likes WHERE uid_liker = $1", [request.signedCookies.info.uid], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      response.status(200).json(results.rows);
     }
-  );
+  });
 };
 
 const checkPic = (request, response) => {
-  pool.query(
-    "SELECT * FROM img WHERE uid = $1",
-    [request.signedCookies.info.uid],
-    (error, results) => {
-      if (error) {
-        throw error;
+  pool.query("SELECT * FROM img WHERE uid = $1", [request.signedCookies.info.uid], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      if (results.rows.length) {
+        response.status(200).json(results.rows);
       } else {
-        if (results.rows.length) {
-          response.status(200).json(results.rows);
-        } else {
-          response.status(401).json();
-        }
+        response.status(401).json();
       }
     }
-  );
+  });
 };
 
 const getNotif = (request, response) => {
@@ -235,17 +206,13 @@ const getNotif = (request, response) => {
 };
 const getNotifNb = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
-  pool.query(
-    "SELECT * FROM notifications WHERE notified_uid = $1 AND seen = false",
-    [user_uid],
-    (error, results) => {
-      if (error) {
-        throw error;
-      } else {
-        response.status(200).json(results.rowCount);
-      }
+  pool.query("SELECT * FROM notifications WHERE notified_uid = $1 AND seen = false", [user_uid], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      response.status(200).json(results.rowCount);
     }
-  );
+  });
 };
 
 const setNotifSeen = (request, response) => {
@@ -261,40 +228,28 @@ const setNotifSeen = (request, response) => {
 };
 
 const setConnected = (uid) => {
-  pool.query(
-    "UPDATE users SET connected = true WHERE uid = $1 AND connected = false",
-    [uid],
-    (error, results) => {
-      if (error) throw error;
-      else return "connected";
-    }
-  );
+  pool.query("UPDATE users SET connected = true WHERE uid = $1 AND connected = false", [uid], (error, results) => {
+    if (error) throw error;
+    else return "connected";
+  });
 };
 
 const setDisconnected = (uid) => {
-  pool.query(
-    "UPDATE users SET connected = false WHERE uid = $1 AND connected = true",
-    [uid],
-    (error, results) => {
-      if (error) throw error;
-      else return "disconnected";
-    }
-  );
+  pool.query("UPDATE users SET connected = false WHERE uid = $1 AND connected = true", [uid], (error, results) => {
+    if (error) throw error;
+    else return "disconnected";
+  });
 };
 
 const updateLocation = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
-  pool.query(
-    "UPDATE users SET country = $2 WHERE uid = $1",
-    [user_uid, request.body.location],
-    (error, results) => {
-      if (error) {
-        throw error;
-      } else {
-        response.status(200).json({ info: "Location Modified" });
-      }
+  pool.query("UPDATE users SET country = $2 WHERE uid = $1", [user_uid, request.body.location], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      response.status(200).json({ info: "Location Modified" });
     }
-  );
+  });
 };
 
 const getUserById = (request, response) => {
@@ -310,27 +265,16 @@ const getUserById = (request, response) => {
 
 const getUserByEmail = (request, response) => {
   const email = request.params.id;
-  pool.query(
-    "SELECT * FROM users WHERE email = $1",
-    [email],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).json(results.rows);
+  pool.query("SELECT * FROM users WHERE email = $1", [email], (error, results) => {
+    if (error) {
+      throw error;
     }
-  );
+    response.status(200).json(results.rows);
+  });
 };
 
 const createUser = (request, response) => {
-  const {
-    login,
-    email,
-    password,
-    birthday,
-    gender,
-    sexual_orientation,
-  } = request.body;
+  const { login, email, password, birthday, gender, sexual_orientation } = request.body;
   pool.query(
     "INSERT INTO users (login, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7)",
     [
@@ -356,13 +300,7 @@ const createNotif = async (request, response) => {
   const { notified_uid, notif_type } = request.body;
   pool.query(
     "INSERT INTO notifications (notified_uid, notifier_uid, notifier_login, notif_type, date) VALUES ($1, $2, $3, $4, $5)",
-    [
-      notified_uid,
-      user.uid,
-      user.login,
-      notif_type,
-      moment().format("YYYY/MM/DD"),
-    ],
+    [notified_uid, user.uid, user.login, notif_type, moment().format("YYYY/MM/DD")],
     (error, results) => {
       if (error) {
         throw error;
@@ -466,37 +404,25 @@ const getMatch = (request, response) => {
 const like = (req, res) => {
   const liker = req.signedCookies.info.uid;
   const liked = req.body.likedUid;
-  pool.query(
-    "SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2",
-    [liker, liked],
-    (error, results) => {
-      if (error) {
-        throw error;
-      } else if (results.rows.length) {
-        pool.query(
-          "DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2",
-          [liker, liked],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            res.json({ info: "unlike" }).status(200);
-          }
-        );
-      } else {
-        pool.query(
-          "INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)",
-          [liker, liked],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            res.json({ info: "like" }).status(200);
-          }
-        );
-      }
+  pool.query("SELECT * FROM likes WHERE uid_liker = $1 AND uid_liked = $2", [liker, liked], (error, results) => {
+    if (error) {
+      throw error;
+    } else if (results.rows.length) {
+      pool.query("DELETE FROM likes WHERE uid_liker = $1 AND uid_liked = $2", [liker, liked], (error, results) => {
+        if (error) {
+          throw error;
+        }
+        res.json({ info: "unlike" }).status(200);
+      });
+    } else {
+      pool.query("INSERT INTO likes (uid_liker, uid_liked) VALUES ($1, $2)", [liker, liked], (error, results) => {
+        if (error) {
+          throw error;
+        }
+        res.json({ info: "like" }).status(200);
+      });
     }
-  );
+  });
 };
 
 const getMessages = (request, response) => {
@@ -531,9 +457,10 @@ const createMessages = (request, response) => {
   );
 };
 const getUsersProfile = (request, response) => {
+  //console.log(request.params.uid);
   const uid = request.params.uid;
   pool.query(
-    "SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1",
+    "SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND n_pic = 1",
     [uid],
     (error, results) => {
       if (error) {
@@ -547,17 +474,13 @@ const getUsersProfile = (request, response) => {
 
 const getAllImg = (request, response) => {
   const uid = request.params.uid;
-  pool.query(
-    "SELECT * FROM img WHERE uid = $1 AND NOT n_pic = 1",
-    [uid],
-    (error, results) => {
-      if (error) {
-        throw error;
-      } else {
-        response.status(200).json(results.rows);
-      }
+  pool.query("SELECT * FROM img WHERE uid = $1 AND NOT n_pic = 1", [uid], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      response.status(200).json(results.rows);
     }
-  );
+  });
 };
 
 const getOneLike = (request, response) => {
@@ -591,45 +514,32 @@ const getYouLike = (request, response) => {
 const updatePopularity = (request, response) => {
   const uid = request.signedCookies.info.uid;
   const popularity = request.signedCookies.info.popularity;
-  pool.query(
-    "SELECT * FROM likes WHERE uid_liker = $1",
-    [uid],
-    (error, resultsLike) => {
-      if (error) {
-        throw error;
-      } else {
-        nb_likes = resultsLike.rowCount;
-        pool.query(
-          "SELECT * FROM match WHERE uid_1 = $1 OR uid_2 = $1",
-          [uid],
-          (error, resultsMatch) => {
+  pool.query("SELECT * FROM likes WHERE uid_liker = $1", [uid], (error, resultsLike) => {
+    if (error) {
+      throw error;
+    } else {
+      nb_likes = resultsLike.rowCount;
+      pool.query("SELECT * FROM match WHERE uid_1 = $1 OR uid_2 = $1", [uid], (error, resultsMatch) => {
+        if (error) {
+          throw error;
+        } else {
+          var nb_match = resultsMatch.rowCount;
+          var ratio = nb_match / nb_likes;
+          var newPopularity = popularity;
+          if (ratio < 0.25) newPopularity += ratio * -10;
+          else if (ratio > 0.75) newPopularity += ratio * 2;
+          if (newPopularity < 0 || newPopularity > 100) newPopularity = newPopularity < 0 ? 0 : 100;
+          pool.query("UPDATE users SET popularity = $2 WHERE uid = $1", [uid, newPopularity], (error, results) => {
             if (error) {
               throw error;
             } else {
-              var nb_match = resultsMatch.rowCount;
-              var ratio = nb_match / nb_likes;
-              var newPopularity = popularity;
-              if (ratio < 0.25) newPopularity += ratio * -10;
-              else if (ratio > 0.75) newPopularity += ratio * 2;
-              if (newPopularity < 0 || newPopularity > 100)
-                newPopularity = newPopularity < 0 ? 0 : 100;
-              pool.query(
-                "UPDATE users SET popularity = $2 WHERE uid = $1",
-                [uid, newPopularity],
-                (error, results) => {
-                  if (error) {
-                    throw error;
-                  } else {
-                    response.status(200).json({ info: newPopularity });
-                  }
-                }
-              );
+              response.status(200).json({ info: newPopularity });
             }
-          }
-        );
-      }
+          });
+        }
+      });
     }
-  );
+  });
 };
 module.exports = {
   pool,

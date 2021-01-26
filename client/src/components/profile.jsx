@@ -25,6 +25,7 @@ class profile extends Component {
   }
 
   componentDidMount() {
+    console.log("awdawd");
     const queryString = window.location.search;
     const urlParam = new URLSearchParams(queryString);
     if (urlParam.get("uid") === "") {

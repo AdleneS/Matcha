@@ -18,6 +18,8 @@ export default function withAuth(ComponentToProtect, socket) {
     }
 
     componentDidMount() {
+      console.log(this.contextType);
+      this._isMounted = true;
       if (ComponentToProtect.name !== "Test_upload") {
         fetch("/checkpic").then((res) => {
           if (res.status !== 200) {
@@ -25,7 +27,6 @@ export default function withAuth(ComponentToProtect, socket) {
           }
         });
       }
-      this._isMounted = true;
       fetch("/checkCookie")
         .then((res) => {
           if (res.status === 200) {
@@ -43,8 +44,7 @@ export default function withAuth(ComponentToProtect, socket) {
                     fetch("/users/location", {
                       method: "POST",
                       body: JSON.stringify({
-                        location:
-                          geo.results[5].address_components[1].long_name,
+                        location: geo.results[5].address_components[1].long_name,
                       }),
                       headers: {
                         "Content-type": "application/json",
@@ -60,7 +60,7 @@ export default function withAuth(ComponentToProtect, socket) {
                   .then(function (geo) {
                     fetch("/users/location", {
                       method: "POST",
-                      body: JSON.stringify({ location: geo }),
+                      body: JSON.stringify({ location: geo.city }),
                       headers: {
                         "Content-type": "application/json",
                       },
@@ -93,8 +93,10 @@ export default function withAuth(ComponentToProtect, socket) {
     }
 
     componentWillUnmount() {
+      console.log("ppppp");
       this._isMounted = false;
     }
+
     render() {
       const { setIsLogged } = this.context;
       const spin = {
@@ -104,9 +106,7 @@ export default function withAuth(ComponentToProtect, socket) {
       };
       const { loading, redirect, alert } = this.state;
       if (alert) {
-        return (
-          <Redirect to={{ pathname: "/changeinfo", state: { alert: true } }} />
-        );
+        return <Redirect to={{ pathname: "/changeinfo", state: { alert: true } }} />;
       }
       if (loading) {
         return (
@@ -119,8 +119,9 @@ export default function withAuth(ComponentToProtect, socket) {
         setIsLogged(false);
         return <Redirect to="/login" />;
       }
-      if (this._isMounted && !loading && !redirect)
+      if (this._isMounted && !loading && !redirect) {
         return <ComponentToProtect {...this.props} socket={socket} />;
+      }
     }
   };
 }
