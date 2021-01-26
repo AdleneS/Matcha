@@ -70,9 +70,7 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -100,9 +98,7 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -134,9 +130,7 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           const data = {
@@ -146,8 +140,7 @@ class Home extends Component {
           this.props.socket.emit("sendNotif", pretenderUid);
           this.addNotif(data);
           if (res.body.info === "like") this.addMatch(pretenderUid, data);
-          else if (res.body.info === "unlike")
-            this.deleteMatch(pretenderUid, data);
+          else if (res.body.info === "unlike") this.deleteMatch(pretenderUid, data);
           fetch("/users/likes")
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
@@ -167,9 +160,7 @@ class Home extends Component {
     }
     this.setState({ loading: true });
     await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then(async (res) => {
         if (res.status === 200) {
           this.setState({
@@ -213,8 +204,7 @@ class Home extends Component {
                       src={
                         pretender.path
                           ? process.env.PUBLIC_URL + pretender.path
-                          : "https://source.unsplash.com/collection/159213/sig=" +
-                            i
+                          : "https://source.unsplash.com/collection/159213/sig=" + i
                       }
                     />
                     <div className="overlay">
@@ -222,9 +212,7 @@ class Home extends Component {
                         {pretender.login}{" "}
                         <span>
                           {pretender.connected ? (
-                            <FaCircle
-                              style={{ color: "green", width: "10px" }}
-                            />
+                            <FaCircle style={{ color: "green", width: "10px" }} />
                           ) : (
                             <FaCircle style={{ color: "red", width: "10px" }} />
                           )}
@@ -234,10 +222,8 @@ class Home extends Component {
                       <Card.Text>
                         {Moment().diff(pretender.birthday, "years")} years old
                         <br></br>
-                        {pretender.gender.charAt(0).toUpperCase() +
-                          pretender.gender.slice(1)}{" "}
-                        {pretender.sexual_orientation.charAt(0).toUpperCase() +
-                          pretender.sexual_orientation.slice(1)}
+                        {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
+                        {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
                         <br></br>
                         Popularity: {pretender.popularity}
                         <br></br>

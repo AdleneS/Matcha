@@ -28,7 +28,7 @@ io.on("connection", (socket) => {
   socket.on("FromAPI", (uid) => {
     db.setConnected(uid);
     socketArray[socket.id] = uid;
-    console.log("connected");
+    //console.log("connected");
   });
   socket.on("sendNotif", (notified_uid) => {
     found = Object.keys(socketArray).find((key) => socketArray[key] === notified_uid);
@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     db.setDisconnected(socketArray[socket.id]);
     delete socketArray[socket.id];
-    console.log("user disconnected");
+    //console.log("user disconnected");
   });
 });
 
@@ -59,13 +59,20 @@ app.get("/checkCookie", withAuth, function (req, res) {
     [req.signedCookies.info.uid, req.signedCookies.info.session],
     (error, results) => {
       if (error) {
+        res.clearCookie("ssid");
+        res.clearCookie("info");
+        res.status(400).json({
+          error: "Bad Cookie",
+        });
         throw error;
       } else if (results.rowCount) {
-        res.status(200).json(results.rows);
+        res.json({ message: "Logged !", uid: results.rows[0].uid }).status(200);
       } else {
         res.clearCookie("ssid");
         res.clearCookie("info");
-        res.json({ error: "Bad Cookies" }).status(400);
+        res.status(400).json({
+          error: "Bad Cookies",
+        });
       }
     }
   );
@@ -120,8 +127,7 @@ app.post("/imgupload", upload.single("file"), (req, res) => {
   } else {
     fs.unlink(tempPath, (err) => {
       if (err) {
-        console.log("here");
-        //return handleError(err, res);
+        throw err;
       }
 
       res.status(403).json({ info: "Only .png and .jpg files are allowed!" });

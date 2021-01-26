@@ -187,7 +187,6 @@ class Search extends Component {
   };
 
   handleTag = async (event) => {
-    console.log(event.target.value);
     if (event.target.value === "") {
       this.setState({ tagValue: [] });
     }
@@ -215,7 +214,6 @@ class Search extends Component {
       })
         .then((res) =>
           res.json().then((data) => {
-            console.log(data.length);
             if (data.length >= 50) {
               this.setState({ hasMore: true });
             }

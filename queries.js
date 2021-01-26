@@ -151,7 +151,6 @@ const postSearch = async (request, response) => {
           );
         }
         if (tag && tag.length && tag[0] !== "") {
-          console.log(tag);
           filter = filter.filter((pretender) => {
             return pretender.tag.some((ptag) => tag.includes(ptag));
           });
@@ -457,7 +456,6 @@ const createMessages = (request, response) => {
   );
 };
 const getUsersProfile = (request, response) => {
-  //console.log(request.params.uid);
   const uid = request.params.uid;
   pool.query(
     "SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND n_pic = 1",

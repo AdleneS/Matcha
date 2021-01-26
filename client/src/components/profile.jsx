@@ -25,7 +25,6 @@ class profile extends Component {
   }
 
   componentDidMount() {
-    console.log("awdawd");
     const queryString = window.location.search;
     const urlParam = new URLSearchParams(queryString);
     if (urlParam.get("uid") === "") {
@@ -33,7 +32,17 @@ class profile extends Component {
     } else {
       fetch("/cookie/")
         .then((res) => res.json())
-        .then((cookie) => this.setState({ cookie }));
+        .then((cookie) => {
+          this.setState({ cookie }, () => {
+            const data = {
+              notified_uid: urlParam.get("uid"),
+              notif_type: "view",
+            };
+            if (cookie.info.uid !== urlParam.get("uid")) {
+              this.createNotif(data);
+            }
+          });
+        });
       fetch("/profile/" + urlParam.get("uid"))
         .then((response) => response.json())
         .then((user) => {
@@ -68,13 +77,6 @@ class profile extends Component {
       fetch("/profile/gallery/" + urlParam.get("uid"))
         .then((res) => res.json())
         .then((gallery) => this.setState({ gallery }));
-      const data = {
-        notified_uid: urlParam.get("uid"),
-        notif_type: "view",
-      };
-      if (this.props.socket) {
-        this.createNotif(data);
-      }
     }
   }
 
@@ -127,7 +129,10 @@ class profile extends Component {
 
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/home" />;
+      return (
+        <div style={{ marginTop: "100px", marginLeft: "10px", color: "white" }}>Their is no user with this uid</div>
+      );
+      //<Redirect to="/home" />;
     }
     return (
       <div>

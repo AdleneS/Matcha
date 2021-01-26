@@ -33,7 +33,6 @@ const updateLogin = (request, response) => {
 
     if (request.body.login && request.body.login != user_log[0].rows.login) {
       pool.query("SELECT * FROM users WHERE login = $1", [request.body.login], (error, check_login) => {
-        console.log("test_col", request.body.login);
         if (error) {
           throw error;
         } else {

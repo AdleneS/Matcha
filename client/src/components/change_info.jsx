@@ -32,15 +32,14 @@ class Test_upload extends Component {
   componentDidMount() {
     fetch("/change/tag")
       .then((response) => response.json())
-      .then((tag) => this.setState({ tag }, () => console.log("tag = ", tag)));
+      .then((tag) => this.setState({ tag }));
     fetch("/change/sortImage")
       .then((response) => response.json())
-      .then((image) => this.setState({ image }, () => console.log("image = ", image)));
+      .then((image) => this.setState({ image }));
   }
 
   onClickImg = (event, image) => {
     event.preventDefault();
-    console.log("test del image : ", image);
     fetch("/change/deleteImage", {
       method: "POST",
       body: JSON.stringify({ img: image }),
@@ -50,7 +49,7 @@ class Test_upload extends Component {
     }).then((response) => response.json());
     fetch("/change/sortImage")
       .then((response) => response.json())
-      .then((image) => this.setState({ image }, () => console.log("image = ", image)));
+      .then((image) => this.setState({ image }));
   };
 
   onClick = (event, tag_delete) => {
@@ -64,13 +63,13 @@ class Test_upload extends Component {
     }).then((response) => response.json());
     fetch("/change/tag")
       .then((response) => response.json())
-      .then((tag) => this.setState({ tag }, () => console.log("tag = ", tag)));
+      .then((tag) => this.setState({ tag }));
   };
 
   handleInputChange = (event) => {
     event.preventDefault();
     const name = event.target.name;
-    this.setState({ [name]: event.target.value }, () => console.log(this.state));
+    this.setState({ [name]: event.target.value });
   };
 
   onFileChange = (event) => {
@@ -84,7 +83,6 @@ class Test_upload extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    console.log("submited");
     if (this.state.file) {
       const formData = new FormData();
       formData.append("file", this.state.file, this.state.file.name);
@@ -93,9 +91,6 @@ class Test_upload extends Component {
         body: formData,
       })
         .then((response) => response.json())
-        .then((data) => {
-          console.log("lol", data);
-        })
         .catch((error) => {
           console.error("error", error);
         });
@@ -106,15 +101,7 @@ class Test_upload extends Component {
       headers: {
         "Content-type": "application/json",
       },
-    })
-      .then((response) => response.json().then((data) => ({ status: response.status, body: data })))
-      .then((response) => {
-        if (response.status === 200) {
-          console.log(response.body.info);
-        } else {
-          console.log("fail", response.body.info);
-        }
-      });
+    }).then((response) => response.json().then((data) => ({ status: response.status, body: data })));
     fetch("/change/tag")
       .then((response) => response.json())
       .then((tag) => this.setState({ tag }));
