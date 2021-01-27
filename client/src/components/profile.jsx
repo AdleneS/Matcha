@@ -6,7 +6,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { MdBlock, MdReport } from "react-icons/md";
-import { Redirect } from "react-router-dom";
 
 class profile extends Component {
   constructor(props) {
