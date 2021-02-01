@@ -12,7 +12,9 @@ import withAuth from "./withAuth";
 import MyContext from "./components/appcontext";
 import ChangeInfo from "./components/change_info";
 import Profile from "./components/profile";
-import Confirm_email from "./components/confirm_email";
+import ConfirmEmail from "./components/confirm_email";
+import ResetPassword from "./components/reset_passwd";
+import ResetPasswordMail from "./components/reset_passwd_email";
 
 import io from "socket.io-client";
 const ENDPOINT = "127.0.0.1:5000";
@@ -82,11 +84,13 @@ export default function App() {
             <Route path="/changeinfo" component={withAuth(ChangeInfo)} />
             <Route path="/customers" component={withAuth(Customers)} />
             <Route exact path="/chat/:match_uid" component={withAuth(Chat, socket)} />
-            <Route exact path="/confirm_email/:token" component={withAuth(Confirm_email)} />
+            <Route exact path="/confirm_email" component={ConfirmEmail} />
             <Route path="/login">
               <Login socket={socket} />
             </Route>
             <Route path="/register" component={Register} />
+            <Route path="/reset/password/email" component={ResetPasswordMail} />
+            <Route path="/reset/password" component={ResetPassword} />
             <Route path="*" component={ErrorPage} />
           </Switch>
         </BrowserRouter>

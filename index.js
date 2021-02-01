@@ -153,7 +153,9 @@ app.post("/change/deleteTag", info.deleteTag);
 app.get("/change/tag", info.sortTags);
 app.post("/change/login", info.updateLogin);
 
-app.post("/email/test", email.sendEmail);
+app.post("/email/confirm", email.confirmEmail);
+app.post("/email/reset", email.reset);
+app.post("/email/updatepass", email.updatePass);
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({

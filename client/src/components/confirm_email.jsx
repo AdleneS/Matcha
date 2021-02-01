@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 
-class confirm_email extends Component {
+class ConfirmEmail extends Component {
   state = {};
 
   componentDidMount() {
-    fetch("/profile/report/", {
+    const queryString = window.location.search;
+    const urlParam = new URLSearchParams(queryString);
+    fetch("/email/confirm", {
       method: "POST",
-      body: JSON.stringify({ uidUser: this.state.user[0].uid }),
+      body: JSON.stringify({ token: urlParam.get("token") }),
       headers: {
         "Content-type": "application/json",
       },
@@ -15,14 +17,11 @@ class confirm_email extends Component {
 
   render() {
     return (
-      <div>
-        <form onSubmit={this.onSubmit} style={{ paddingTop: "90px" }}>
-          <input type="file" name="file" onChange={this.onFileChange} />
-          <input type="submit" />
-        </form>
+      <div style={{ marginTop: "200px" }}>
+        <p>cet email a ete confirm</p>
       </div>
     );
   }
 }
 
-export default confirm_email;
+export default ConfirmEmail;
