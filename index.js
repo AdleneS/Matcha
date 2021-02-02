@@ -10,6 +10,7 @@ const withAuth = require("./middleware");
 var auth = require("./auth");
 const pool = require("./db");
 const info = require("./change_info");
+const email = require("./email");
 const server = http.createServer(app);
 const io = require("socket.io")(server, { cookie: false });
 var socketArray = {};
@@ -28,7 +29,6 @@ io.on("connection", (socket) => {
   socket.on("FromAPI", (uid) => {
     db.setConnected(uid);
     socketArray[socket.id] = uid;
-    //console.log("connected");
   });
   socket.on("sendNotif", (notified_uid) => {
     found = Object.keys(socketArray).find((key) => socketArray[key] === notified_uid);
@@ -139,34 +139,49 @@ const handleError = (err, res) => {
 };
 
 app.use("/auth", auth);
+
+app.get("/pretender/:offset/:limit", db.getUsersImg);
+app.get("/users/uid/", db.getUsersByUid);
+
+app.post("/search/:offset/:limit", db.postSearch);
 app.get("/users", db.getUsers);
 app.get("/users/likes", db.getLikes);
 app.get("/users/popularity", db.updatePopularity);
-app.get("/pretender/:offset/:limit", db.getUsersImg);
-app.get("/users/uid/", db.getUsersByUid);
 app.post("/users", db.createUser);
-app.post("/search/:offset/:limit", db.postSearch);
+
+app.get("/pretender", db.getUsersImg);
 app.post("/like", db.like);
+
 app.post("/match/create", db.createMatch);
 app.post("/match/delete", db.deleteMatch);
 app.get("/match/get", db.getMatch);
+
 app.get("/chat/get/:match_uid", db.getMessages);
 app.post("/chat/create/:match_uid", db.createMessages);
+
 app.post("/notif/create", db.createNotif);
 app.get("/notif/get", db.getNotif);
 app.get("/notif/getnb", db.getNotifNb);
 app.post("/notif/setseen", db.setNotifSeen);
 app.post("/users/location", db.updateLocation);
+
+app.get("/checkpic", db.checkPic);
 app.get("/profile/gallery/:uid", db.getAllImg);
 app.get("/profile/:uid", db.getUsersProfile);
-app.get("/checkpic", db.checkPic);
 app.get("/profile/like/:uid", db.getOneLike);
 app.get("/profile/likeYou/:uid", db.getYouLike);
+app.post("/profile/report/", db.addReport);
+app.post("/profile/block/", db.addBlock);
+
 app.get("/change/sortImage", info.sortImage);
 app.post("/change/deleteImage", info.deleteImage);
 app.post("/change/deleteTag", info.deleteTag);
 app.get("/change/tag", info.sortTags);
 app.post("/change/login", info.updateLogin);
+
+app.post("/email/confirm", email.confirmEmail);
+app.post("/email/reset", email.reset);
+app.post("/email/updatepass", email.updatePass);
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({

@@ -5,8 +5,10 @@ const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const secret = "keyboard cat";
+const sendEmail = require("../email");
 var moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
+const cookieParser = require("cookie-parser");
 
 router.get("/", (req, res) => {
   res.json({
@@ -105,12 +107,13 @@ function validateRegistration(user) {
 router.post("/register", (req, res) => {
   const { login, email, password, birthday, gender, sexual_orientation } = req.body;
   var err = validateRegistration(req.body);
+  const uid = uuidv4();
   if (err.email && err.pass && err.v_pass && err.login) {
     pool.query(
       "INSERT INTO users (login, uid, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
       [
         login,
-        uuidv4(),
+        uid,
         email,
         bcrypt.hashSync(password, 10),
         moment().format("YYYY/MM/DD"),
@@ -118,10 +121,11 @@ router.post("/register", (req, res) => {
         gender.toLowerCase(),
         sexual_orientation.toLowerCase(),
       ],
-      (error, results) => {
+      async (error, results) => {
         if (error) {
           res.status(401).json({ error: error });
         } else {
+          await sendEmail.sendEmail(uid, email);
           res.status(200).json({ message: "New User: " + email });
         }
       }

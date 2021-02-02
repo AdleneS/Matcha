@@ -213,7 +213,6 @@ const getNotifNb = (request, response) => {
     }
   });
 };
-
 const setNotifSeen = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   pool.query(
@@ -509,6 +508,38 @@ const getYouLike = (request, response) => {
   );
 };
 
+const addReport = (request, response) => {
+  const user_uid = request.signedCookies.info.uid;
+  const profile_uid = request.body.uidUser;
+  pool.query(
+    "INSERT INTO report (uid_reported, uid_reporter, date_insert) VALUES ($1, $2, $3)",
+    [user_uid, profile_uid, new Date(Date.now())],
+    (error, results) => {
+      if (error) {
+        throw error;
+      } else {
+        response.status(200).json({ message: "Sent", info: "message" });
+      }
+    }
+  );
+};
+
+const addBlock = (request, response) => {
+  const user_uid = request.signedCookies.info.uid;
+  const profile_uid = request.body.uidUser;
+  pool.query(
+    "INSERT INTO block (uid_blocked, uid_blocker, date_insert) VALUES ($1, $2, $3)",
+    [user_uid, profile_uid, new Date(Date.now())],
+    (error, results) => {
+      if (error) {
+        throw error;
+      } else {
+        response.status(200).json({ message: "Sent", info: "message" });
+      }
+    }
+  );
+};
+
 const updatePopularity = (request, response) => {
   const uid = request.signedCookies.info.uid;
   const popularity = request.signedCookies.info.popularity;
@@ -569,4 +600,6 @@ module.exports = {
   getOneLike,
   getYouLike,
   updatePopularity,
+  addReport,
+  addBlock,
 };

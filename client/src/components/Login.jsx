@@ -89,7 +89,11 @@ export default function Login(props) {
             required
           />
         </Form.Group>
-        <Button variant="primary" type="submit">
+        <Link style={{ color: "white" }} to="/reset/password/email">
+          Reset password
+        </Link>
+        <br />
+        <Button style={{ marginTop: "25px" }} variant="primary" type="submit">
           Submit
         </Button>
       </Form>

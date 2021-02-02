@@ -79,6 +79,16 @@ class profile extends Component {
     }
   }
 
+  onClickReport = () => {
+    fetch("/profile/report/", {
+      method: "POST",
+      body: JSON.stringify({ uidUser: this.state.user[0].uid }),
+      headers: {
+        "Content-type": "application/json",
+      },
+    });
+  };
+
   createNotif = (data) => {
     fetch("/notif/create", {
       method: "POST",
@@ -126,12 +136,21 @@ class profile extends Component {
       });
   };
 
+  onClickBlock = () => {
+    fetch("/profile/block/", {
+      method: "POST",
+      body: JSON.stringify({ uidUser: this.state.user[0].uid }),
+      headers: {
+        "Content-type": "application/json",
+      },
+    });
+  };
+
   render() {
     if (this.state.redirect) {
       return (
         <div style={{ marginTop: "100px", marginLeft: "10px", color: "white" }}>Their is no user with this uid</div>
       );
-      //<Redirect to="/home" />;
     }
     return (
       <div>
@@ -200,6 +219,9 @@ class profile extends Component {
                 </Col>
                 <Col className="test block">
                   <MdBlock
+                    onClick={() => {
+                      this.onClickReport();
+                    }}
                     style={{
                       color: "#ff3333",
                       width: "30px",
@@ -209,6 +231,9 @@ class profile extends Component {
                     }}
                   />
                   <MdReport
+                    onClick={() => {
+                      this.onClickBlock();
+                    }}
                     style={{
                       color: "#ff3333",
                       width: "30px",
