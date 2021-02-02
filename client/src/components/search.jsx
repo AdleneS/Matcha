@@ -10,6 +10,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { FaCircle } from "react-icons/fa";
 import InfiniteScroll from "react-infinite-scroller";
+import Spinner from "react-bootstrap/Spinner";
 
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -299,7 +300,7 @@ class Search extends Component {
           }
         });
       this.setState({ loading: false });
-    }, 200);
+    }, 1000);
   };
 
   navBarStyle = {
@@ -316,8 +317,12 @@ class Search extends Component {
   };
 
   wrapperStyle = { width: 200, marginLeft: "10px" };
-
   render() {
+    const spin = {
+      width: "25px",
+      height: "25px",
+      color: "white !important",
+    };
     const { gender, genderValue, orientation, orientationValue } = this.state;
     Moment.locale("fr");
     return (
@@ -394,14 +399,13 @@ class Search extends Component {
             </Form.Group>
           </Form>
         </div>
-        <div style={{ overflow: "auto", marginTop: "179px" }}>
+        <div style={{ overflow: "hidden", marginTop: "179px" }}>
           <InfiniteScroll
             loadMore={this.loadMore.bind(this)}
             hasMore={this.state.hasMore}
             loader={
-              <div key={0} className="loader">
-                {" "}
-                Loading...{" "}
+              <div key={0}>
+                <Spinner style={spin} animation="border" variant="dark" />
               </div>
             }
             useWindow={true}

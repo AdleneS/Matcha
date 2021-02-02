@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import MyContext from "./appcontext";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 
 export default function Login(props) {
   const [sValue, setValue] = useState({ email: "", password: "" });

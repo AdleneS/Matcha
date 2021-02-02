@@ -1,12 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
 import Spinner from "react-bootstrap/Spinner";
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import MyContext from "./components/appcontext";
+import ChangeInfo from "./components/change_info";
+import Login from "./components/Login";
 
 const WithAuth = ({ component: Component, socket, ...rest }) => {
-  const [loading, setLoading] = useState(true);
-  const [redirect, setRedirect] = useState(false);
-  const [alert, setAlert] = useState(false);
+  const [loading, setLoading] = useState(null);
+  const [redirect, setRedirect] = useState(null);
+  const [alert, setAlert] = useState(null);
   const [uid, setUid] = useState(null);
   const { islogged, setIsLogged } = useContext(MyContext);
 
@@ -54,20 +56,29 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
                 });
             }
           );
+          fetch("/checkpic/").then((res) => {
+            if (res.status !== 200 && Component?.name !== "ChangeInfo") {
+              setAlert(true);
+              setLoading(false);
+            } else {
+              setAlert(false);
+            }
+          });
           setUid(res.body.uid);
           setLoading(false);
+          setRedirect(false);
         } else {
           setRedirect(true);
           setLoading(false);
+          setAlert(false);
         }
       })
       .catch((err) => {
-        console.log(err);
         setLoading(false);
         setRedirect(true);
         throw err;
       });
-  }, [setIsLogged]);
+  });
 
   const spin = {
     margin: "0 auto",
@@ -75,30 +86,24 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
     height: "100px",
   };
 
-  if (alert) {
-    return <Redirect to={{ pathname: "/changeinfo", state: { alert: true } }} />;
-  }
-  if (loading) {
-    return (
-      <div style={{ display: "flex", marginTop: "100px" }}>
-        <Spinner style={spin} animation="border" variant="dark" />
-      </div>
-    );
-  }
-  if (redirect) {
-    setIsLogged(false);
-    return <Redirect to="/login" />;
-  } else if (!loading && !redirect) {
-    socket.emit("FromAPI", uid);
-    return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;
-  }
-
-  if (Component?.name !== "Test_upload" && islogged) {
-    fetch("/checkpic").then((res) => {
-      if (res.status !== 200) {
-        setAlert(true);
-      }
-    });
+  if (alert !== null && loading !== null && redirect !== null) {
+    if (loading) {
+      return (
+        <div style={{ display: "flex", marginTop: "100px" }}>
+          <Spinner style={spin} animation="border" variant="dark" />
+        </div>
+      );
+    } else if (redirect) {
+      setIsLogged(false);
+      return <Login socket={socket} />;
+    } else if (alert && islogged) {
+      return <ChangeInfo alert="true" />;
+    } else if (!loading && !redirect && !alert) {
+      socket.emit("FromAPI", uid);
+      return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;
+    }
+  } else {
+    return <div></div>;
   }
 };
 

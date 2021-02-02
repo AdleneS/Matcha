@@ -108,7 +108,7 @@ app.post("/imgupload", upload.single("file"), (req, res) => {
   if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {
     fs.rename(tempPath, targetPath, (err) => {
       if (err) {
-        return handleError(err, res);
+        throw err;
       }
       pool.query("SELECT * FROM img WHERE uid = $1", [req.signedCookies.info.uid], (error, check_img) => {
         if (error) throw error;
@@ -121,6 +121,8 @@ app.post("/imgupload", upload.single("file"), (req, res) => {
             }
           );
           res.status(200).json({ info: "File uploaded!" });
+        } else {
+          res.status(403).json({ info: "Only .png and .jpg files are allowed!" });
         }
       });
     });
@@ -129,7 +131,6 @@ app.post("/imgupload", upload.single("file"), (req, res) => {
       if (err) {
         throw err;
       }
-
       res.status(403).json({ info: "Only .png and .jpg files are allowed!" });
     });
   }

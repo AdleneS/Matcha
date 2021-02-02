@@ -28,7 +28,7 @@ router.post("/signup", (req, res, next) => {
   if (validateUser(req.body)) {
     pool.query("SELECT * FROM users WHERE email = $1", [req.body.email], (error, results) => {
       if (error) throw error;
-      else if (results.rows[0]) {
+      else if (results.rows[0] && results.rows[0].mail_confirm) {
         if (bcrypt.compareSync(req.body.password, results.rows[0].password)) {
           const rows = results.rows[0];
           const session = uuidv4();
@@ -105,12 +105,12 @@ function validateRegistration(user) {
 }
 
 router.post("/register", (req, res) => {
-  const { login, email, password, birthday, gender, sexual_orientation } = req.body;
+  const { login, email, password, birthday, gender, sexual_orientation, firstname, name } = req.body;
   var err = validateRegistration(req.body);
   const uid = uuidv4();
   if (err.email && err.pass && err.v_pass && err.login) {
     pool.query(
-      "INSERT INTO users (login, uid, email, password, date, birthday, gender, sexual_orientation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      "INSERT INTO users (login, uid, email, password, date, birthday, gender, sexual_orientation, firstname, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
       [
         login,
         uid,
@@ -120,6 +120,8 @@ router.post("/register", (req, res) => {
         moment(birthday, "YYYY/MM/DD"),
         gender.toLowerCase(),
         sexual_orientation.toLowerCase(),
+        firstname,
+        name,
       ],
       async (error, results) => {
         if (error) {

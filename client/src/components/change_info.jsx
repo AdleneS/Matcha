@@ -7,7 +7,7 @@ import Image from "react-bootstrap/Image";
 import "./change_info.css";
 import Alert from "react-bootstrap/Alert";
 
-class Test_upload extends Component {
+class ChangeInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -89,11 +89,7 @@ class Test_upload extends Component {
       fetch("/imgupload", {
         method: "POST",
         body: formData,
-      })
-        .then((response) => response.json())
-        .catch((error) => {
-          console.error("error", error);
-        });
+      }).then((response) => response.json());
     }
     fetch("/change/login", {
       method: "POST",
@@ -114,7 +110,7 @@ class Test_upload extends Component {
     return (
       <div>
         <div className="container containerChange">
-          {this.props.location?.state?.alert ? (
+          {this.props?.alert ? (
             <Alert variant="primary">
               <Alert.Heading>Hey, nice to see you</Alert.Heading>
               <p>You have to add a profil picture to access the home page</p>
@@ -323,4 +319,4 @@ class Test_upload extends Component {
   }
 }
 
-export default Test_upload;
+export default ChangeInfo;

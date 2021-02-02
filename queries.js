@@ -159,7 +159,7 @@ const postSearch = async (request, response) => {
       if (results.rows.length && filter.length) {
         response.status(200).json(filter);
       } else {
-        response.status(401).json(filter);
+        response.status(403).json(filter);
       }
     }
   );
@@ -181,9 +181,9 @@ const checkPic = (request, response) => {
       throw error;
     } else {
       if (results.rows.length) {
-        response.status(200).json(results.rows);
+        response.status(200).json();
       } else {
-        response.status(401).json();
+        response.status(403).json();
       }
     }
   });
@@ -512,14 +512,27 @@ const addReport = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   const profile_uid = request.body.uidUser;
   pool.query(
-    "INSERT INTO report (uid_reported, uid_reporter, date_insert) VALUES ($1, $2, $3)",
-    [user_uid, profile_uid, new Date(Date.now())],
+    "SELECT * FROM report WHERE uid_reported = $1 AND uid_reporter = $2",
+    [profile_uid, user_uid],
     (error, results) => {
       if (error) {
         throw error;
       } else {
-        response.status(200).json({ message: "Sent", info: "message" });
+        if (!results.rowCount) {
+          pool.query(
+            "INSERT INTO report (uid_reporter, uid_reported, date_insert) VALUES ($1, $2, $3)",
+            [user_uid, profile_uid, new Date(Date.now())],
+            (error, results) => {
+              if (error) {
+                throw error;
+              } else {
+                response.status(200).json({ message: "Sent", info: "message" });
+              }
+            }
+          );
+        }
       }
+      response.status(403).json({ info: "Forbidden" });
     }
   );
 };
@@ -528,13 +541,38 @@ const addBlock = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   const profile_uid = request.body.uidUser;
   pool.query(
-    "INSERT INTO block (uid_blocked, uid_blocker, date_insert) VALUES ($1, $2, $3)",
-    [user_uid, profile_uid, new Date(Date.now())],
+    "SELECT * FROM block WHERE uid_blocked = $1 AND uid_blocker= $2",
+    [profile_uid, user_uid],
     (error, results) => {
       if (error) {
         throw error;
       } else {
-        response.status(200).json({ message: "Sent", info: "message" });
+        if (!results.rowCount) {
+          pool.query(
+            "INSERT INTO block (uid_blocker, uid_blocked, date_insert) VALUES ($1, $2, $3)",
+            [user_uid, profile_uid, new Date(Date.now())],
+            (error, results) => {
+              if (error) {
+                throw error;
+              } else {
+                response.status(200).json({ info: "block" });
+              }
+            }
+          );
+        } else {
+          pool.query(
+            "DELETE FROM block WHERE uid_blocked = $1 AND uid_blocker= $2",
+            [profile_uid, user_uid],
+            (error, results) => {
+              console.log(results);
+              if (error) {
+                throw error;
+              } else {
+                response.status(200).json({ info: "unblock" });
+              }
+            }
+          );
+        }
       }
     }
   );

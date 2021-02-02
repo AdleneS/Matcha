@@ -143,6 +143,14 @@ class profile extends Component {
       headers: {
         "Content-type": "application/json",
       },
+    }).then((res) => {
+      res.json().then((res) => {
+        if (res.info === "block") {
+          alert("You blocked this user");
+        } else {
+          alert("You unblocked this user");
+        }
+      });
     });
   };
 
@@ -218,7 +226,7 @@ class profile extends Component {
                   <div style={{ marginTop: "10px" }}>{<p>565632</p>}</div>
                 </Col>
                 <Col className="test block">
-                  <MdBlock
+                  <MdReport
                     onClick={() => {
                       this.onClickReport();
                     }}
@@ -230,7 +238,7 @@ class profile extends Component {
                       marginTop: "10px",
                     }}
                   />
-                  <MdReport
+                  <MdBlock
                     onClick={() => {
                       this.onClickBlock();
                     }}
