@@ -9,9 +9,12 @@ import Form from "react-bootstrap/Form";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { FaCircle } from "react-icons/fa";
+import { FaMapPin } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
+import { FaTag } from "react-icons/fa";
+import { GiAges } from "react-icons/gi";
 import InfiniteScroll from "react-infinite-scroller";
 import Spinner from "react-bootstrap/Spinner";
-
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
 
@@ -313,7 +316,7 @@ class Search extends Component {
     backgroundColor: "#27262e",
     display: "flex",
     alignItems: "center",
-    position: "fixed",
+    position: "relative",
   };
 
   wrapperStyle = { width: 200, marginLeft: "10px" };
@@ -397,9 +400,23 @@ class Search extends Component {
                 tipFormatter={(value) => `${value}`}
               />
             </Form.Group>
+            <div style={{ display: "flex" }}>
+              <Form.Group className="filterAge" controlId="filterAge">
+                <GiAges style={{ marginLeft: "10px", height: "35px", width: "35px" }}></GiAges>
+              </Form.Group>
+              <Form.Group className="filterAge" controlId="filterAge">
+                <FaMapPin style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaMapPin>
+              </Form.Group>
+              <Form.Group className="filterAge" controlId="filterAge">
+                <FaHeart style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaHeart>
+              </Form.Group>
+              <Form.Group className="filterAge" controlId="filterAge">
+                <FaTag style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaTag>
+              </Form.Group>
+            </div>
           </Form>
         </div>
-        <div style={{ overflow: "hidden", marginTop: "179px" }}>
+        <div style={{ overflow: "hidden" }}>
           <InfiniteScroll
             loadMore={this.loadMore.bind(this)}
             hasMore={this.state.hasMore}

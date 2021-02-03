@@ -102,9 +102,8 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
       socket.emit("FromAPI", uid);
       return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;
     }
-  } else {
-    return <div></div>;
   }
+  return <div></div>;
 };
 
 export default WithAuth;

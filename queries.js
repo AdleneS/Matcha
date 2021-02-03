@@ -31,7 +31,7 @@ const getUsersByUid = (request, response) => {
 const getUsersInfo = (uid) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      "SELECT uid, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected FROM users WHERE uid = $1",
+      "SELECT users.id, users.uid, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, array_agg(tag.tag) as tag FROM users LEFT JOIN tag ON tag.uid = users.uid  WHERE users.uid = $1 GROUP BY users.id",
       [uid],
       (error, results) => {
         if (error) {
@@ -48,8 +48,14 @@ const getUsersImg = async (request, response) => {
   const user = await getUsersInfo(request.signedCookies.info.uid);
   let pretenders = null;
   pool.query(
-    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, path FROM users LEFT JOIN img ON users.uid = img.uid WHERE NOT users.uid = $1 LIMIT $2 OFFSET $3",
-    [request.signedCookies.info.uid, request.params.limit, request.params.offset],
+    "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, array_agg(tag.tag) as tag,\
+     login, description, country, connected, path \
+     FROM users \
+     LEFT JOIN img ON users.uid = img.uid\
+     LEFT JOIN tag ON tag.uid = users.uid\
+       WHERE NOT users.uid = $1\
+       GROUP BY users.id, img.path ORDER BY users.country <> $4, users.popularity DESC  LIMIT $2 OFFSET $3",
+    [request.signedCookies.info.uid, request.params.limit, request.params.offset, user.country],
     (error, results) => {
       if (error) {
         throw error;
@@ -96,8 +102,19 @@ const getUsersImg = async (request, response) => {
                   pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
           }
+          pretenders.forEach((a, i) => {
+            var tagCommun = 0;
+            user.tag.forEach((tag) => {
+              if (a.tag.includes(tag)) {
+                tagCommun++;
+              }
+            });
+            if (tagCommun > 0) {
+              pretenders.splice(i, 1);
+              pretenders.unshift(a);
+            }
+          });
         }
-        console.log(pretenders);
         if (results.rows.length) {
           response.status(200).json(pretenders);
         } else {

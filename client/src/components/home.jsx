@@ -150,7 +150,7 @@ class Home extends Component {
         }
       })
       .catch((error) => {
-        alert(error);
+        throw error;
       });
   };
 
@@ -162,14 +162,17 @@ class Home extends Component {
     await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
       .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then(async (res) => {
+        console.log(res.status);
         if (res.status === 200) {
           this.setState({
             offset: this.state.offset + 25,
             limit: this.state.limit + 25,
           });
-          this.setState({
-            pretender: [...this.state.pretender, ...res.body],
-          });
+          if (res.status === 200) {
+            this.setState({
+              pretender: [...this.state.pretender, ...res.body],
+            });
+          }
         } else {
           this.setState({ hasMore: false });
         }

@@ -77,6 +77,8 @@ export default function Mynav(props) {
     margin: "auto",
     borderBottom: "1px solid rgb(13, 13, 14)",
     color: "white",
+    display: "flex",
+    flexWrap: "wrap",
   };
 
   return (
