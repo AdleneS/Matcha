@@ -2,6 +2,7 @@ const pool = require("./db");
 var moment = require("moment");
 
 const updateLogin = (request, response) => {
+  console.log(request.signedCookies.info.uid);
   pool.query("SELECT * FROM users WHERE uid = $1", [request.signedCookies.info.uid], (error, user_log) => {
     if (error) {
       throw error;
@@ -31,7 +32,7 @@ const updateLogin = (request, response) => {
       );
     }
 
-    if (request.body.login && request.body.login != user_log[0].rows.login) {
+    if (request.body.login && request.body.login != user_log.rows[0].login) {
       pool.query("SELECT * FROM users WHERE login = $1", [request.body.login], (error, check_login) => {
         if (error) {
           throw error;

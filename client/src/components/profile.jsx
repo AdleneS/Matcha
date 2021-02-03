@@ -6,6 +6,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { MdBlock, MdReport } from "react-icons/md";
+import Badge from "react-bootstrap/Badge";
 
 class profile extends Component {
   constructor(props) {
@@ -19,17 +20,20 @@ class profile extends Component {
       is_like: 0,
       is_likes_you: 0,
       redirect: false,
+      is_user_logged: true,
+      blocked: false,
+      tag: [],
     };
     this.onClick = this.onClick.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const queryString = window.location.search;
     const urlParam = new URLSearchParams(queryString);
     if (urlParam.get("uid") === "") {
       this.setState({ redirect: true });
     } else {
-      fetch("/cookie/")
+      await fetch("/cookie/")
         .then((res) => res.json())
         .then((cookie) => {
           this.setState({ cookie }, () => {
@@ -42,7 +46,8 @@ class profile extends Component {
             }
           });
         });
-      fetch("/profile/" + urlParam.get("uid"))
+
+      await fetch("/profile/" + urlParam.get("uid"))
         .then((response) => response.json())
         .then((user) => {
           if (!user.length) {
@@ -51,31 +56,48 @@ class profile extends Component {
             this.setState({ user });
           }
         });
-      fetch("/profile/like/" + urlParam.get("uid"))
-        .then((res) => res.json())
-        .then((likes) => this.setState({ likes }))
-        .then((likes) => {
-          if (this.state.likes[0] && this.state.user[0]) {
-            if (this.state.likes[0].uid_liked === this.state.user[0].uid) {
-              this.setState({ is_like: 1 });
-            } else this.setState({ is_like: 0 });
-          } else {
-            this.setState({ is_like: 0 });
-          }
+      if (this.state.user[0].uid === this.state.cookie.info.uid) {
+        console.log(this.state.user[0].uid, this.state.cookie.info.uid);
+        this.setState({ is_user_logged: false });
+      } else {
+        fetch("/profile/like/" + urlParam.get("uid"))
+          .then((res) => res.json())
+          .then((likes) => this.setState({ likes }))
+          .then((likes) => {
+            if (this.state.likes[0] && this.state.user[0]) {
+              if (this.state.likes[0].uid_liked === this.state.user[0].uid) {
+                this.setState({ is_like: 1 });
+              } else this.setState({ is_like: 0 });
+            } else {
+              this.setState({ is_like: 0 });
+            }
+          });
+        fetch("/profile/likeYou/" + urlParam.get("uid"))
+          .then((response) => response.json())
+          .then((likes_you) => this.setState({ likes_you }))
+          .then((likes_you) => {
+            if (this.state.likes_you[0]) {
+              this.setState({ is_likes_you: 1 });
+            } else {
+              this.setState({ is_likes_you: 0 });
+            }
+          });
+        fetch("/profile/getBlock/" + urlParam.get("uid")).then((res) => {
+          res.json().then((res) => {
+            if (res.info === "block") {
+              this.setState({ blocked: true });
+            } else {
+              this.setState({ blocked: false });
+            }
+          });
         });
-      fetch("/profile/likeYou/" + urlParam.get("uid"))
-        .then((response) => response.json())
-        .then((likes_you) => this.setState({ likes_you }))
-        .then((likes_you) => {
-          if (this.state.likes_you[0]) {
-            this.setState({ is_likes_you: 1 });
-          } else {
-            this.setState({ is_likes_you: 0 });
-          }
-        });
+      }
       fetch("/profile/gallery/" + urlParam.get("uid"))
         .then((res) => res.json())
         .then((gallery) => this.setState({ gallery }));
+      fetch("/change/tag")
+        .then((response) => response.json())
+        .then((tag) => this.setState({ tag }));
     }
   }
 
@@ -146,8 +168,10 @@ class profile extends Component {
     }).then((res) => {
       res.json().then((res) => {
         if (res.info === "block") {
+          this.setState({ blocked: true });
           alert("You blocked this user");
         } else {
+          this.setState({ blocked: false });
           alert("You unblocked this user");
         }
       });
@@ -188,12 +212,30 @@ class profile extends Component {
                   <Row>
                     <p>{user.sexual_orientation}</p>
                   </Row>
+                  <Row>
+                    <div style={{ marginTop: "10px" }}>popularity: {user.popularity}</div>
+                  </Row>
                 </Col>
               </Row>
-              <Row className="test">
-                <Col className="test block">
-                  {this.state.is_like === 1 ? (
-                    <BsHeartFill
+
+              {this.state.is_user_logged && (
+                <Row className="test" style={{ height: "85px" }}>
+                  <Col className="test block">
+                    {this.state.is_like === 1 ? (
+                      <BsHeartFill
+                        onClick={(event) => {
+                          this.onClick(event, user.uid);
+                        }}
+                        style={{
+                          marginTop: "10px",
+                          color: "#ff3333",
+                          width: "30px",
+                          height: "30px",
+                          position: "absolute",
+                        }}
+                      />
+                    ) : null}
+                    <BsHeart
                       onClick={(event) => {
                         this.onClick(event, user.uid);
                       }}
@@ -205,58 +247,65 @@ class profile extends Component {
                         position: "absolute",
                       }}
                     />
-                  ) : null}
-                  <BsHeart
-                    onClick={(event) => {
-                      this.onClick(event, user.uid);
-                    }}
-                    style={{
-                      marginTop: "10px",
-                      color: "#ff3333",
-                      width: "30px",
-                      height: "30px",
-                      position: "absolute",
-                    }}
-                  />
-                  <div style={{ marginLeft: "40px", marginTop: "10px" }}>
-                    {this.state.is_likes_you === 1 ? <p>{user.login} vous a like</p> : null}
-                  </div>
-                </Col>
-                <Col className="test block">
-                  <div style={{ marginTop: "10px" }}>{<p>565632</p>}</div>
-                </Col>
-                <Col className="test block">
-                  <MdReport
-                    onClick={() => {
-                      this.onClickReport();
-                    }}
-                    style={{
-                      color: "#ff3333",
-                      width: "30px",
-                      height: "30px",
-                      position: "absolute",
-                      marginTop: "10px",
-                    }}
-                  />
-                  <MdBlock
-                    onClick={() => {
-                      this.onClickBlock();
-                    }}
-                    style={{
-                      color: "#ff3333",
-                      width: "30px",
-                      height: "30px",
-                      position: "absolute",
-                      marginLeft: "40px",
-                      marginTop: "10px",
-                    }}
-                  />
-                </Col>
-              </Row>
+                    <div style={{ marginLeft: "40px", marginTop: "10px" }}>
+                      {this.state.is_likes_you === 1 ? <p>{user.login} vous a like</p> : null}
+                    </div>
+                  </Col>
+                  <Col className="test block">
+                    <MdReport
+                      onClick={() => {
+                        this.onClickReport();
+                      }}
+                      style={{
+                        color: "#ff3333",
+                        width: "30px",
+                        height: "30px",
+                        position: "absolute",
+                        marginTop: "10px",
+                      }}
+                    />
+                    <MdBlock
+                      onClick={() => {
+                        this.onClickBlock();
+                      }}
+                      style={
+                        this.state.blocked
+                          ? {
+                              color: "#ff3333",
+                              width: "30px",
+                              height: "30px",
+                              position: "absolute",
+                              marginTop: "10px",
+                              marginLeft: "40px",
+                            }
+                          : {
+                              color: "#34495E",
+                              width: "30px",
+                              height: "30px",
+                              position: "absolute",
+                              marginTop: "10px",
+                              marginLeft: "40px",
+                            }
+                      }
+                    />
+                  </Col>
+                </Row>
+              )}
 
-              <Row className="test block" style={{ height: "140px" }}>
-                <p>{user.description}</p>
-              </Row>
+              <Col className="test block" style={{ height: "140px" }}>
+                <div style={{ marginBot: "50px" }}>
+                  {this.state.tag.map((tag) => (
+                    <h5 key={tag.id} style={{ display: "inline-block", marginRight: "5px" }}>
+                      <Badge pill variant="dark">
+                        {tag.tag}
+                      </Badge>
+                    </h5>
+                  ))}
+                </div>
+                <div>
+                  <p>{user.description}</p>
+                </div>
+              </Col>
             </div>
           ))}
           <div id="galery" className="gallery">

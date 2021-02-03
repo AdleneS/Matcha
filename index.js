@@ -173,6 +173,7 @@ app.get("/profile/like/:uid", db.getOneLike);
 app.get("/profile/likeYou/:uid", db.getYouLike);
 app.post("/profile/report/", db.addReport);
 app.post("/profile/block/", db.addBlock);
+app.get("/profile/getBlock/:uid", db.getBlock);
 
 app.get("/change/sortImage", info.sortImage);
 app.post("/change/deleteImage", info.deleteImage);

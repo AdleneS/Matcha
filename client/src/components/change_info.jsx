@@ -36,6 +36,22 @@ class ChangeInfo extends Component {
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
+    fetch("/users/uid/")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        this.setState({
+          login: res[0].login,
+          email: res[0].email,
+          name: res[0].name,
+          surname: res[0].firstname,
+          birthday: res[0].birthday,
+          gender: res[0].gender,
+          sexual_orientation: res[0].sexual_orientation,
+          description: res[0].description,
+          location: res[0].country,
+        });
+      });
   }
 
   onClickImg = (event, image) => {
@@ -233,6 +249,7 @@ class ChangeInfo extends Component {
                 as="textarea"
                 rows="3"
                 name="description"
+                value={this.state.description}
                 onChange={(event) => {
                   this.handleInputChange(event);
                 }}

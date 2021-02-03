@@ -16,7 +16,7 @@ const getUsers = (request, response) => {
 
 const getUsersByUid = (request, response) => {
   pool.query(
-    "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, gender, description FROM users WHERE uid = $1",
+    "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, gender, description, birthday, country FROM users WHERE uid = $1",
     [request.signedCookies.info.uid],
     (error, results) => {
       if (error) {
@@ -539,6 +539,26 @@ const addReport = (request, response) => {
   );
 };
 
+const getBlock = (request, response) => {
+  const user_uid = request.signedCookies.info.uid;
+  const profile_uid = request.params.uid;
+  pool.query(
+    "SELECT * FROM block WHERE uid_blocked = $1 AND uid_blocker= $2",
+    [profile_uid, user_uid],
+    (error, results) => {
+      if (error) {
+        throw error;
+      } else {
+        if (results.rows.length) {
+          response.status(200).json("block");
+        } else {
+          response.status(200).json("unblock");
+        }
+      }
+    }
+  );
+};
+
 const addBlock = (request, response) => {
   const user_uid = request.signedCookies.info.uid;
   const profile_uid = request.body.uidUser;
@@ -642,4 +662,5 @@ module.exports = {
   updatePopularity,
   addReport,
   addBlock,
+  getBlock,
 };
