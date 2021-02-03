@@ -97,6 +97,7 @@ const getUsersImg = async (request, response) => {
             );
           }
         }
+        console.log(pretenders);
         if (results.rows.length) {
           response.status(200).json(pretenders);
         } else {
@@ -457,7 +458,8 @@ const createMessages = (request, response) => {
 const getUsersProfile = (request, response) => {
   const uid = request.params.uid;
   pool.query(
-    "SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND n_pic = 1",
+    "SELECT users.id, users.uid, birthday, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, n_pic, img.path, array_agg(tag.tag) as tag FROM users LEFT JOIN img ON img.uid = users.uid LEFT JOIN tag ON tag.uid = users.uid WHERE users.uid = $1 AND n_pic = 1 GROUP BY users.id, img.n_pic, img.path",
+    //"SELECT * FROM users LEFT JOIN img ON img.uid = users.uid WHERE users.uid = $1 AND n_pic = 1",
     [uid],
     (error, results) => {
       if (error) {
