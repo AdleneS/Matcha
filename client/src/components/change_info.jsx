@@ -29,29 +29,30 @@ class ChangeInfo extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     fetch("/change/tag")
       .then((response) => response.json())
       .then((tag) => this.setState({ tag }));
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
-    fetch("/users/uid/")
+    await fetch("/users/uid/")
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
+        console.log(res, res[0].sexual_orientation);
         this.setState({
           login: res[0].login,
           email: res[0].email,
           name: res[0].name,
           surname: res[0].firstname,
           birthday: res[0].birthday,
-          gender: res[0].gender,
-          sexual_orientation: res[0].sexual_orientation,
+          gender: res[0].gender.charAt(0).toUpperCase() + res[0].gender.slice(1),
+          sexual_orientation: res[0].sexual_orientation.charAt(0).toUpperCase() + res[0].sexual_orientation.slice(1),
           description: res[0].description,
           location: res[0].country,
         });
       });
+    console.log(this.state.birthday);
   }
 
   onClickImg = (event, image) => {
