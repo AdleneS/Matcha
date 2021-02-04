@@ -50,7 +50,6 @@ io.on("connection", (socket) => {
     );
     db.setDisconnected(socketArray[socket.id]);
     delete socketArray[socket.id];
-    //console.log("user disconnected");
   });
 });
 

@@ -288,10 +288,9 @@ class Home extends Component {
                       className="myPic"
                       variant="top"
                       src={
-                        //pretender.path
-                        //?
-                        process.env.PUBLIC_URL + pretender.path
-                        //: "https://source.unsplash.com/collection/159213/sig=" + i
+                        pretender.path
+                          ? process.env.PUBLIC_URL + pretender.path
+                          : "https://source.unsplash.com/collection/159213/sig=" + i
                       }
                     />
                     <div className="overlay">

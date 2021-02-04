@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { MdBlock, MdReport } from "react-icons/md";
 import Badge from "react-bootstrap/Badge";
+import Moment from "moment";
 
 class profile extends Component {
   constructor(props) {
@@ -57,7 +58,6 @@ class profile extends Component {
           }
         });
       if (this.state.user[0].uid === this.state.cookie.info.uid) {
-        console.log(this.state.user[0].uid, this.state.cookie.info.uid);
         this.setState({ is_user_logged: false });
       } else {
         fetch("/profile/like/" + urlParam.get("uid"))
@@ -213,7 +213,10 @@ class profile extends Component {
                     <p>{user.sexual_orientation}</p>
                   </Row>
                   <Row>
-                    <div style={{ marginTop: "10px" }}>popularity: {user.popularity}</div>
+                    <div>popularity: {user.popularity}</div>
+                  </Row>
+                  <Row>
+                    <div>Last connection: {Moment(user.last_connection).format("YYYY/MM/DD - h:mm a")}</div>
                   </Row>
                 </Col>
               </Row>

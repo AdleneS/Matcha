@@ -2,7 +2,6 @@ const pool = require("./db");
 var moment = require("moment");
 
 const updateLogin = (request, response) => {
-  console.log(request.signedCookies.info.uid);
   pool.query("SELECT * FROM users WHERE uid = $1", [request.signedCookies.info.uid], (error, user_log) => {
     if (error) {
       throw error;
@@ -207,7 +206,6 @@ const deleteImage = (request, response) => {
 };
 
 //const imgUpload = (req, res) => {
-//    console.log('TESTe')
 //    const tempPath = req.file.path;
 //    const targetPath = "./client/public/img_container/" + req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
 //    if (path.extname(req.file.originalname).toLowerCase() === ".png" || ".jpg") {

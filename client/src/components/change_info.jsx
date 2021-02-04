@@ -39,7 +39,6 @@ class ChangeInfo extends Component {
     await fetch("/users/uid/")
       .then((res) => res.json())
       .then((res) => {
-        console.log(res, res[0].sexual_orientation);
         this.setState({
           login: res[0].login,
           email: res[0].email,
@@ -52,7 +51,6 @@ class ChangeInfo extends Component {
           location: res[0].country,
         });
       });
-    console.log(this.state.birthday);
   }
 
   onClickImg = (event, image) => {

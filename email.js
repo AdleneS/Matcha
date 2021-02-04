@@ -5,8 +5,6 @@ const bcrypt = require("bcryptjs");
 
 const sendEmail = async (uid, email) => {
   //et testAccount = await nodemailer.createTestAccount();
-
-  console.log(uid, email);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -32,9 +30,7 @@ const sendEmail = async (uid, email) => {
     },
     (error, info) => {
       if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
+        throw error;
       }
     }
   );
@@ -46,7 +42,6 @@ const confirmEmail = (req, res) => {
     if (error) {
       throw error;
     } else {
-      //console.log(results.rows, token);
       const uid = results.rows[0].uid_user;
       pool.query("UPDATE users SET mail_confirm = $2 WHERE uid = $1", [uid, true], (error, results) => {
         if (error) {
@@ -62,7 +57,6 @@ const confirmEmail = (req, res) => {
 
 const reset = async (req, res) => {
   //let testAccount = await nodemailer.createTestAccount();
-  console.log("mail");
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -103,9 +97,7 @@ const reset = async (req, res) => {
     },
     (error, info) => {
       if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
+        throw error;
       }
     }
   );
@@ -120,7 +112,6 @@ const updatePass = (req, res) => {
       if (error) {
         throw error;
       } else if (results.rows.length) {
-        console.log(results.rows);
         const uid = results.rows[0].uid_user;
         pool.query(
           "UPDATE users SET password = $2 WHERE uid = $1",

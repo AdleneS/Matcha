@@ -200,10 +200,10 @@ class Search extends Component {
   };
 
   filteringPretender = () => {
-    this.setState({ offset: 0, limit: 50 });
-
-    setTimeout(() => {
-      fetch("/search/" + this.state.offset + "/" + this.state.limit, {
+    this.setState({ offset: 0, limit: 50, hasMore: true });
+    setTimeout(async () => {
+      console.log(this.state.popularityValue);
+      await fetch("/search/" + this.state.offset + "/" + this.state.limit, {
         method: "POST",
         body: JSON.stringify({
           gender: this.state.genderValue,
@@ -221,6 +221,8 @@ class Search extends Component {
           res.json().then((data) => {
             if (data.length >= 50) {
               this.setState({ hasMore: true });
+            } else {
+              this.setState({ hasMore: false });
             }
             this.setState({
               filtredPretender: data,
@@ -232,7 +234,7 @@ class Search extends Component {
         .catch((error) => {
           alert(error);
         });
-    }, 200);
+    }, 500);
   };
 
   onClick = (event, pretenderUid) => {
@@ -436,7 +438,7 @@ class Search extends Component {
                 Popularity {this.state.popularityValue[0]} - {this.state.popularityValue[1]}
               </Form.Label>
               <Range
-                onChange={this.handlePopularity}
+                onAfterChange={this.handlePopularity}
                 style={this.wrapperStyle}
                 min={0}
                 max={100}
@@ -450,7 +452,7 @@ class Search extends Component {
                 Age {this.state.ageValue[0]} - {this.state.ageValue[1]}
               </Form.Label>
               <Range
-                onChange={this.handleAge}
+                onAfterChange={this.handleAge}
                 style={this.wrapperStyle}
                 min={18}
                 max={100}
