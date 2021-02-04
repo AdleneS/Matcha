@@ -17,6 +17,8 @@ var socketArray = {};
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+var moment = require("moment");
+
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -39,6 +41,13 @@ io.on("connection", (socket) => {
     io.to(found).emit("getMessage", socketArray[socket.id]);
   });
   socket.on("disconnect", () => {
+    pool.query(
+      "UPDATE users SET last_connection = $2 WHERE uid = $1",
+      [socketArray[socket.id], moment().format("YYYY/MM/DD, h:mm:ss a")],
+      (error) => {
+        if (error) throw error;
+      }
+    );
     db.setDisconnected(socketArray[socket.id]);
     delete socketArray[socket.id];
     //console.log("user disconnected");

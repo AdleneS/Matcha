@@ -47,14 +47,15 @@ const getUsersInfo = (uid) => {
 const getUsersImg = async (request, response) => {
   const user = await getUsersInfo(request.signedCookies.info.uid);
   let pretenders = null;
+  console.log(request.params.limit, request.params.offset);
   pool.query(
     "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, array_agg(tag.tag) as tag,\
-     login, description, country, connected, path \
+     login, description, country, connected, path, img.n_pic \
      FROM users \
      LEFT JOIN img ON users.uid = img.uid\
      LEFT JOIN tag ON tag.uid = users.uid\
-       WHERE NOT users.uid = $1\
-       GROUP BY users.id, img.path ORDER BY users.country <> $4, users.popularity DESC  LIMIT $2 OFFSET $3",
+       WHERE NOT users.uid = $1 AND (img.n_pic = 1 OR img.n_pic IS NULL)\
+       GROUP BY users.id, users.uid, img.path, img.n_pic ORDER BY users.country <> $4, users.popularity DESC LIMIT $2 OFFSET $3",
     [request.signedCookies.info.uid, request.params.limit, request.params.offset, user.country],
     (error, results) => {
       if (error) {
@@ -102,19 +103,20 @@ const getUsersImg = async (request, response) => {
                   pretender.sexual_orientation === genderOrientation.orientation.bi)
             );
           }
-          pretenders.forEach((a, i) => {
-            var tagCommun = 0;
-            user.tag.forEach((tag) => {
-              if (a.tag.includes(tag)) {
-                tagCommun++;
-              }
-            });
-            if (tagCommun > 0) {
-              pretenders.splice(i, 1);
-              pretenders.unshift(a);
-            }
-          });
+          //pretenders.forEach((a, i) => {
+          //  var tagCommun = 0;
+          //  user.tag.forEach((tag) => {
+          //    if (a.tag.includes(tag)) {
+          //      tagCommun++;
+          //    }
+          //  });
+          //  if (tagCommun > 0) {
+          //    pretenders.splice(i, 1);
+          //    pretenders.unshift(a);
+          //  }
+          //});
         }
+        console.log(pretenders.map((p) => p.login));
         if (results.rows.length) {
           response.status(200).json(pretenders);
         } else {
@@ -126,8 +128,8 @@ const getUsersImg = async (request, response) => {
 };
 
 const postSearch = async (request, response) => {
-  const { gender, sexual_orientation, age, popularity, country, tag } = request.body;
-  let filter = null;
+  const { gender, sexual_orientation, age, popularity, country, tag, filter } = request.body;
+  let filterSearch = null;
   pool.query(
     "SELECT users.id, users.uid, birthday, email, firstname, gender, popularity, sexual_orientation, name, login, description, country, connected, array_agg(img.path) as path, array_agg(tag.tag) as tag FROM users LEFT JOIN img ON img.uid = users.uid LEFT JOIN tag ON tag.uid = users.uid WHERE NOT users.uid = $1 GROUP BY users.id LIMIT $2 OFFSET $3 ",
     [request.signedCookies.info.uid, request.params.limit, request.params.offset],
@@ -135,15 +137,15 @@ const postSearch = async (request, response) => {
       if (error) {
         throw error;
       } else {
-        filter = results.rows;
+        filterSearch = results.rows;
         if (gender) {
-          filter = filter.filter((pretender) => pretender.gender === gender);
+          filterSearch = filterSearch.filter((pretender) => pretender.gender === gender);
         }
         if (sexual_orientation) {
-          filter = filter.filter((pretender) => pretender.sexual_orientation === sexual_orientation);
+          filterSearch = filterSearch.filter((pretender) => pretender.sexual_orientation === sexual_orientation);
         }
         if (country) {
-          filter = filter.filter((pretender) =>
+          filterSearch = filterSearch.filter((pretender) =>
             pretender.country
               .toLocaleLowerCase("en-US")
               .normalize("NFD")
@@ -157,27 +159,27 @@ const postSearch = async (request, response) => {
           );
         }
         if (popularity) {
-          filter = filter.filter(
+          filterSearch = filterSearch.filter(
             (pretender) => pretender.popularity >= popularity[0] && pretender.popularity <= popularity[1]
           );
         }
         if (age) {
-          filter = filter.filter(
+          filterSearch = filterSearch.filter(
             (pretender) =>
               moment().diff(pretender.birthday, "years") >= age[0] &&
               moment().diff(pretender.birthday, "years") <= age[1]
           );
         }
         if (tag && tag.length && tag[0] !== "") {
-          filter = filter.filter((pretender) => {
+          filterSearch = filterSearch.filter((pretender) => {
             return pretender.tag.some((ptag) => tag.includes(ptag));
           });
         }
       }
-      if (results.rows.length && filter.length) {
-        response.status(200).json(filter);
+      if (results.rows.length && filterSearch.length) {
+        response.status(200).json(filterSearch);
       } else {
-        response.status(403).json(filter);
+        response.status(403).json(filterSearch);
       }
     }
   );
@@ -583,7 +585,6 @@ const addBlock = (request, response) => {
             "DELETE FROM block WHERE uid_blocked = $1 AND uid_blocker= $2",
             [profile_uid, user_uid],
             (error, results) => {
-              console.log(results);
               if (error) {
                 throw error;
               } else {

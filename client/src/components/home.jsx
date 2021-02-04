@@ -7,6 +7,11 @@ import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaCircle } from "react-icons/fa";
 import InfiniteScroll from "react-infinite-scroller";
+import { FaMapPin } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
+import { FaTag } from "react-icons/fa";
+import { GiAges } from "react-icons/gi";
+import Form from "react-bootstrap/Form";
 
 class Home extends Component {
   constructor(props) {
@@ -20,6 +25,7 @@ class Home extends Component {
       offset: 0,
       hasMore: true,
       loading: true,
+      filter: { age: false, location: false, popularity: false, tag: false },
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -39,7 +45,6 @@ class Home extends Component {
         this.setState({
           pretender,
           offset: this.state.offset + 50,
-          limit: this.state.limit + 25,
           loading: false,
         });
       });
@@ -158,32 +163,110 @@ class Home extends Component {
     if (this.state.loading) {
       return;
     }
-    this.setState({ loading: true });
-    await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
-      .then(async (res) => {
-        console.log(res.status);
-        if (res.status === 200) {
+    setTimeout(async () => {
+      this.setState({ loading: true });
+      await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
+        .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+        .then(async (res) => {
           this.setState({
-            offset: this.state.offset + 25,
-            limit: this.state.limit + 25,
+            offset: this.state.offset + 50,
           });
           if (res.status === 200) {
             this.setState({
               pretender: [...this.state.pretender, ...res.body],
             });
+          } else {
+            this.setState({ hasMore: false });
           }
-        } else {
-          this.setState({ hasMore: false });
-        }
-      });
-    this.setState({ loading: false });
+        });
+      this.setState({ loading: false });
+    }, 300);
+  };
+
+  handleFilter = (event) => {
+    if (event === "age") {
+      if (!this.state.filter.age) {
+        this.setState({
+          pretender: this.state.pretender.sort((b, a) => {
+            return Moment().diff(a.birthday, "years") - Moment().diff(b.birthday, "years");
+          }),
+        });
+        this.setState({ filter: { age: true, location: false, popularity: false, tag: false } });
+      } else {
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "location") {
+      if (!this.state.filter.location) {
+        this.setState({
+          pretender: this.state.pretender.sort((a, b) => {
+            if (a.country.toLowerCase() < b.country.toLowerCase()) {
+              return -1;
+            }
+            if (a.country.toLowerCase() > b.country.toLowerCase()) {
+              return 1;
+            }
+            return 0;
+          }),
+        });
+        this.setState({ filter: { age: false, location: true, popularity: false, tag: false } });
+      } else {
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "popularity") {
+      if (!this.state.filter.popularity) {
+        this.setState({
+          pretender: this.state.pretender.sort((b, a) => {
+            return a.popularity - b.popularity;
+          }),
+        });
+        this.setState({ filter: { age: false, location: false, popularity: true, tag: false } });
+      } else {
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "tag") {
+      if (!this.state.filter.tag) {
+        this.setState({
+          pretender: this.state.pretender.sort((b, a) => {
+            return a.tag.length - b.tag.length;
+          }),
+        });
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: true } });
+      } else {
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    }
   };
 
   render() {
     Moment.locale("fr");
     return (
       <div style={{ overflow: "auto" }}>
+        <div style={{ display: "flex", marginTop: "100px", color: "white", marginLeft: "35px" }}>
+          <Form.Group controlId="filterAge">
+            <GiAges
+              onClick={() => this.handleFilter("age")}
+              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+            ></GiAges>
+          </Form.Group>
+          <Form.Group controlId="filterLocation">
+            <FaMapPin
+              onClick={() => this.handleFilter("location")}
+              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+            ></FaMapPin>
+          </Form.Group>
+          <Form.Group controlId="filterPopularity">
+            <FaHeart
+              onClick={() => this.handleFilter("popularity")}
+              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+            ></FaHeart>
+          </Form.Group>
+          <Form.Group controlId="filterTag">
+            <FaTag
+              onClick={() => this.handleFilter("tag")}
+              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+            ></FaTag>
+          </Form.Group>
+        </div>
         <InfiniteScroll
           loadMore={this.loadMore.bind(this)}
           hasMore={this.state.hasMore}
@@ -205,9 +288,10 @@ class Home extends Component {
                       className="myPic"
                       variant="top"
                       src={
-                        pretender.path
-                          ? process.env.PUBLIC_URL + pretender.path
-                          : "https://source.unsplash.com/collection/159213/sig=" + i
+                        //pretender.path
+                        //?
+                        process.env.PUBLIC_URL + pretender.path
+                        //: "https://source.unsplash.com/collection/159213/sig=" + i
                       }
                     />
                     <div className="overlay">

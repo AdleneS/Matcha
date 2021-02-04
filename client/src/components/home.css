@@ -1,5 +1,5 @@
 .cardContainer {
-  margin-top: 100px;
+  margin-top: 30px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 260px);
   justify-content: center;
@@ -34,13 +34,11 @@
   color: #ffffff;
   opacity: 0;
   transition: all 0.5s;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
 }
 
 .title {
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
   font-weight: bold;
   border-bottom: 1px solid white;
   font-variant: small-caps;

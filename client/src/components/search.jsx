@@ -30,6 +30,7 @@ class Search extends Component {
       offset: 0,
       hasMore: false,
       loading: true,
+      filter: { age: false, location: false, popularity: false, tag: false },
       gender: [
         {
           name: "All",
@@ -224,7 +225,6 @@ class Search extends Component {
             this.setState({
               filtredPretender: data,
               offset: this.state.offset + 50,
-              limit: this.state.limit + 25,
               loading: false,
             });
           })
@@ -283,6 +283,7 @@ class Search extends Component {
           popularity: this.state.popularityValue,
           country: this.state.locationValue,
           tag: this.state.tagValue,
+          filter: this.state.filter,
         }),
         headers: {
           "Content-type": "application/json",
@@ -292,8 +293,7 @@ class Search extends Component {
         .then(async (res) => {
           if (res.status === 200) {
             this.setState({
-              offset: this.state.offset + 25,
-              limit: this.state.limit + 25,
+              offset: this.state.offset + 50,
             });
             this.setState({
               filtredPretender: [...this.state.filtredPretender, ...res.body],
@@ -304,6 +304,64 @@ class Search extends Component {
         });
       this.setState({ loading: false });
     }, 1000);
+  };
+
+  handleFilter = (event) => {
+    if (event === "age") {
+      if (!this.state.filter.age) {
+        this.setState({
+          filtredPretender: this.state.filtredPretender.sort((b, a) => {
+            return Moment().diff(a.birthday, "years") - Moment().diff(b.birthday, "years");
+          }),
+        });
+        this.setState({ filter: { age: true, location: false, popularity: false, tag: false } });
+      } else {
+        this.filteringPretender();
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "location") {
+      if (!this.state.filter.location) {
+        this.setState({
+          filtredPretender: this.state.filtredPretender.sort((a, b) => {
+            if (a.country.toLowerCase() < b.country.toLowerCase()) {
+              return -1;
+            }
+            if (a.country.toLowerCase() > b.country.toLowerCase()) {
+              return 1;
+            }
+            return 0;
+          }),
+        });
+        this.setState({ filter: { age: false, location: true, popularity: false, tag: false } });
+      } else {
+        this.filteringPretender();
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "popularity") {
+      if (!this.state.filter.popularity) {
+        this.setState({
+          filtredPretender: this.state.filtredPretender.sort((b, a) => {
+            return a.popularity - b.popularity;
+          }),
+        });
+        this.setState({ filter: { age: false, location: false, popularity: true, tag: false } });
+      } else {
+        this.filteringPretender();
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    } else if (event === "tag") {
+      if (!this.state.filter.tag) {
+        this.setState({
+          filtredPretender: this.state.filtredPretender.sort((b, a) => {
+            return a.tag.length - b.tag.length;
+          }),
+        });
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: true } });
+      } else {
+        this.filteringPretender();
+        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+      }
+    }
   };
 
   navBarStyle = {
@@ -401,17 +459,29 @@ class Search extends Component {
               />
             </Form.Group>
             <div style={{ display: "flex" }}>
-              <Form.Group className="filterAge" controlId="filterAge">
-                <GiAges style={{ marginLeft: "10px", height: "35px", width: "35px" }}></GiAges>
+              <Form.Group controlId="filterAge">
+                <GiAges
+                  onClick={() => this.handleFilter("age")}
+                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                ></GiAges>
               </Form.Group>
-              <Form.Group className="filterAge" controlId="filterAge">
-                <FaMapPin style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaMapPin>
+              <Form.Group controlId="filterLocation">
+                <FaMapPin
+                  onClick={() => this.handleFilter("location")}
+                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                ></FaMapPin>
               </Form.Group>
-              <Form.Group className="filterAge" controlId="filterAge">
-                <FaHeart style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaHeart>
+              <Form.Group controlId="filterPopularity">
+                <FaHeart
+                  onClick={() => this.handleFilter("popularity")}
+                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                ></FaHeart>
               </Form.Group>
-              <Form.Group className="filterAge" controlId="filterAge">
-                <FaTag style={{ marginLeft: "10px", height: "35px", width: "35px" }}></FaTag>
+              <Form.Group controlId="filterTag">
+                <FaTag
+                  onClick={() => this.handleFilter("tag")}
+                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                ></FaTag>
               </Form.Group>
             </div>
           </Form>
