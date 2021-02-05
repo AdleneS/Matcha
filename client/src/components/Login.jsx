@@ -1,24 +1,32 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import MyContext from "./appcontext";
-import { Redirect, Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 export default function Login(props) {
   const [sValue, setValue] = useState({ email: "", password: "" });
 
   const { islogged, setIsLogged } = useContext(MyContext);
+  let history = useHistory();
   const setIsLoggedTrue = () => {
     setIsLogged(true);
   };
+
+  useEffect(() => {
+    if (islogged) {
+      history.push("/home");
+    }
+  }, [islogged, history]);
+
   const handleInputChange = (event) => {
     const { value, name } = event.target;
     setValue({ ...sValue, [name]: value });
   };
 
-  const onSubmit = (event, socket) => {
+  const onSubmit = async (event, socket) => {
     event.preventDefault();
-    fetch("/auth/signup", {
+    await fetch("/auth/signup", {
       method: "POST",
       body: JSON.stringify(sValue),
       headers: {
@@ -51,9 +59,12 @@ export default function Login(props) {
     marginTop: "100px",
   };
 
-  if (islogged) {
-    return <Redirect to="/home" />;
-  }
+  //if (islogged) {
+  //  // setTimeout(() => {
+  //  console.log("2");
+  //  history.push("/home");
+  //  //}, 100);
+  //}
 
   return (
     <div style={divLog}>

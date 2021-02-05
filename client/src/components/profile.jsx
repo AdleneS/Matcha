@@ -95,9 +95,6 @@ class profile extends Component {
       fetch("/profile/gallery/" + urlParam.get("uid"))
         .then((res) => res.json())
         .then((gallery) => this.setState({ gallery }));
-      fetch("/change/tag")
-        .then((response) => response.json())
-        .then((tag) => this.setState({ tag }));
     }
   }
 
@@ -297,10 +294,10 @@ class profile extends Component {
 
               <Col className="test block" style={{ height: "140px" }}>
                 <div style={{ marginBot: "50px" }}>
-                  {this.state.tag.map((tag) => (
-                    <h5 key={tag.id} style={{ display: "inline-block", marginRight: "5px" }}>
+                  {user.tag.map((tag, i) => (
+                    <h5 key={i} style={{ display: "inline-block", marginRight: "5px" }}>
                       <Badge pill variant="dark">
-                        {tag.tag}
+                        {tag}
                       </Badge>
                     </h5>
                   ))}

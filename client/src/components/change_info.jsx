@@ -30,9 +30,6 @@ class ChangeInfo extends Component {
   }
 
   async componentDidMount() {
-    fetch("/change/tag")
-      .then((response) => response.json())
-      .then((tag) => this.setState({ tag }));
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
@@ -49,6 +46,7 @@ class ChangeInfo extends Component {
           sexual_orientation: res[0].sexual_orientation.charAt(0).toUpperCase() + res[0].sexual_orientation.slice(1),
           description: res[0].description,
           location: res[0].country,
+          tag: res[0].tag,
         });
       });
   }
@@ -76,9 +74,13 @@ class ChangeInfo extends Component {
         "Content-type": "application/json",
       },
     }).then((response) => response.json());
-    fetch("/change/tag")
-      .then((response) => response.json())
-      .then((tag) => this.setState({ tag }));
+    fetch("/users/uid/")
+      .then((res) => res.json())
+      .then((res) => {
+        this.setState({
+          tag: res[0].tag,
+        });
+      });
   };
 
   handleInputChange = (event) => {
@@ -113,12 +115,16 @@ class ChangeInfo extends Component {
         "Content-type": "application/json",
       },
     }).then((response) => response.json().then((data) => ({ status: response.status, body: data })));
-    fetch("/change/tag")
-      .then((response) => response.json())
-      .then((tag) => this.setState({ tag }));
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
+    fetch("/users/uid/")
+      .then((res) => res.json())
+      .then((res) => {
+        this.setState({
+          tag: res[0].tag,
+        });
+      });
   };
 
   render() {
@@ -267,16 +273,16 @@ class ChangeInfo extends Component {
             </Form.Group>
 
             <div style={{ marginBot: "50px" }}>
-              {this.state.tag.map((tag) => (
-                <h5 key={tag.id} style={{ display: "inline-block", marginRight: "5px" }}>
+              {this.state.tag.map((tag, i) => (
+                <h5 key={i} style={{ display: "inline-block", marginRight: "5px" }}>
                   <Badge
                     pill
                     variant="dark"
                     onClick={(event) => {
-                      this.onClick(event, tag.tag);
+                      this.onClick(event, tag);
                     }}
                   >
-                    {tag.tag}
+                    {tag}
                   </Badge>
                 </h5>
               ))}

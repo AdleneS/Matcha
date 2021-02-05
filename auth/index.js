@@ -49,17 +49,19 @@ router.post("/signup", (req, res, next) => {
             } else {
               res
                 .cookie("ssid", token, {
-                  maxAge: 72000000,
+                  expires: new Date(Date.now() + 86400 * 1000),
+                  //maxAge: 72000000,
                   httpOnly: true,
                   secure: false,
-                  sameSite: "strict",
+                  sameSite: "Lax",
                   signed: true,
                 })
                 .cookie("info", info, {
-                  maxAge: 72000000,
+                  expires: new Date(Date.now() + 86400 * 1000),
+                  //maxAge: 72000000,
                   httpOnly: true,
                   secure: false,
-                  sameSite: "strict",
+                  sameSite: "Lax",
                   signed: true,
                 })
                 .json({ message: "Logged !", uid: rows.uid })

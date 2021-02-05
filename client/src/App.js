@@ -6,7 +6,7 @@ import Home from "./components/home";
 import Chat from "./components/chat";
 import Register from "./components/register";
 import ErrorPage from "./components/404";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import MyContext from "./components/appcontext";
 import ChangeInfo from "./components/change_info";
 import Profile from "./components/profile";
@@ -30,7 +30,7 @@ export default function App() {
           <NavBar socket={socket}></NavBar>
           <Switch>
             <Route exact path="/">
-              <Redirect to="/home" />
+              <WithAuth path="/home" component={Home} socket={socket} />
             </Route>
             <WithAuth path="/changeinfo" component={ChangeInfo} socket={socket} />
             <WithAuth path="/home" component={Home} socket={socket} />

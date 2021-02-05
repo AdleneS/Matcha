@@ -16,7 +16,7 @@ const getUsers = (request, response) => {
 
 const getUsersByUid = (request, response) => {
   pool.query(
-    "SELECT email, firstname, gender, popularity, sexual_orientation, name, login, gender, description, birthday, country FROM users WHERE uid = $1",
+    "SELECT users.id, email, firstname, gender, popularity, sexual_orientation, name, login, gender, description, birthday, country, array_agg(tag.tag) as tag FROM users LEFT JOIN tag ON tag.uid = users.uid WHERE users.uid = $1 GROUP BY users.id",
     [request.signedCookies.info.uid],
     (error, results) => {
       if (error) {

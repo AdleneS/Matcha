@@ -12,6 +12,7 @@ import { FaHeart } from "react-icons/fa";
 import { FaTag } from "react-icons/fa";
 import { GiAges } from "react-icons/gi";
 import Form from "react-bootstrap/Form";
+import Badge from "react-bootstrap/Badge";
 
 class Home extends Component {
   constructor(props) {
@@ -245,25 +246,25 @@ class Home extends Component {
           <Form.Group controlId="filterAge">
             <GiAges
               onClick={() => this.handleFilter("age")}
-              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+              style={{ marginLeft: "10px", height: "25px", width: "25px" }}
             ></GiAges>
           </Form.Group>
           <Form.Group controlId="filterLocation">
             <FaMapPin
               onClick={() => this.handleFilter("location")}
-              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+              style={{ marginLeft: "10px", height: "20px", width: "20px" }}
             ></FaMapPin>
           </Form.Group>
           <Form.Group controlId="filterPopularity">
             <FaHeart
               onClick={() => this.handleFilter("popularity")}
-              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+              style={{ marginLeft: "10px", height: "20px", width: "20px" }}
             ></FaHeart>
           </Form.Group>
           <Form.Group controlId="filterTag">
             <FaTag
               onClick={() => this.handleFilter("tag")}
-              style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+              style={{ marginLeft: "10px", height: "20px", width: "20px" }}
             ></FaTag>
           </Form.Group>
         </div>
@@ -344,6 +345,19 @@ class Home extends Component {
                           position: "absolute",
                         }}
                       />
+                      <div style={{ marginTop: "50px", display: "flex", flexWrap: "wrap" }}>
+                        {pretender.tag[0] !== null &&
+                          pretender.tag.map(
+                            (tag, i) =>
+                              i < 6 && (
+                                <div key={i} style={{ marginRight: "5px", maxWidth: "80px", overflow: "hidden" }}>
+                                  <Badge pill variant="dark">
+                                    {tag}
+                                  </Badge>
+                                </div>
+                              )
+                          )}
+                      </div>
                     </div>
                   </Card>
                 </Link>

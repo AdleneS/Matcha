@@ -1,9 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import Spinner from "react-bootstrap/Spinner";
-import { Route } from "react-router-dom";
+import { Route, useHistory } from "react-router-dom";
 import MyContext from "./components/appcontext";
-import ChangeInfo from "./components/change_info";
-import Login from "./components/Login";
 
 const WithAuth = ({ component: Component, socket, ...rest }) => {
   const [loading, setLoading] = useState(null);
@@ -11,6 +9,7 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
   const [alert, setAlert] = useState(null);
   const [uid, setUid] = useState(null);
   const { islogged, setIsLogged } = useContext(MyContext);
+  let history = useHistory();
 
   useEffect(() => {
     fetch("/checkCookie")
@@ -78,7 +77,13 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
         setRedirect(true);
         throw err;
       });
-  });
+  }, [Component, setIsLogged]);
+
+  useEffect(() => {
+    if (!islogged) {
+      history.push("/login");
+    }
+  }, [islogged, history]);
 
   const spin = {
     margin: "0 auto",
@@ -95,9 +100,11 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
       );
     } else if (redirect) {
       setIsLogged(false);
-      return <Login socket={socket} />;
+      //history.push("/login");
+      //return <Login socket={socket} />;
     } else if (alert && islogged) {
-      return <ChangeInfo alert="true" />;
+      history.push("/changeinfo", { alert: true });
+      //return <ChangeInfo alert="true" />;
     } else if (!loading && !redirect && !alert) {
       socket.emit("FromAPI", uid);
       return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;

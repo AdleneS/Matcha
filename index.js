@@ -67,8 +67,8 @@ app.get("/checkCookie", withAuth, function (req, res) {
     [req.signedCookies.info.uid, req.signedCookies.info.session],
     (error, results) => {
       if (error) {
-        res.clearCookie("ssid");
-        res.clearCookie("info");
+        //res.clearCookie("ssid");
+        //res.clearCookie("info");
         res.status(400).json({
           error: "Bad Cookie",
         });
@@ -76,8 +76,8 @@ app.get("/checkCookie", withAuth, function (req, res) {
       } else if (results.rowCount) {
         res.json({ message: "Logged !", uid: results.rows[0].uid }).status(200);
       } else {
-        res.clearCookie("ssid");
-        res.clearCookie("info");
+        //res.clearCookie("ssid");
+        //res.clearCookie("info");
         res.status(400).json({
           error: "Bad Cookies",
         });
@@ -87,21 +87,24 @@ app.get("/checkCookie", withAuth, function (req, res) {
 });
 
 app.get("/logout", function (req, res) {
+  date = new Date();
+  console.log(date);
   db.setDisconnected(req.signedCookies.info.uid);
-  res.clearCookie("ssid", {
-    maxAge: 72000000,
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-    signed: true,
-  });
-  res.clearCookie("info", {
-    maxAge: 72000000,
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-    signed: true,
-  });
+  res
+    .cookie("ssid", "", {
+      expires: new Date(1),
+      httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+      signed: true,
+    })
+    .cookie("info", "", {
+      expires: new Date(1),
+      httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+      signed: true,
+    });
   res.sendStatus(200);
 });
 
@@ -186,7 +189,7 @@ app.get("/profile/getBlock/:uid", db.getBlock);
 app.get("/change/sortImage", info.sortImage);
 app.post("/change/deleteImage", info.deleteImage);
 app.post("/change/deleteTag", info.deleteTag);
-app.get("/change/tag", info.sortTags);
+app.get("/change/tag/:uid", info.sortTags);
 app.post("/change/login", info.updateLogin);
 
 app.post("/email/confirm", email.confirmEmail);

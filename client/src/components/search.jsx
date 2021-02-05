@@ -15,6 +15,8 @@ import { FaTag } from "react-icons/fa";
 import { GiAges } from "react-icons/gi";
 import InfiniteScroll from "react-infinite-scroller";
 import Spinner from "react-bootstrap/Spinner";
+import Badge from "react-bootstrap/Badge";
+
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
 
@@ -30,6 +32,7 @@ class Search extends Component {
       offset: 0,
       hasMore: false,
       loading: true,
+      timer: null,
       filter: { age: false, location: false, popularity: false, tag: false },
       gender: [
         {
@@ -172,8 +175,14 @@ class Search extends Component {
   };
 
   handleLocation = async (event) => {
-    await this.setState({ locationValue: event.target.value });
-    this.filteringPretender();
+    event.persist();
+    this.setState({ timer: clearTimeout(this.state.timer) });
+    this.setState({
+      timer: setTimeout(() => {
+        this.setState({ locationValue: event.target.value });
+        this.filteringPretender();
+      }, 1000),
+    });
   };
 
   handleOrientation = async (event) => {
@@ -192,11 +201,17 @@ class Search extends Component {
   };
 
   handleTag = async (event) => {
+    event.persist();
     if (event.target.value === "") {
       this.setState({ tagValue: [] });
     }
-    await this.setState({ tagValue: event.target.value.split(" ") });
-    this.filteringPretender();
+    this.setState({ timer: clearTimeout(this.state.timer) });
+    this.setState({
+      timer: setTimeout(() => {
+        this.setState({ tagValue: event.target.value.split(" ") });
+        this.filteringPretender();
+      }, 1000),
+    });
   };
 
   filteringPretender = () => {
@@ -219,10 +234,9 @@ class Search extends Component {
       })
         .then((res) =>
           res.json().then((data) => {
+            console.log(data);
             if (data.length >= 50) {
               this.setState({ hasMore: true });
-            } else {
-              this.setState({ hasMore: false });
             }
             this.setState({
               filtredPretender: data,
@@ -382,8 +396,10 @@ class Search extends Component {
   wrapperStyle = { width: 200, marginLeft: "10px" };
   render() {
     const spin = {
-      width: "25px",
-      height: "25px",
+      width: "50px",
+      height: "50px",
+      marginRight: "auto",
+      marginLeft: "auto",
       color: "white !important",
     };
     const { gender, genderValue, orientation, orientationValue } = this.state;
@@ -425,12 +441,18 @@ class Search extends Component {
 
             <Form.Group className="select" controlId="formLocation">
               <Form.Label>Location</Form.Label>
-              <Form.Control onChange={this.handleLocation} type="text" placeholder="Location" />
+              <Form.Control
+                onChange={(event) => {
+                  this.handleLocation(event);
+                }}
+                type="text"
+                placeholder="Location"
+              />
             </Form.Group>
 
             <Form.Group className="select" controlId="formTag">
               <Form.Label>Tags</Form.Label>
-              <Form.Control onChange={this.handleTag} type="text" placeholder="Tag.. Tag.." />
+              <Form.Control onChange={(event) => this.handleTag(event)} type="text" placeholder="Tag.. Tag.." />
             </Form.Group>
 
             <Form.Group className="select" controlId="formPopularity">
@@ -464,37 +486,48 @@ class Search extends Component {
               <Form.Group controlId="filterAge">
                 <GiAges
                   onClick={() => this.handleFilter("age")}
-                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                  style={{ marginLeft: "10px", height: "25px", width: "25px" }}
                 ></GiAges>
               </Form.Group>
               <Form.Group controlId="filterLocation">
                 <FaMapPin
                   onClick={() => this.handleFilter("location")}
-                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                  style={{ marginLeft: "10px", height: "20px", width: "20px" }}
                 ></FaMapPin>
               </Form.Group>
               <Form.Group controlId="filterPopularity">
                 <FaHeart
                   onClick={() => this.handleFilter("popularity")}
-                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                  style={{ marginLeft: "10px", height: "20px", width: "20px" }}
                 ></FaHeart>
               </Form.Group>
               <Form.Group controlId="filterTag">
                 <FaTag
                   onClick={() => this.handleFilter("tag")}
-                  style={{ marginLeft: "10px", height: "35px", width: "35px" }}
+                  style={{ marginLeft: "10px", height: "20px", width: "20px" }}
                 ></FaTag>
               </Form.Group>
             </div>
           </Form>
         </div>
+
         <div style={{ overflow: "hidden" }}>
           <InfiniteScroll
             loadMore={this.loadMore.bind(this)}
             hasMore={this.state.hasMore}
             loader={
-              <div key={0}>
-                <Spinner style={spin} animation="border" variant="dark" />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                  color: "white !important",
+                }}
+                key={0}
+                className="text-dark"
+              >
+                <Spinner style={spin} animation="border" variant="light" />
               </div>
             }
             useWindow={true}
@@ -570,6 +603,19 @@ class Search extends Component {
                             position: "absolute",
                           }}
                         />
+                        <div style={{ marginTop: "50px", display: "flex", flexWrap: "wrap" }}>
+                          {pretender.tag[0] !== null &&
+                            pretender.tag.map(
+                              (tag, i) =>
+                                i < 6 && (
+                                  <div key={i} style={{ marginRight: "5px", maxWidth: "80px", overflow: "hidden" }}>
+                                    <Badge pill variant="dark">
+                                      {tag}
+                                    </Badge>
+                                  </div>
+                                )
+                            )}
+                        </div>
                       </div>
                     </Card>
                   </Link>
