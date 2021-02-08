@@ -5,6 +5,7 @@ import logo from "../imgs/logoMatcha.png";
 import MyContext from "./appcontext";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
+import "./navbar.scss";
 import { Link } from "react-router-dom";
 import { BsGearFill } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
@@ -75,116 +76,121 @@ export default function Mynav(props) {
     margin: "auto",
     borderBottom: "1px solid rgb(13, 13, 14)",
     color: "white",
-    display: "flex",
     flexWrap: "wrap",
+    display: "flex",
+    justifyContent: "space-between",
   };
 
   return (
     <Navbar className="nav-flat fixed-top" style={navBarStyle} variant="dark">
-      {islogged && (
-        <Link to={"/home"}>
-          <Navbar.Brand>
+      <div className="leftNavBar">
+        {islogged && (
+          <Link to={"/home"} className="navBarLogo">
+            <Navbar.Brand>
+              <img src={logo} width="150" height="50" className="d-inline-block align-top" alt="Matcha" />
+            </Navbar.Brand>
+          </Link>
+        )}
+        {!islogged && (
+          <Navbar.Brand className="navBarLogo">
             <img src={logo} width="150" height="50" className="d-inline-block align-top" alt="React Bootstrap logo" />
           </Navbar.Brand>
-        </Link>
-      )}
-      {!islogged && (
-        <Navbar.Brand>
-          <img src={logo} width="150" height="50" className="d-inline-block align-top" alt="React Bootstrap logo" />
-        </Navbar.Brand>
-      )}
-      <Nav className="mr-auto">
-        {islogged && (
-          <Link className="nav-link" to={"/home"}>
-            {" "}
-            Home{" "}
-          </Link>
         )}
-
-        {!islogged && (
-          <Link className="nav-link" to={"/login"}>
-            {" "}
-            Login{" "}
-          </Link>
-        )}
-        {!islogged && (
-          <Link className="nav-link" to={"/register"}>
-            {" "}
-            Sign In{" "}
-          </Link>
-        )}
-        {islogged && cookie && (
-          <Link className="nav-link" to={"/profile/user/?uid=" + cookie.info.uid}>
-            {" "}
-            Profil{" "}
-          </Link>
-        )}
-        {islogged && (
-          <Link className="nav-link" to={"/chat/0"}>
-            {" "}
-            Chat{" "}
-          </Link>
-        )}
-        {islogged && (
-          <Navbar.Text className="nav-link" style={{ cursor: "pointer" }} onClick={handleClick}>
-            {" "}
-            Log Out{" "}
-          </Navbar.Text>
-        )}
-      </Nav>
-      {islogged && (
-        <Link to={"/search"}>
-          <FaSearch
-            style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
-          ></FaSearch>
-        </Link>
-      )}
-      {islogged && (
-        <Link to={"/changeinfo"}>
-          <BsGearFill
-            style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
-          ></BsGearFill>
-        </Link>
-      )}
-      {islogged && (
-        <DropdownButton
-          onClick={(event) => {
-            onNotifClick(event);
-          }}
-          variant={nb_notif ? "danger" : "secondary"}
-          id="dropdown-button-drop-left"
-          drop="left"
-          title={nb_notif ? nb_notif + " Notifications" : "Notification"}
-        >
-          {notifs.length ? (
-            notifs.map((notifs) =>
-              notifs.notif_type === "message" ? (
-                <Link className="dropdown-item" to={"/chat/" + notifs.notifier_uid} key={notifs.id}>
-                  <span role="img" aria-label="speech">
-                    💬
-                  </span>{" "}
-                  {notifs.notifier_login} sent you a {notifs.notif_type}{" "}
-                </Link>
-              ) : (
-                <Link className="dropdown-item" to={"/profile/?uid=" + notifs.notifier_uid} key={notifs.id}>
-                  <span role="img" aria-label="heart">
-                    ❤️
-                  </span>{" "}
-                  {notifs.notifier_login} {notifs.notif_type}ed you{" "}
-                </Link>
-              )
-            )
-          ) : (
-            <Dropdown.Item>
+        <Nav className="mr-auto">
+          {islogged && (
+            <Link className="nav-link" to={"/home"}>
               {" "}
-              Vous n'avez pas de notification{" "}
-              <span role="img" aria-label="bad">
-                ☹️
-              </span>{" "}
-            </Dropdown.Item>
+              Home{" "}
+            </Link>
           )}
-        </DropdownButton>
-      )}
+
+          {!islogged && (
+            <Link className="nav-link" to={"/login"}>
+              {" "}
+              Login{" "}
+            </Link>
+          )}
+          {!islogged && (
+            <Link className="nav-link" to={"/register"}>
+              {" "}
+              Sign In{" "}
+            </Link>
+          )}
+          {islogged && cookie && (
+            <Link className="nav-link" to={"/profile/user/?uid=" + cookie.info.uid}>
+              {" "}
+              Profil{" "}
+            </Link>
+          )}
+          {islogged && (
+            <Link className="nav-link" to={"/chat/0"}>
+              {" "}
+              Chat{" "}
+            </Link>
+          )}
+          {islogged && (
+            <Navbar.Text className="nav-link" style={{ cursor: "pointer" }} onClick={handleClick}>
+              {" "}
+              Log Out{" "}
+            </Navbar.Text>
+          )}
+        </Nav>
+      </div>
+      <div className="rightNavBar">
+        {islogged && (
+          <Link to={"/search"}>
+            <FaSearch
+              style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
+            ></FaSearch>
+          </Link>
+        )}
+        {islogged && (
+          <Link to={"/changeinfo"}>
+            <BsGearFill
+              style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
+            ></BsGearFill>
+          </Link>
+        )}
+        {islogged && (
+          <DropdownButton
+            onClick={(event) => {
+              onNotifClick(event);
+            }}
+            variant={nb_notif ? "danger" : "secondary"}
+            id="dropdown-button-drop-left"
+            drop="left"
+            title={nb_notif ? nb_notif + "" : ""}
+          >
+            {notifs.length ? (
+              notifs.map((notifs) =>
+                notifs.notif_type === "message" ? (
+                  <Link className="dropdown-item" to={"/chat/" + notifs.notifier_uid} key={notifs.id}>
+                    <span role="img" aria-label="speech">
+                      💬
+                    </span>{" "}
+                    {notifs.notifier_login} sent you a {notifs.notif_type}{" "}
+                  </Link>
+                ) : (
+                  <Link className="dropdown-item" to={"/profile/?uid=" + notifs.notifier_uid} key={notifs.id}>
+                    <span role="img" aria-label="heart">
+                      ❤️
+                    </span>{" "}
+                    {notifs.notifier_login} {notifs.notif_type}ed you{" "}
+                  </Link>
+                )
+              )
+            ) : (
+              <Dropdown.Item>
+                {" "}
+                Vous n'avez pas de notification{" "}
+                <span role="img" aria-label="bad">
+                  ☹️
+                </span>{" "}
+              </Dropdown.Item>
+            )}
+          </DropdownButton>
+        )}
+      </div>
     </Navbar>
   );
 }

@@ -57,7 +57,7 @@ class profile extends Component {
             this.setState({ user });
           }
         });
-      if (this.state.user[0].uid === this.state.cookie.info.uid) {
+      if (this.state.user[0]?.uid === this.state.cookie.info.uid) {
         this.setState({ is_user_logged: false });
       } else {
         fetch("/profile/like/" + urlParam.get("uid"))
@@ -292,7 +292,7 @@ class profile extends Component {
                 </Row>
               )}
 
-              <Col className="test block" style={{ height: "140px" }}>
+              <div className="test block" style={{ marginRight: "-15px", marginLeft: "-15px" }}>
                 <div style={{ marginBot: "50px" }}>
                   {user.tag.map((tag, i) => (
                     <h5 key={i} style={{ display: "inline-block", marginRight: "5px" }}>
@@ -305,7 +305,7 @@ class profile extends Component {
                 <div>
                   <p>{user.description}</p>
                 </div>
-              </Col>
+              </div>
             </div>
           ))}
           <div id="galery" className="gallery">

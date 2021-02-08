@@ -33,7 +33,6 @@
 $size: 6;
 .gallery {
   display: grid;
-  //height: calc(100vh - 77px);
   grid-template: repeat(3, 1fr) / repeat(5, 1fr);
   grid-gap: 0.5em;
   margin: 10px -15px 10px -15px;

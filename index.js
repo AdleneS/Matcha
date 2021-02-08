@@ -88,21 +88,20 @@ app.get("/checkCookie", withAuth, function (req, res) {
 
 app.get("/logout", function (req, res) {
   date = new Date();
-  console.log(date);
   db.setDisconnected(req.signedCookies.info.uid);
   res
     .cookie("ssid", "", {
-      expires: new Date(1),
+      expires: new Date(Date.now() + 86400 * 1000),
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "strict",
       signed: true,
     })
     .cookie("info", "", {
-      expires: new Date(1),
+      expires: new Date(Date.now() + 86400 * 1000),
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: "strict",
       signed: true,
     });
   res.sendStatus(200);

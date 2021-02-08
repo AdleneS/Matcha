@@ -67,9 +67,10 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
           setLoading(false);
           setRedirect(false);
         } else {
-          setRedirect(true);
           setLoading(false);
           setAlert(false);
+          setRedirect(true);
+          history.push("/login");
         }
       })
       .catch((err) => {
@@ -77,13 +78,7 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
         setRedirect(true);
         throw err;
       });
-  }, [Component, setIsLogged]);
-
-  useEffect(() => {
-    if (!islogged) {
-      history.push("/login");
-    }
-  }, [islogged, history]);
+  }, [Component, setIsLogged, setRedirect, islogged, history]);
 
   const spin = {
     margin: "0 auto",
@@ -100,11 +95,8 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
       );
     } else if (redirect) {
       setIsLogged(false);
-      //history.push("/login");
-      //return <Login socket={socket} />;
     } else if (alert && islogged) {
       history.push("/changeinfo", { alert: true });
-      //return <ChangeInfo alert="true" />;
     } else if (!loading && !redirect && !alert) {
       socket.emit("FromAPI", uid);
       return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;

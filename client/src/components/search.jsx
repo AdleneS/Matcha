@@ -217,7 +217,6 @@ class Search extends Component {
   filteringPretender = () => {
     this.setState({ offset: 0, limit: 50, hasMore: true });
     setTimeout(async () => {
-      console.log(this.state.popularityValue);
       await fetch("/search/" + this.state.offset + "/" + this.state.limit, {
         method: "POST",
         body: JSON.stringify({
@@ -234,7 +233,6 @@ class Search extends Component {
       })
         .then((res) =>
           res.json().then((data) => {
-            console.log(data);
             if (data.length >= 50) {
               this.setState({ hasMore: true });
             }

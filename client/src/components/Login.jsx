@@ -49,22 +49,15 @@ export default function Login(props) {
   };
 
   const divLog = {
-    width: "400px",
-    height: "320px",
-    backgroundColor: "#1d1c22",
+    width: "350px",
+    height: "300px",
+    backgroundColor: "rgba(0, 0, 0, 0.18)",
+    borderRadius: "5px",
     padding: "9px",
     color: "white",
-    borderBottom: "1px solid #111111",
     margin: "Auto",
     marginTop: "100px",
   };
-
-  //if (islogged) {
-  //  // setTimeout(() => {
-  //  console.log("2");
-  //  history.push("/home");
-  //  //}, 100);
-  //}
 
   return (
     <div style={divLog}>
@@ -104,7 +97,7 @@ export default function Login(props) {
           Reset password
         </Link>
         <br />
-        <Button style={{ marginTop: "25px" }} variant="primary" type="submit">
+        <Button style={{ marginTop: "25px", width: "100%" }} variant="primary" type="submit">
           Submit
         </Button>
       </Form>

@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 import Image from "react-bootstrap/Image";
 import { Link } from "react-router-dom";
 
-import "./chat.css";
+import "./chat.scss";
 import "./animation.css";
 
 class Chat extends Component {

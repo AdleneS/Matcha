@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Moment from "moment";
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
-import "./home.css";
+import "./home.scss";
 import "./animation.css";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { FaCircle } from "react-icons/fa";
@@ -242,7 +242,7 @@ class Home extends Component {
     Moment.locale("fr");
     return (
       <div style={{ overflow: "auto" }}>
-        <div style={{ display: "flex", marginTop: "100px", color: "white", marginLeft: "35px" }}>
+        <div className="filterContainer">
           <Form.Group controlId="filterAge">
             <GiAges
               onClick={() => this.handleFilter("age")}
