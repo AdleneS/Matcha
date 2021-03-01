@@ -15,6 +15,7 @@ import Form from "react-bootstrap/Form";
 import Badge from "react-bootstrap/Badge";
 
 class Home extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
@@ -32,27 +33,43 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
     fetch("/cookie/")
       .then((res) => res.json())
-      .then((cookie) => this.setState({ cookie }));
+      .then((cookie) => {
+        if (this._isMounted) {
+          this.setState({ cookie });
+        }
+      });
     fetch("/users/uid/")
       .then((res) => res.json())
       .then((user) => {
-        this.setState({ user });
+        if (this._isMounted) {
+          this.setState({ user });
+        }
       });
     fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
       .then((res) => res.json())
       .then((pretender) => {
-        this.setState({
-          pretender,
-          offset: this.state.offset + 50,
-          loading: false,
-        });
+        if (this._isMounted) {
+          this.setState({
+            pretender,
+            offset: this.state.offset + 50,
+            loading: false,
+          });
+        }
       });
     fetch("/users/likes")
       .then((res) => res.json())
-      .then((likes) => this.setState({ likes }));
-    this.setState({ isMounted: true });
+      .then((likes) => {
+        if (this._isMounted) {
+          this.setState({ likes });
+        }
+      });
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   addNotif = (data) => {
@@ -76,7 +93,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -104,7 +123,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -136,7 +157,9 @@ class Home extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           const data = {
@@ -146,7 +169,8 @@ class Home extends Component {
           this.props.socket.emit("sendNotif", pretenderUid);
           this.addNotif(data);
           if (res.body.info === "like") this.addMatch(pretenderUid, data);
-          else if (res.body.info === "unlike") this.deleteMatch(pretenderUid, data);
+          else if (res.body.info === "unlike")
+            this.deleteMatch(pretenderUid, data);
           fetch("/users/likes")
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
@@ -167,7 +191,9 @@ class Home extends Component {
     setTimeout(async () => {
       this.setState({ loading: true });
       await fetch("/pretender/" + this.state.offset + "/" + this.state.limit)
-        .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+        .then((res) =>
+          res.json().then((data) => ({ status: res.status, body: data }))
+        )
         .then(async (res) => {
           this.setState({
             offset: this.state.offset + 50,
@@ -189,12 +215,24 @@ class Home extends Component {
       if (!this.state.filter.age) {
         this.setState({
           pretender: this.state.pretender.sort((b, a) => {
-            return Moment().diff(a.birthday, "years") - Moment().diff(b.birthday, "years");
+            return (
+              Moment().diff(a.birthday, "years") -
+              Moment().diff(b.birthday, "years")
+            );
           }),
         });
-        this.setState({ filter: { age: true, location: false, popularity: false, tag: false } });
+        this.setState({
+          filter: { age: true, location: false, popularity: false, tag: false },
+        });
       } else {
-        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+        this.setState({
+          filter: {
+            age: false,
+            location: false,
+            popularity: false,
+            tag: false,
+          },
+        });
       }
     } else if (event === "location") {
       if (!this.state.filter.location) {
@@ -209,9 +247,18 @@ class Home extends Component {
             return 0;
           }),
         });
-        this.setState({ filter: { age: false, location: true, popularity: false, tag: false } });
+        this.setState({
+          filter: { age: false, location: true, popularity: false, tag: false },
+        });
       } else {
-        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+        this.setState({
+          filter: {
+            age: false,
+            location: false,
+            popularity: false,
+            tag: false,
+          },
+        });
       }
     } else if (event === "popularity") {
       if (!this.state.filter.popularity) {
@@ -220,9 +267,18 @@ class Home extends Component {
             return a.popularity - b.popularity;
           }),
         });
-        this.setState({ filter: { age: false, location: false, popularity: true, tag: false } });
+        this.setState({
+          filter: { age: false, location: false, popularity: true, tag: false },
+        });
       } else {
-        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+        this.setState({
+          filter: {
+            age: false,
+            location: false,
+            popularity: false,
+            tag: false,
+          },
+        });
       }
     } else if (event === "tag") {
       if (!this.state.filter.tag) {
@@ -231,9 +287,18 @@ class Home extends Component {
             return a.tag.length - b.tag.length;
           }),
         });
-        this.setState({ filter: { age: false, location: false, popularity: false, tag: true } });
+        this.setState({
+          filter: { age: false, location: false, popularity: false, tag: true },
+        });
       } else {
-        this.setState({ filter: { age: false, location: false, popularity: false, tag: false } });
+        this.setState({
+          filter: {
+            age: false,
+            location: false,
+            popularity: false,
+            tag: false,
+          },
+        });
       }
     }
   };
@@ -291,7 +356,8 @@ class Home extends Component {
                       src={
                         pretender.path
                           ? process.env.PUBLIC_URL + pretender.path
-                          : "https://source.unsplash.com/collection/159213/sig=" + i
+                          : "https://source.unsplash.com/collection/159213/sig=" +
+                            i
                       }
                     />
                     <div className="overlay">
@@ -299,7 +365,9 @@ class Home extends Component {
                         {pretender.login}{" "}
                         <span>
                           {pretender.connected ? (
-                            <FaCircle style={{ color: "green", width: "10px" }} />
+                            <FaCircle
+                              style={{ color: "green", width: "10px" }}
+                            />
                           ) : (
                             <FaCircle style={{ color: "red", width: "10px" }} />
                           )}
@@ -309,8 +377,10 @@ class Home extends Component {
                       <Card.Text>
                         {Moment().diff(pretender.birthday, "years")} years old
                         <br></br>
-                        {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
-                        {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
+                        {pretender.gender.charAt(0).toUpperCase() +
+                          pretender.gender.slice(1)}{" "}
+                        {pretender.sexual_orientation.charAt(0).toUpperCase() +
+                          pretender.sexual_orientation.slice(1)}
                         <br></br>
                         Popularity: {pretender.popularity}
                         <br></br>
@@ -345,12 +415,25 @@ class Home extends Component {
                           position: "absolute",
                         }}
                       />
-                      <div style={{ marginTop: "50px", display: "flex", flexWrap: "wrap" }}>
+                      <div
+                        style={{
+                          marginTop: "50px",
+                          display: "flex",
+                          flexWrap: "wrap",
+                        }}
+                      >
                         {pretender.tag[0] !== null &&
                           pretender.tag.map(
                             (tag, i) =>
                               i < 6 && (
-                                <div key={i} style={{ marginRight: "5px", maxWidth: "80px", overflow: "hidden" }}>
+                                <div
+                                  key={i}
+                                  style={{
+                                    marginRight: "5px",
+                                    maxWidth: "80px",
+                                    overflow: "hidden",
+                                  }}
+                                >
                                   <Badge pill variant="dark">
                                     {tag}
                                   </Badge>

@@ -1,13 +1,15 @@
 import React, { Component } from "react";
-import Form from "react-bootstrap/Form";
-import Col from "react-bootstrap/Col";
+import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
 import Image from "react-bootstrap/Image";
 import "./change_info.css";
-import Alert from "react-bootstrap/Alert";
 
 class ChangeInfo extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -29,26 +31,43 @@ class ChangeInfo extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this._isMounted = true;
+
     fetch("/change/sortImage")
       .then((response) => response.json())
-      .then((image) => this.setState({ image }));
-    await fetch("/users/uid/")
+      .then((image) => {
+        if (this._isMounted) {
+          this.setState({ image });
+        }
+      });
+    fetch("/users/uid/")
       .then((res) => res.json())
       .then((res) => {
-        this.setState({
-          login: res[0].login,
-          email: res[0].email,
-          name: res[0].name,
-          surname: res[0].firstname,
-          birthday: res[0].birthday,
-          gender: res[0].gender.charAt(0).toUpperCase() + res[0].gender.slice(1),
-          sexual_orientation: res[0].sexual_orientation.charAt(0).toUpperCase() + res[0].sexual_orientation.slice(1),
-          description: res[0].description,
-          location: res[0].country,
-          tag: res[0].tag,
-        });
+        if (!res[0]) {
+          this.props.history.push("/login");
+        } else if (this._isMounted) {
+          this.setState({
+            login: res[0].login,
+            email: res[0].email,
+            name: res[0].name,
+            surname: res[0].firstname,
+            birthday: res[0].birthday,
+            gender:
+              res[0].gender.charAt(0).toUpperCase() + res[0].gender.slice(1),
+            sexual_orientation:
+              res[0].sexual_orientation.charAt(0).toUpperCase() +
+              res[0].sexual_orientation.slice(1),
+            description: res[0].description,
+            location: res[0].country,
+            tag: res[0].tag,
+          });
+        }
       });
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   onClickImg = (event, image) => {
@@ -114,7 +133,9 @@ class ChangeInfo extends Component {
       headers: {
         "Content-type": "application/json",
       },
-    }).then((response) => response.json().then((data) => ({ status: response.status, body: data })));
+    }).then((response) =>
+      response.json().then((data) => ({ status: response.status, body: data }))
+    );
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
@@ -131,7 +152,7 @@ class ChangeInfo extends Component {
     return (
       <div>
         <div className="container containerChange">
-          {this.props?.alert ? (
+          {this.props.location.state?.alert ? (
             <Alert variant="primary">
               <Alert.Heading>Hey, nice to see you</Alert.Heading>
               <p>You have to add a profil picture to access the home page</p>
@@ -254,7 +275,7 @@ class ChangeInfo extends Component {
                 as="textarea"
                 rows="3"
                 name="description"
-                value={this.state.description}
+                value={this.state.description ? this.state.description : ""}
                 onChange={(event) => {
                   this.handleInputChange(event);
                 }}
@@ -274,7 +295,10 @@ class ChangeInfo extends Component {
 
             <div style={{ marginBot: "50px" }}>
               {this.state.tag.map((tag, i) => (
-                <h5 key={i} style={{ display: "inline-block", marginRight: "5px" }}>
+                <h5
+                  key={i}
+                  style={{ display: "inline-block", marginRight: "5px" }}
+                >
                   <Badge
                     pill
                     variant="dark"
@@ -306,7 +330,11 @@ class ChangeInfo extends Component {
                 <div key={image.id} className="thumbnail">
                   <Image
                     src={process.env.PUBLIC_URL + image.path}
-                    style={{ objectFit: "cover", width: "100%", height: "200px" }}
+                    style={{
+                      objectFit: "cover",
+                      width: "100%",
+                      height: "200px",
+                    }}
                     onClick={(event) => {
                       this.onClickImg(event, image.n_pic);
                     }}
@@ -318,7 +346,11 @@ class ChangeInfo extends Component {
                 <div className="thumbnail">
                   <Image
                     src={this.state.tmp_file}
-                    style={{ objectFit: "cover", width: "100%", height: "200px" }}
+                    style={{
+                      objectFit: "cover",
+                      width: "100%",
+                      height: "200px",
+                    }}
                     rounded
                   />
                 </div>

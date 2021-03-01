@@ -33,7 +33,9 @@ export default function Login(props) {
         "Content-type": "application/json",
       },
     })
-      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
       .then((res) => {
         if (res.status === 200) {
           props.socket.emit("FromAPI", res.body.uid);
@@ -78,7 +80,9 @@ export default function Login(props) {
             value={sValue.email}
             required
           />
-          <Form.Text className="text-muted">We'll never share your email with anyone else.</Form.Text>
+          <Form.Text className="text-muted">
+            We'll never share your email with anyone else.
+          </Form.Text>
         </Form.Group>
         <Form.Group controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
@@ -97,7 +101,11 @@ export default function Login(props) {
           Reset password
         </Link>
         <br />
-        <Button style={{ marginTop: "25px", width: "100%" }} variant="primary" type="submit">
+        <Button
+          style={{ marginTop: "25px", width: "100%" }}
+          variant="primary"
+          type="submit"
+        >
           Submit
         </Button>
       </Form>

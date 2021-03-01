@@ -6,7 +6,7 @@ import MyContext from "./appcontext";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import "./navbar.scss";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { BsGearFill } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 
@@ -16,6 +16,7 @@ export default function Mynav(props) {
   const [cookie, setCookie] = useState(null);
   const [notifs, setNotif] = useState([]);
   const socket = props.socket;
+  let history = useHistory();
 
   useEffect(() => {
     socket.on("getNotif", () => {
@@ -51,6 +52,7 @@ export default function Mynav(props) {
     fetch("/logout").then((res) => {
       if (res.status === 200) {
         setIsLogged(false);
+        history.push("/login");
       } else {
         const error = new Error(res.error);
         throw error;
@@ -87,13 +89,25 @@ export default function Mynav(props) {
         {islogged && (
           <Link to={"/home"} className="navBarLogo">
             <Navbar.Brand>
-              <img src={logo} width="150" height="50" className="d-inline-block align-top" alt="Matcha" />
+              <img
+                src={logo}
+                width="150"
+                height="50"
+                className="d-inline-block align-top"
+                alt="Matcha"
+              />
             </Navbar.Brand>
           </Link>
         )}
         {!islogged && (
           <Navbar.Brand className="navBarLogo">
-            <img src={logo} width="150" height="50" className="d-inline-block align-top" alt="React Bootstrap logo" />
+            <img
+              src={logo}
+              width="150"
+              height="50"
+              className="d-inline-block align-top"
+              alt="React Bootstrap logo"
+            />
           </Navbar.Brand>
         )}
         <Nav className="mr-auto">
@@ -117,7 +131,10 @@ export default function Mynav(props) {
             </Link>
           )}
           {islogged && cookie && (
-            <Link className="nav-link" to={"/profile/user/?uid=" + cookie.info.uid}>
+            <Link
+              className="nav-link"
+              to={"/profile/user/?uid=" + cookie.info.uid}
+            >
               {" "}
               Profil{" "}
             </Link>
@@ -129,7 +146,11 @@ export default function Mynav(props) {
             </Link>
           )}
           {islogged && (
-            <Navbar.Text className="nav-link" style={{ cursor: "pointer" }} onClick={handleClick}>
+            <Navbar.Text
+              className="nav-link"
+              style={{ cursor: "pointer" }}
+              onClick={handleClick}
+            >
               {" "}
               Log Out{" "}
             </Navbar.Text>
@@ -140,14 +161,26 @@ export default function Mynav(props) {
         {islogged && (
           <Link to={"/search"}>
             <FaSearch
-              style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
+              style={{
+                cursor: "pointer",
+                color: "#6c757d",
+                width: "30px",
+                height: "30px",
+                marginRight: "10px",
+              }}
             ></FaSearch>
           </Link>
         )}
         {islogged && (
           <Link to={"/changeinfo"}>
             <BsGearFill
-              style={{ cursor: "pointer", color: "#6c757d", width: "30px", height: "30px", marginRight: "10px" }}
+              style={{
+                cursor: "pointer",
+                color: "#6c757d",
+                width: "30px",
+                height: "30px",
+                marginRight: "10px",
+              }}
             ></BsGearFill>
           </Link>
         )}
@@ -164,14 +197,22 @@ export default function Mynav(props) {
             {notifs.length ? (
               notifs.map((notifs) =>
                 notifs.notif_type === "message" ? (
-                  <Link className="dropdown-item" to={"/chat/" + notifs.notifier_uid} key={notifs.id}>
+                  <Link
+                    className="dropdown-item"
+                    to={"/chat/" + notifs.notifier_uid}
+                    key={notifs.id}
+                  >
                     <span role="img" aria-label="speech">
                       💬
                     </span>{" "}
                     {notifs.notifier_login} sent you a {notifs.notif_type}{" "}
                   </Link>
                 ) : (
-                  <Link className="dropdown-item" to={"/profile/?uid=" + notifs.notifier_uid} key={notifs.id}>
+                  <Link
+                    className="dropdown-item"
+                    to={"/profile/?uid=" + notifs.notifier_uid}
+                    key={notifs.id}
+                  >
                     <span role="img" aria-label="heart">
                       ❤️
                     </span>{" "}

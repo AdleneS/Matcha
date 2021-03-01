@@ -23,8 +23,22 @@ const socket = io(ENDPOINT);
 export default function App() {
   const [islogged, setIsLogged] = useState(false);
 
+  fetch("/checkCookie")
+    .then((res) =>
+      res.json().then((data) => ({ status: res.status, body: data }))
+    )
+    .then((res) => {
+      if (res.status === 200) {
+        setIsLogged(true);
+      } else {
+        setIsLogged(false);
+      }
+    });
+
   return (
-    <MyContext.Provider value={{ islogged: islogged, setIsLogged: setIsLogged }}>
+    <MyContext.Provider
+      value={{ islogged: islogged, setIsLogged: setIsLogged }}
+    >
       <div className="app">
         <BrowserRouter>
           <NavBar socket={socket}></NavBar>
@@ -32,11 +46,28 @@ export default function App() {
             <Route exact path="/">
               <WithAuth path="/home" component={Home} socket={socket} />
             </Route>
-            <WithAuth path="/changeinfo" component={ChangeInfo} socket={socket} />
+            <Route
+              path="/changeinfo"
+              render={(props) => <ChangeInfo {...props} />}
+            />
             <WithAuth path="/home" component={Home} socket={socket} />
-            <WithAuth exact path="/profile" component={Profile} socket={socket} />
-            <WithAuth exact path="/profile/user/" component={Profile} socket={socket} />
-            <WithAuth path="/chat/:match_uid" component={Chat} socket={socket} />
+            <WithAuth
+              exact
+              path="/profile"
+              component={Profile}
+              socket={socket}
+            />
+            <WithAuth
+              exact
+              path="/profile/user/"
+              component={Profile}
+              socket={socket}
+            />
+            <WithAuth
+              path="/chat/:match_uid"
+              component={Chat}
+              socket={socket}
+            />
             <WithAuth path="/search/" component={Search} socket={socket} />
             <Route path="/login">
               <Login socket={socket}></Login>
