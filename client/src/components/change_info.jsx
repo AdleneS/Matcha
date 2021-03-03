@@ -5,6 +5,8 @@ import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Image from "react-bootstrap/Image";
+import Moment from "moment";
+
 import "./change_info.css";
 
 class ChangeInfo extends Component {
@@ -52,12 +54,9 @@ class ChangeInfo extends Component {
             email: res[0].email,
             name: res[0].name,
             surname: res[0].firstname,
-            birthday: res[0].birthday,
-            gender:
-              res[0].gender.charAt(0).toUpperCase() + res[0].gender.slice(1),
-            sexual_orientation:
-              res[0].sexual_orientation.charAt(0).toUpperCase() +
-              res[0].sexual_orientation.slice(1),
+            birthday: Moment(res[0].birthday).format("YYYY-MM-DD"),
+            gender: res[0].gender.charAt(0).toUpperCase() + res[0].gender.slice(1),
+            sexual_orientation: res[0].sexual_orientation.charAt(0).toUpperCase() + res[0].sexual_orientation.slice(1),
             description: res[0].description,
             location: res[0].country,
             tag: res[0].tag,
@@ -133,9 +132,7 @@ class ChangeInfo extends Component {
       headers: {
         "Content-type": "application/json",
       },
-    }).then((response) =>
-      response.json().then((data) => ({ status: response.status, body: data }))
-    );
+    }).then((response) => response.json().then((data) => ({ status: response.status, body: data })));
     fetch("/change/sortImage")
       .then((response) => response.json())
       .then((image) => this.setState({ image }));
@@ -295,10 +292,7 @@ class ChangeInfo extends Component {
 
             <div style={{ marginBot: "50px" }}>
               {this.state.tag.map((tag, i) => (
-                <h5
-                  key={i}
-                  style={{ display: "inline-block", marginRight: "5px" }}
-                >
+                <h5 key={i} style={{ display: "inline-block", marginRight: "5px" }}>
                   <Badge
                     pill
                     variant="dark"

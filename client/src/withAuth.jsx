@@ -15,9 +15,7 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
     const runAsync = async () => {
       try {
         fetch("/checkCookie")
-          .then((res) =>
-            res.json().then((data) => ({ status: res.status, body: data }))
-          )
+          .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
           .then((res) => {
             if (res.status === 200 && !isMounted) {
               setIsLogged(true);
@@ -35,8 +33,7 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
                       fetch("/users/location", {
                         method: "POST",
                         body: JSON.stringify({
-                          location:
-                            geo.results[5].address_components[1].long_name,
+                          location: geo.results[5].address_components[1].long_name,
                         }),
                         headers: {
                           "Content-type": "application/json",
@@ -77,6 +74,7 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
             } else if (!isMounted) {
               setLoading(false);
               setRedirect(true);
+              setAlert(false);
             }
           });
       } catch (e) {
@@ -106,16 +104,12 @@ const WithAuth = ({ component: Component, socket, ...rest }) => {
       );
     } else if (redirect) {
       setIsLogged(false);
+      return <Redirect to="/login" />;
     } else if (alert && islogged) {
       return <Redirect to={{ pathname: "/changeinfo", state: { alert } }} />;
     } else if (!loading && !redirect && !alert) {
       socket.emit("FromAPI", uid);
-      return (
-        <Route
-          {...rest}
-          render={(props) => <Component {...props} socket={socket} />}
-        />
-      );
+      return <Route {...rest} render={(props) => <Component {...props} socket={socket} />} />;
     }
   }
   return <div></div>;

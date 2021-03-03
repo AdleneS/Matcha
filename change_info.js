@@ -182,8 +182,7 @@ const deleteTag = (request, response) => {
 };
 
 const sortImage = (request, response) => {
-  const profile_uid = request.params.uid;
-  pool.query("SELECT * FROM img WHERE uid = $1", [profile_uid], (error, results) => {
+  pool.query("SELECT * FROM img WHERE uid = $1", [request.signedCookies.info.uid], (error, results) => {
     if (error) {
       throw error;
     } else {

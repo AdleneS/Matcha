@@ -101,7 +101,9 @@ class Search extends Component {
           });
         }
       });
-    this.setState({ filtredPretender: this.filteringPretender() });
+    if (this._isMounted) {
+      this.setState({ filtredPretender: this.filteringPretender() });
+    }
     fetch("/users/likes")
       .then((res) => res.json())
       .then((likes) => {
@@ -136,9 +138,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -166,9 +166,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           this.updatePopularity();
@@ -256,13 +254,17 @@ class Search extends Component {
         .then((res) =>
           res.json().then((data) => {
             if (data.length >= 50) {
-              this.setState({ hasMore: true });
+              if (this._isMounted) {
+                this.setState({ hasMore: true });
+              }
             }
-            this.setState({
-              filtredPretender: data,
-              offset: this.state.offset + 50,
-              loading: false,
-            });
+            if (this._isMounted) {
+              this.setState({
+                filtredPretender: data,
+                offset: this.state.offset + 50,
+                loading: false,
+              });
+            }
           })
         )
         .catch((error) => {
@@ -280,9 +282,7 @@ class Search extends Component {
         "Content-type": "application/json",
       },
     })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
+      .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
       .then((res) => {
         if (res.status === 200) {
           const data = {
@@ -292,8 +292,7 @@ class Search extends Component {
           this.props.socket.emit("sendNotif", pretenderUid);
           this.addNotif(data);
           if (res.body.info === "like") this.addMatch(pretenderUid, data);
-          else if (res.body.info === "unlike")
-            this.deleteMatch(pretenderUid, data);
+          else if (res.body.info === "unlike") this.deleteMatch(pretenderUid, data);
           fetch("/users/likes")
             .then((res) => res.json())
             .then((likes) => this.setState({ likes }));
@@ -328,9 +327,7 @@ class Search extends Component {
           "Content-type": "application/json",
         },
       })
-        .then((res) =>
-          res.json().then((data) => ({ status: res.status, body: data }))
-        )
+        .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
         .then(async (res) => {
           if (res.status === 200) {
             this.setState({
@@ -352,10 +349,7 @@ class Search extends Component {
       if (!this.state.filter.age) {
         this.setState({
           filtredPretender: this.state.filtredPretender.sort((b, a) => {
-            return (
-              Moment().diff(a.birthday, "years") -
-              Moment().diff(b.birthday, "years")
-            );
+            return Moment().diff(a.birthday, "years") - Moment().diff(b.birthday, "years");
           }),
         });
         this.setState({
@@ -483,12 +477,7 @@ class Search extends Component {
           >
             <Form.Group className="select" controlId="formGender">
               <Form.Label>Gender</Form.Label>
-              <Form.Control
-                as="select"
-                onChange={this.handleGender}
-                value={genderValue}
-                custom
-              >
+              <Form.Control as="select" onChange={this.handleGender} value={genderValue} custom>
                 {gender.map((item) => (
                   <option key={item.value} value={item.value}>
                     {item.name}
@@ -499,12 +488,7 @@ class Search extends Component {
 
             <Form.Group className="select" controlId="formOrientation">
               <Form.Label>Sexual Orientation</Form.Label>
-              <Form.Control
-                as="select"
-                onChange={this.handleOrientation}
-                value={orientationValue}
-                custom
-              >
+              <Form.Control as="select" onChange={this.handleOrientation} value={orientationValue} custom>
                 {orientation.map((item) => (
                   <option key={item.value} value={item.value}>
                     {item.name}
@@ -526,17 +510,12 @@ class Search extends Component {
 
             <Form.Group className="select" controlId="formTag">
               <Form.Label>Tags</Form.Label>
-              <Form.Control
-                onChange={(event) => this.handleTag(event)}
-                type="text"
-                placeholder="Tag.. Tag.."
-              />
+              <Form.Control onChange={(event) => this.handleTag(event)} type="text" placeholder="Tag.. Tag.." />
             </Form.Group>
 
             <Form.Group className="select" controlId="formPopularity">
               <Form.Label>
-                Popularity {this.state.popularityValue[0]} -{" "}
-                {this.state.popularityValue[1]}
+                Popularity {this.state.popularityValue[0]} - {this.state.popularityValue[1]}
               </Form.Label>
               <Range
                 onAfterChange={this.handlePopularity}
@@ -628,8 +607,7 @@ class Search extends Component {
                         src={
                           pretender.path[0]
                             ? process.env.PUBLIC_URL + pretender.path[0]
-                            : "https://source.unsplash.com/collection/159213/sig=" +
-                              i
+                            : "https://source.unsplash.com/collection/159213/sig=" + i
                         }
                       />
                       <div className="overlay">
@@ -638,25 +616,17 @@ class Search extends Component {
                           {pretender.login}{" "}
                           <span>
                             {pretender.connected ? (
-                              <FaCircle
-                                style={{ color: "green", width: "10px" }}
-                              />
+                              <FaCircle style={{ color: "green", width: "10px" }} />
                             ) : (
-                              <FaCircle
-                                style={{ color: "red", width: "10px" }}
-                              />
+                              <FaCircle style={{ color: "red", width: "10px" }} />
                             )}
                           </span>
                         </Card.Title>
                         <Card.Text>
                           {Moment().diff(pretender.birthday, "years")} years old
                           <br></br>
-                          {pretender.gender.charAt(0).toUpperCase() +
-                            pretender.gender.slice(1)}{" "}
-                          {pretender.sexual_orientation
-                            .charAt(0)
-                            .toUpperCase() +
-                            pretender.sexual_orientation.slice(1)}
+                          {pretender.gender.charAt(0).toUpperCase() + pretender.gender.slice(1)}{" "}
+                          {pretender.sexual_orientation.charAt(0).toUpperCase() + pretender.sexual_orientation.slice(1)}
                           <br></br>
                           Popularity: {pretender.popularity}
                           <br></br>
