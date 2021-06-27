@@ -8,5 +8,5 @@ const pool = new Pool({
 })
 
 pool.connect()
-
+tu es une pute
 module.exports = pool
